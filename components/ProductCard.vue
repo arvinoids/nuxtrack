@@ -1,32 +1,50 @@
 <template>
-    <div>
-        <div class="flex flex-row flex-wrap">
-            <div class="flex flex-col rounded-2xl text-center p-4 m-4 w-[200px] shadow-lg bg-gray-100">
-                <h2 class="font-semibold mb-3">{{ group.description }}</h2>                
-                    <div v-for="user in users" :key="user">
-                        <div class="text-sm">
-                                {{ user.fullname }} 
-                        </div>
-                    </div>
-                    <div class="flex flex-col flex-grow mt-3">
-                        <div class="btn btn-sm btn-success mt-auto w-20 self-center">{{ select }}</div>
-                    </div>
+    <div class="flex flex-col rounded-2xl text-center p-4 m-4 w-[200px] shadow-lg bg-gray-100">
+        <h2 class="font-semibold mb-3 text-green-700">{{ group.description }}</h2>
+        <div v-if="users.length">
+            <div v-for="(user, index) in users" :key="user">
+                <div class="text-sm" :class="{ 'next': index === 0 }" >
+                    {{ user["@expand"].user.fullname }}
+                    {{ user.count }}
+                </div>
             </div>
         </div>
+        <div v-else class="text-xs">No members currently</div>
+        <div class="flex flex-col flex-grow mt-3">
+            <div class="btn btn-sm btn-success mt-auto w-20 self-center">{{ select }}</div>
+        </div>
     </div>
+
 </template>
 
-<script setup lang="ts">
+<script setup>
 
 const app = useNuxtApp().$pb
-const props = defineProps({
-    groupId: String
-})
-const groupFilter:String = 'memberOf~'+props.groupId
+const props = defineProps({ groupId: String })
 
-const group = await app.collection('groups').getOne(props.groupId)
-const users = await app.collection('users').getList(1,100,{filter:groupFilter})
-
+const groupFilter = `memberOf~"${props.groupId}"`
 const select = "Select"
+const counterFilter = `group~"${props.groupId}"`
+
+let group = await app.collection('groups').getOne(props.groupId)
+// let users = (await app.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, sort: '+shortname' })).items
+// console.log(group)
+let users = await app.collection('counter').getList(1,100,{ filter: counterFilter, '$autoCancel': false, expand: 'user', sort: '+count' })
+users = users.items
+// console.log(users)
+
+if (!users.items) {
+    //get users that belong to this group and create a new entry for each one in the counters collection
+    let users = await app.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, })
+    users = users.items
+    for
+
+}
 
 </script>
+
+<style>
+.next {
+    @apply text-green-900 font-semibold
+}
+</style>
