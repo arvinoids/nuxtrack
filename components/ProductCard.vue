@@ -4,12 +4,16 @@
         <div v-if="users.length">
             <div v-for="(user, index) in users" :key="user">
                 <div class="text-sm" :class="{ 'next': index === 0 }" >
-                    {{ user["@expand"].user.fullname }}
+                    {{ user.expand.user.fullname }}
                     {{ user.count }}
                 </div>
             </div>
         </div>
-        <div v-else class="text-xs">No members currently</div>
+        <div v-else class="text-xs">
+            <div v-for="user in users" :key="user">
+            {{ user.fullname }}
+            </div>
+        </div>
         <div class="flex flex-col flex-grow mt-3">
             <div class="btn btn-sm btn-success mt-auto w-20 self-center">{{ select }}</div>
         </div>
@@ -30,15 +34,20 @@ let group = await app.collection('groups').getOne(props.groupId)
 // let users = (await app.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, sort: '+shortname' })).items
 // console.log(group)
 let users = await app.collection('counter').getList(1,100,{ filter: counterFilter, '$autoCancel': false, expand: 'user', sort: '+count' })
-users = users.items
+if (users.length!=0) { console.log(users.length); users = users.items;  }
+// console.log(group.name+ users.length)
 // console.log(users)
 
-if (!users.items) {
+else {
     //get users that belong to this group and create a new entry for each one in the counters collection
-    let users = await app.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, })
-    users = users.items
-    for
-
+    let res = await app.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, })
+    // console.log(group.name, res.items)
+    // for (let user in users) {
+    //     console.log (user.item)
+    // }
+    console.log(res.items)
+    users = res
+    console.log("users = "+users)
 }
 
 </script>
