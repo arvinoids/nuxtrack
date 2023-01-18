@@ -1,12 +1,11 @@
 <template>
-
     <div class="flex h-screen items-center justify-center">
         <div class="card w-96 bg-base-100 shadow-xl">
             <figure><img src="https://placeimg.com/400/225/arch" alt="Shoes" /></figure>
             <div class="card-body">
                 <h2 class="card-title">Login</h2>
                 <input type="text" class="input input-bordered text-center rounded-full"
-                    placeholder="username@lexmark.com" v-model="username">
+                    placeholder="shortname" v-model="username">
                 <input type="password" class="input input-bordered text-center rounded-full" placeholder="password"
                     v-model="password">
                 <div class="card-actions justify-center">
@@ -31,10 +30,14 @@
 let username = ''
 let password = ''
 let message = ''
+
+const router = useRouter()
+
 const app = useNuxtApp().$pb
 async function login() {
     try {
         const authData = await app.collection('users').authWithPassword(username, password)
+        navigateTo('/')
     }
     catch (error: any) {
         console.log(error)

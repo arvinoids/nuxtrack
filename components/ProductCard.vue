@@ -22,7 +22,6 @@
 </template>
 
 <script setup>
-
 const app = useNuxtApp().$pb
 const props = defineProps({ groupId: String })
 
@@ -31,23 +30,12 @@ const select = "Select"
 const counterFilter = `group~"${props.groupId}"`
 
 let group = await app.collection('groups').getOne(props.groupId)
-// let users = (await app.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, sort: '+shortname' })).items
-// console.log(group)
-let users = await app.collection('counter').getList(1,100,{ filter: counterFilter, '$autoCancel': false, expand: 'user', sort: '+count' })
-if (users.length!=0) { console.log(users.length); users = users.items;  }
-// console.log(group.name+ users.length)
-// console.log(users)
 
+let users = await app.collection('counter').getList(1,100,{ filter: counterFilter, '$autoCancel': false, expand: 'user', sort: '+count' })
+if (users.length!=0) {  users = users.items;  }
 else {
-    //get users that belong to this group and create a new entry for each one in the counters collection
     let res = await app.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, })
-    // console.log(group.name, res.items)
-    // for (let user in users) {
-    //     console.log (user.item)
-    // }
-    console.log(res.items)
     users = res
-    console.log("users = "+users)
 }
 
 </script>

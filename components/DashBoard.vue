@@ -1,5 +1,5 @@
 <template>
-        <div v-for="group in groups" :key="group.id" class="flex">
+        <div v-for="group in groups" :key="group.id" class="flex flex-row flex-wrap">
              <ProductCard :groupId="group.id" />
         </div>
 </template>
