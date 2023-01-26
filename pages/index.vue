@@ -1,19 +1,19 @@
 <template>
-    <Navbar />
-    <div class="flex flex-col">
+    <div class="flex flex-col p-5" v-if="auth.isAuthenticated">
         <div class="self-center">
-            <div class="flex flex-row flex-wrap">
-                <DashBoard />
-            </div>
+        <DashBoard/>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-const app = useNuxtApp().$pb
-const name: string = app.authStore.baseModel.fullname
-
 definePageMeta({
-  middleware: ["auth"]
+    middleware: "auth"
 })
+
+const auth = useAuth()
+const pb = useNuxtApp().$pb
+
+auth.value.isAuthenticated = pb.authStore.isValid
+
 </script>
