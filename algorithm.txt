@@ -1,0 +1,10 @@
+CounterCreator
+1) open the user
+2) get the groups where the user belongs
+3) create a counter for each of the groups
+
+Create a counter for all
+1) get list of users
+2) recurse through all the userids
+3) for each user id, do CounterCreator
+
