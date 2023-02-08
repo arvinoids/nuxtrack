@@ -1,6 +1,7 @@
 import PocketBase from 'pocketbase'
 const cnf = useRuntimeConfig().public
 const pb = new PocketBase(cnf.pocketBaseURL)
+pb.autoCancellation(false);
 
 const users = await pb.collection('users').getList(1,100,{ '$autoCancel': false, })
 const groups = await pb.collection('groups').getList(1,100,{ '$autoCancel': false, })
@@ -89,8 +90,6 @@ function getMembership(user:string){
  }
 
  async function reRunCount(userId:string,groupId:string) {
-    //zp81nluzd17f2tt
-    //is6zgjo8mr43ur7
     pb.collection('cases').getList(1,500,{filter:''})
 
  }

@@ -8,3 +8,37 @@ Create a counter for all
 2) recurse through all the userids
 3) for each user id, do CounterCreator
 
+Adding a case
+1) Identify selected user
+2) Add case to user, append with group(product set)
+3) Rerun case count for user in group
+
+Determining who is selected user
+1) Check CurrentList
+2) Check who is next on list (next value==true)
+3) Select the user
+
+Creating CurrentList - 
+1) Query the counter, filter by group, sort by count in ascending then by username
+2) create list and assign order
+
+
+When to create CurrentList
+1) check if currentposition group and count>currentlist.group.length
+2) if true, create new currentlist
+
+>>>
+What to do when assigning case
+1) check if caseExists
+2) if false, assignCase to next user
+3) check if next in line needs to be skipped catch-up or out of office, if true, update order and go back to 2 
+4) add 1 to currentposition
+5) check if currentposition group and count  is greater then currentlist.group.length
+6) if true, delete old currentlist for group and createCurrentList
+
+//
+Skip algorithms
+out of office - assign OOO case to user
+catch up later - swap position with next user
+
+

@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="flex flex-col flex-grow mt-3">
-            <a class="btn btn-sm btn-success mt-auto w-20 self-center" :href="anchor">{{ select }}</a>
+            <a class="btn btn-success mt-auto w-20 self-center" :href="anchor">{{ select }}</a>
         </div>
         <AddCase :groupId = props.groupId :groupDescription="group.description" :nextUserId="nextUserId" :nextUserName="nextUserName"/>
     </div>
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 const pb = useNuxtApp().$pb
-const props = defineProps({ groupId: String })
+const props = defineProps<{ groupId: string }>()
 const anchor:string = '#'+props.groupId
 
 const groupFilter = `memberOf~"${props.groupId}"`
@@ -32,7 +32,7 @@ const group = await pb.collection('groups').getOne(props.groupId)
 
 //useCreateGroupList(props.groupId)
 
-let users = await pb.collection('counter').getList(1,100,{ filter: counterFilter, '$autoCancel': false, expand: 'user', sort: '+count' })
+let users = await pb.collection('counter').getList(1,100,{ filter: counterFilter, '$autoCancel': false, expand: 'user', sort: '+count,user' })
 if (users.length!=0) {  users = users.items;  }
 else {
     users = await pb.collection('users').getList(1,100,{ filter: groupFilter, '$autoCancel': false, })

@@ -2,7 +2,7 @@
     <div class="flex flex-col justify-center">
         <div class="flex w-screen items-center justify-center">
             <div class="card w-96 bg-base-100 shadow-xl">
-                <figure><img src="https://placeimg.com/400/225/arch" alt="Shoes" /></figure>
+                <figure><img src="/lexmark-logo.svg" alt="Logo" /></figure>
                 <div class="card-body">
                     <h2 class="card-title">Login</h2>
                     <form @submit.prevent="login()" class="flex flex-col gap-2">

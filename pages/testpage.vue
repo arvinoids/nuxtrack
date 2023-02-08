@@ -7,46 +7,33 @@
 // 3) create a counter for each of the groups
 
 const pb = useNuxtApp().$pb
+pb.autoCancellation(false);
 
 
 const users = await pb.collection('users').getList(1,100,{ '$autoCancel': false, })
 const cases = await pb.collection('cases').getList(1,100,{ '$autoCancel': false, })
-
-//useCounterCreator()
-const caseId = "CAS-93450934850938"
-const caseFilter = 'case="'+caseId+'"'
-
-async function caseExists(caseId:string) {
-    const caseFilter = 'case="'+caseId+'"'
-    try{
-            const record = await pb.collection('cases').getFirstListItem(caseFilter)
-            return true
-    } catch(e) { 
-        console.log(e)
-        return false
-    }
- }
-
-//const doesCaseExist:boolean = await caseExists(caseId)
-
-// rerun
 const groupId = "zp81nluzd17f2tt"
-const userId = "is6zgjo8mr43ur7"
-async function reRunCount(userId:string,groupId:string) {
-    const groupFilter = 'group="'+groupId+'"'
-    const userFilter = 'user="'+userId+'"'
-    const combinedFilter = groupFilter+" && "+userFilter
-    console.log(combinedFilter)
-    const cases = await pb.collection('cases').getList(1,500,{filter:combinedFilter})
-    return cases.totalItems
+let listItems:any = []
+
+async function createCurrentList(groupId:string) {
+//     1) Query the counter, filter by group, sort by count in ascending then by username
+    const queryFilter = 'group="'+groupId+'"'
+    const list = await pb.collection('counter').getList(1,500,{ filter:queryFilter, sort: '+count','$autoCancel': false })
+// 2) create list and assign order
+    listItems = list.items
+    listItems.forEach(async (item: any, i:number) => {        
+        try {
+            let data = { "user":item.user,"group":groupId,"count":item.count,"order":i+1 }
+            await pb.collection('currentlist').create(data)
+        } catch(e) { console.log(e) }
+    });
  }
 
-const count:number = await reRunCount(userId,groupId)
-
+await createCurrentList(groupId)
 </script>
 
 <template>
     <p class="text-lg text-center">This is a testpage</p>
-    <p>How many cases for user? {{ count }}</p>
+    <p class="text-center" v-for="item in listItems">{{ item.count }}</p>
 </template>
 

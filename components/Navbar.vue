@@ -1,9 +1,9 @@
 <template>
-    <div class="navbar bg-green-700 shadow-md mb-3">
+    <div class="navbar bg-primary shadow-md mb-3">
         <div class="navbar-start">
             <div class="dropdown" v-if="auth.isAuthenticated">
-                <label tabindex="0" class="btn btn-ghost btn-circle text-accent mx-3">
-                    <svg class="btn-circle text-accent h-10 w-15 fill-secondary btn btn-ghost"
+                <label tabindex="0" class="btn btn-ghost btn-circle text-secondary mx-3">
+                    <svg class="btn-circle text-primary h-10 w-15 fill-base-100 btn btn-ghost"
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 496 512"><!-- Font Awesome Free 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) -->
                         <path
@@ -12,7 +12,7 @@
                 </label>
                 <ul tabindex="0" v-if="auth"
                     class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                    <li><nuxt-link to="/ChangePassword">Change Password</nuxt-link></li>
+                    <li><a to="/ChangePassword">Change Password</a></li>
                     <li>
                         <div @click="logout()">Logout</div>
                     </li>
@@ -21,9 +21,10 @@
             </div>
         </div>
         <div class=" navbar-center">
-            <h1 class="mx-2 text-xl font-bold text-secondary">Rotation Tracker</h1>
+            <h1 class="mx-2 text-2xl font-bold text-base-100"><NuxtLink to="/">Rotation Tracker</NuxtLink></h1>
         </div>
         <div class="navbar-end">
+            <h1 class="mx-2 font-bold text-base-100 btn btn-ghost text-lg"><NuxtLink to="/Cases">All Cases</NuxtLink></h1>
         </div>
     </div>
 </template>
