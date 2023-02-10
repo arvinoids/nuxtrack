@@ -1,15 +1,15 @@
 <template>
-    <CasesTable class="m-10 shadow-lg"/>
+  <div class="flex flex-col items-center">
+    <CasesTable />
+  </div>
 </template>
-    
-<script setup lang='ts'>
-    const pb = useNuxtApp().$pb
-    const auth = useAuth()
-    if(pb.authStore.isValid){
-        auth.value.isAuthenticated = true
-    }
+
+<script setup lang="ts">
+const pb = useNuxtApp().$pb;
+const auth = useAuth();
+if (pb.authStore.isValid) {
+  auth.value.isAuthenticated = true;
+}
 </script>
-    
-<style>
-    
-</style>
+
+<style></style>

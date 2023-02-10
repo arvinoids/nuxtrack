@@ -16,3 +16,7 @@ export const useRefresher = ()=>
 useState(()=> ({
     count: 0
 }))
+
+export const useCaseId = ()=> useState(()=> (''))
+
+export const useFromGroup = ()=> useState(()=>(''))
