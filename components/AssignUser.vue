@@ -42,6 +42,7 @@ let caseId = useCaseId();
 let group: string = origin.value;
 let message = ref("");
 const submitStatus = ref("");
+const updated = useDataUpdated();
 
 const pb = useNuxtApp().$pb;
 const user = await pb.collection("users").getOne(props.userId);
@@ -53,22 +54,12 @@ const userGroupsRec = await pb
 const userGroups = userGroupsRec.expand.memberOf;
 if (group === "") group = userGroups[0].id;
 
-async function submitCase() {
-  const res = await assignCase(caseId, props.userId, group);
-  message.value = res.message;
-  submitStatus.value = res.status;
-  if (submitStatus.value === "success") {
-    setTimeout(() => {
-      window.location.reload();
-      console.log("reloading window");
-    }, 1000);
-  }
-}
-
 async function doSubmit() {
-  const result = await useSubmitCase(caseId, props.userId, group);
+  console.log("submitting case with data: ", caseId.value, props.userId, group);
+  const result = await useSubmitCase(caseId.value, props.userId, group);
   message.value = result.message;
   submitStatus.value = result.submitStatus;
+  updated.value++;
 }
 
 async function clearForm() {

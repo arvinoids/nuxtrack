@@ -20,3 +20,4 @@ useState(()=> ({
 export const useCaseId = ()=> useState(()=> (''))
 
 export const useFromGroup = ()=> useState(()=>(''))
+export const useDataUpdated = ()=> useState(()=>0)

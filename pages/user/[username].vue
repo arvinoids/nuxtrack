@@ -6,7 +6,7 @@
       <p v-if="pb.authStore.model.id === userData.id">Email: {{ userData.email }}</p>
     </div>
     <div class="flex flex-col items-center gap-3">
-      <CasesTable :userId="userData.id" class="rounded-b-lg" />
+      <CasesTable :userId="userData.id" :group="fromGroup" />
       <a
         href="#assign"
         class="btn btn-warning shadow-md btn-outl w-[100px]"
@@ -19,11 +19,14 @@
 </template>
 
 <script setup lang="ts">
-const route = useRoute();
+const fromGroup = useFromGroup();
 const pb = useNuxtApp().$pb;
-const userData = await pb
-  .collection("users")
-  .getFirstListItem(`username="${route.params.username}"`);
+const selector = useSelector();
+const user = selector.value.user;
+console.log("page for", user);
+const userData = await pb.collection("users").getOne(user);
+// console.log("opening page for user: ", username);
+console.log(userData);
 </script>
 
 <style></style>

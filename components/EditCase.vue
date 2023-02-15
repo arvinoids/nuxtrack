@@ -1,75 +1,83 @@
 <template>
-    <!-- Put this part before </body> tag -->
-    <input type="checkbox" :id="props.id + 'edit'" class="modal-toggle" />
-    <div class="modal">
-        <div class="modal-box w-min max-w-5xl">
-            <h3 class="font-bold text-lg text-center">Edit case...</h3>
-            <div class="flex gap-4 my-2">
-                <div class="form-control w-full max-w-xs">
-                    <label class="label">
-                        <span class="label-text">Case ID</span>
-                    </label>
-                    <input type="text"  v-model="newCase" class="input input-bordered" />
-                </div>
-                <div class="form-control w-full max-w-xs">
-                    <label class="label">
-                        <span class="label-text">Owner</span>
-                    </label>
-                    <select class="select select-bordered" v-model="newUser">
-                        <option v-for="user in users" :key="user.id" :value="user.id">{{ user.fullname }}</option>
-                    </select>
-                </div>
-                <div class="form-control w-full max-w-xs">
-                    <label class="label">
-                        <span class="label-text">Product Set</span>
-                    </label>
-                    <select class="select select-bordered" v-model="newGroup">
-                        <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.description }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="alert alert-success" v-if="message">
-            <p>{{ message }}</p>
-            </div>
-
-            <div class="modal-action">
-                <label :for="props.id + 'edit'" class="btn">Cancel</label>
-                <label :for="props.id + 'edit'" class="btn btn-warning" @click="doUpdate">Update</label>
-            </div>
+  <!-- Put this part before </body> tag -->
+  <input type="checkbox" :id="props.id + 'edit'" class="modal-toggle" />
+  <div class="modal">
+    <div class="modal-box w-min max-w-5xl">
+      <h3 class="font-bold text-lg text-center">Edit case...</h3>
+      <div class="flex gap-4 my-2">
+        <div class="form-control w-full max-w-xs">
+          <label class="label">
+            <span class="label-text">Case ID</span>
+          </label>
+          <input type="text" v-model="newCase" class="input input-bordered" />
         </div>
+        <div class="form-control w-full max-w-xs">
+          <label class="label">
+            <span class="label-text">Owner</span>
+          </label>
+          <select class="select select-bordered" v-model="newUser">
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.fullname }}
+            </option>
+          </select>
+        </div>
+        <div class="form-control w-full max-w-xs">
+          <label class="label">
+            <span class="label-text">Product Set</span>
+          </label>
+          <select class="select select-bordered" v-model="newGroup">
+            <option v-for="group in groups" :key="group.id" :value="group.id">
+              {{ group.description }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="alert alert-success" v-if="message">
+        <p>{{ message }}</p>
+      </div>
+
+      <div class="modal-action">
+        <label :for="props.id + 'edit'" class="btn">Cancel</label>
+        <label :for="props.id + 'edit'" class="btn btn-warning" @click="doUpdate"
+          >Update</label
+        >
+      </div>
     </div>
+  </div>
 </template>
-    
-<script setup lang='ts'>
-const pb = useNuxtApp().$pb
-pb.autoCancellation(false)
+
+<script setup lang="ts">
+const pb = useNuxtApp().$pb;
+pb.autoCancellation(false);
 const props = defineProps<{
-    id: string,
-    caseId: string,
-    owner: string,
-    product: string,
-}>()
+  id: string;
+  caseId: string;
+  owner: string;
+  product: string;
+}>();
 
-const userRec = await pb.collection('users').getList(1, 50, {
-    filter: `memberOf~"${props.product}"`,
-})
-const users = userRec.items
+const userRec = await pb.collection("users").getList(1, 50, {
+  filter: `memberOf~"${props.product}"`,
+});
+const users = userRec.items;
 
-const productSets = await pb.collection('groups').getList(1, 100,)
-const groups = productSets.items
+const productSets = await pb.collection("groups").getList(1, 100);
+const groups = productSets.items;
 
-let newUser: string= props.owner
-let newCase: string = props.caseId
-let newGroup: string = props.product
+let newUser: string = props.owner;
+let newCase: string = props.caseId;
+let newGroup: string = props.product;
 
-const message=ref('')
-async function doUpdate(){
-    message.value = await useUpdateCase(props.id,newUser,newGroup,newCase,pb.authStore.model.username)
+const message = ref("");
+const updated = useDataUpdated();
+async function doUpdate() {
+  message.value = await useUpdateCase(
+    props.id,
+    newUser,
+    newGroup,
+    newCase,
+    pb.authStore.model.username
+  );
+  updated.value++;
 }
-
 </script>
-    
-<style>
-
-</style>
