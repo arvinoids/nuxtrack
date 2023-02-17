@@ -25,7 +25,7 @@
         {{ message }}
       </div>
       <div class="modal-action justify-center">
-        <label class="btn btn-success" @click="doSubmit">Assign</label>
+        <a class="btn btn-success" @click="doSubmit" href="#">Assign</a>
         <a href="#" class="btn btn-warning" @click="clearForm">Cancel</a>
       </div>
     </div>
@@ -55,11 +55,9 @@ const userGroups = userGroupsRec.expand.memberOf;
 if (group === "") group = userGroups[0].id;
 
 async function doSubmit() {
-  console.log("submitting case with data: ", caseId.value, props.userId, group);
-  const result = await useSubmitCase(caseId.value, props.userId, group);
-  message.value = result.message;
-  submitStatus.value = result.submitStatus;
-  updated.value++;
+  const result = await assignCase(caseId.value, props.userId, group);
+  useShowToast(result.message, result.status);
+  if (result.status === "success") updated.value++;
 }
 
 async function clearForm() {

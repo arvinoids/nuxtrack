@@ -39,7 +39,9 @@
       </table>
       <div class="text-center" v-else>Loading...</div>
     </div>
-    <p class="text-center my-3">{{ summary(cases.length) }}</p>
+    <p class="text-center my-3 text-sm">
+      Total <span class="text-accent">{{ cases.length }}</span> Cases
+    </p>
   </div>
 </template>
 
@@ -50,8 +52,6 @@ const props = defineProps<{
   group?: string;
 }>();
 const updated = useDataUpdated();
-
-const group = useSelector();
 const loading = ref(true);
 async function getCases() {
   const record = await useGetFilteredCases(props.userId, props.group);
@@ -64,16 +64,6 @@ async function getCases() {
 }
 let cases = await getCases();
 // console.log("these are the cases: ", cases);
-
-function summary(cases: number) {
-  let msg;
-  if (cases !== 1) {
-    msg = "There are " + cases + " cases in this view.";
-  } else {
-    msg = "There is 1 case in this view";
-  }
-  return msg;
-}
 
 function userIsAdmin() {
   if (pb.authStore.model.role === "lead" || pb.authStore.model.role === "admin")

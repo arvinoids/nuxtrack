@@ -1,19 +1,18 @@
 <template>
-    <div class="flex flex-col p-5" v-if="auth.isAuthenticated">
-        <div class="self-center">
-        <DashBoard/>
-        </div>
+  <div class="flex flex-col overflow-hidden" v-if="auth.isAuthenticated">
+    <div class="self-center">
+      <DashBoard />
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 definePageMeta({
-    middleware: "auth"
-})
+  middleware: "auth",
+});
 
-const auth = useAuth()
-const pb = useNuxtApp().$pb
+const auth = useAuth();
+const pb = useNuxtApp().$pb;
 
-auth.value.isAuthenticated = pb.authStore.isValid
-
+auth.value.isAuthenticated = pb.authStore.isValid;
 </script>

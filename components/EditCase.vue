@@ -71,7 +71,7 @@ let newGroup: string = props.product;
 const message = ref("");
 const updated = useDataUpdated();
 async function doUpdate() {
-  message.value = await useUpdateCase(
+  const res = await useUpdateCase(
     props.id,
     newUser,
     newGroup,
@@ -79,5 +79,6 @@ async function doUpdate() {
     pb.authStore.model.username
   );
   updated.value++;
+  useShowToast(res.message, res.status);
 }
 </script>

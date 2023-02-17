@@ -43,7 +43,7 @@ const update = useDataUpdated();
 async function deleteCase(id: string) {
   const res = await useDeleteCase(id);
   update.value++;
-  message.value = res.message;
+  useShowToast(res.message, res.status);
 }
 </script>
 

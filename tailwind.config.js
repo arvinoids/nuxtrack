@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin')
 module.exports = {
   content: [
     "./components/**/*.{js,vue,ts}",
@@ -14,7 +15,7 @@ module.exports = {
   plugins: [require("daisyui")],
   daisyui: {
     themes: [{
-      mytheme: {
+      light: {
         "primary": "#00C425",
         "secondary": "#008A44",
         "accent": "#1C64B4",
@@ -28,7 +29,7 @@ module.exports = {
         "error": "#dc2626",
         "--btn-text-case":"none"
       },
-      darkLex: {
+      dark: {
         "primary": "#a3e635", 
         "secondary": "#15803d",
         "accent": "#a7f3d0",

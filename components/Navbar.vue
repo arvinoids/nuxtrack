@@ -19,10 +19,14 @@
           v-if="auth"
           class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
         >
+          <li>
+            <label>Color Mode <ColorToggle /></label>
+          </li>
           <li><nuxt-link to="/ChangePassword">Change Password</nuxt-link></li>
           <li>
             <nuxt-link to="/user/Profile">My Page</nuxt-link>
           </li>
+
           <li>
             <div @click="logout()">Logout</div>
           </li>

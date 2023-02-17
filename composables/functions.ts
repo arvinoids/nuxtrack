@@ -74,7 +74,7 @@ export async function assignCase(caseId: string, user: string, group: string) {
     await updateCounter(group, user);
     await createCurrentList(group);
     result.message =
-      "Case has been saved. The owner should receive a notification shortly.";
+      "Case has been assigned. The owner should receive a notification shortly.";
     result.status = "success";
     return result;
   }
@@ -127,6 +127,11 @@ export async function createCurrentList(groupId: string) {
   });
 }
 
+interface result {
+  message:string,
+  status:string,
+}
+
 
 export async function useSkipOut(userId: string, groupId: string) {
   const random = Math.random().toString(36).substring(3, 9);
@@ -136,12 +141,17 @@ export async function useSkipOut(userId: string, groupId: string) {
     case: "OutOfOffice-" + random,
     assignedBy: pb.authStore.model!.username,
   };
-  await pb.collection("cases").create(data);
-  // console.log("created outOfOffice");
-  await updateCounter(groupId, userId);
-  await createCurrentList(groupId);
-  location.reload();
+  const result:result = { message:'', status:''}
+  try { 
+    await pb.collection("cases").create(data);
+    await updateCounter(groupId, userId);
+    await createCurrentList(groupId)
+    result.message = "User has been skipped."
+    result.status = "success"
+  } catch(e:any) { result.message = e.message; result.status = "failed" }
+  return result
 }
+
 export async function getUserCases(userId?: string, group?: string) {
   // console.log("getting cases for user ", userId);
   let cases;
@@ -189,11 +199,17 @@ export async function useUpdateCase(
     case: caseId,
     assignedBy: assignedBy,
   };
+  const result = {
+    message: '',
+    status: 'success'
+  }
   try {
     const res = await pb.collection("cases").update(recordId, data);
-    return "Case updated.";
+    result.message = "Case has been updated."
+    return result
   } catch (e: any) {
-    return e.message;
+    result.message = "There is a problem with the update."
+    return result
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="text-2xl font-bold text-secondary text-start"></h1>
-    <div class="flex flex-row flex-wrap p-2 w-full justify-center items-stretch">
+    <div class="flex flex-row flex-wrap justify-center">
       <div
         v-for="group in groups"
         :key="group.id"

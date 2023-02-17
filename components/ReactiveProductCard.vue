@@ -1,14 +1,13 @@
 <template>
   <div
     class="flex flex-col rounded-xl text-center p-5 m-2 w-[250px] shadow-lg border bg-base-100"
-    :key="updateCard"
   >
     <h2 class="font-semibold mb-5 text-secondary text-xl">
       <NuxtLink :to="`/groups/${group.name}`" @click="setFromGroup(group.id)">{{
         group.description
       }}</NuxtLink>
     </h2>
-    <div v-if="users.totalItems > 0">
+    <div v-if="users.totalItems > 0" :key="updateCard">
       <div v-for="(user, id) in users.items" :key="id" class="text-base">
         <nuxt-link
           :to="`/user/${user.expand.user.username}`"
@@ -83,8 +82,8 @@ function clearCaseId() {
 // if no return, create currentlist for group
 // get the group entries from currentlist, sort by count asc
 
-const nextUserId = users.items[0].expand.user.id;
-const nextUserName = users.items[0].expand.user.fullname;
+let nextUserId = users.items[0].expand.user.id;
+let nextUserName = users.items[0].expand.user.fullname;
 
 async function selectUser(user: string, group: string) {
   selectedUser.value.user = user;
@@ -96,7 +95,10 @@ async function setFromGroup(group: string) {
 }
 
 watch(updated, async () => {
+  console.log("data updated");
   users = await getCurrentList(props.group);
+  nextUserId = users.items[0].expand.user.id;
+  nextUserName = users.items[0].expand.user.fullname;
   updateCard.value++;
 });
 </script>

@@ -10,18 +10,11 @@
           class="input input-bordered my-2 w-[300px]"
           v-model="caseId"
         />
-        <div
-          v-if="message"
-          class="alert alert-success my-2 w-max"
-          :class="{ 'alert-error': submitStatus === 'failed' }"
-        >
-          {{ message }}
-        </div>
       </div>
       <div class="modal-action justify-center">
         <a :href="'#' + skipAnchorCatch" class="btn btn-outline">Skip - Catch up later</a>
         <a :href="'#' + skipAnchorOut" class="btn btn-outline">Skip - Out of office</a>
-        <label class="btn btn-success" @click="submitCase">Assign</label>
+        <a href="#"> <label class="btn btn-success" @click="submitCase">Assign</label></a>
         <a href="#" class="btn btn-warning">Cancel</a>
       </div>
     </div>
@@ -58,20 +51,15 @@ let str1 = props.groupId;
 let str2 = props.nextUserId;
 const skipAnchorCatch: string = str1!.concat(str2!, "Catch");
 const skipAnchorOut: string = str1!.concat(str2!, "Out");
-const message = ref("");
 const submitStatus = ref("");
 const updated = useDataUpdated();
 
 async function submitCase() {
   const res = await assignCase(caseId.value, props.nextUserId, props.groupId);
-  message.value = res.message;
   submitStatus.value = res.status;
   if (submitStatus.value === "success") {
-    // setTimeout(() => {
-    //   window.location.reload();
-    //   console.log("reloading window");
-    // }, 1000);
+    useShowToast(res.message, res.status);
     updated.value++;
-  }
+  } else useShowToast(res.message, res.status);
 }
 </script>
