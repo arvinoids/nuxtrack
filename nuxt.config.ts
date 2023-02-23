@@ -21,9 +21,9 @@ export default defineNuxtConfig({
   },
 
   app: {
+    baseURL: '/Tracker',
     head: {
-      title: "Solutions Team Rotation Tracker",
-    },
+      title: "Solutions Team Rotation Tracker",    },
     pageTransition: { name: "page", mode: "out-in" },
   },
   modules: ["@nuxtjs/color-mode"],
