@@ -1,5 +1,5 @@
 <template>
-  <p class="text-center text-sm pt-5">Copyright 2023 JayR Sumaban</p>
+  <p class="text-center text-sm pt-5">&copy; 2023 Lexmark Solutions Support</p>
 </template>
 
 <script setup lang="ts"></script>

@@ -1,6 +1,6 @@
 <template>
   <Navbar />
-  <div>
+  <div class="flex flex-col items-center">
     <NuxtPage />
   </div>
   <Footer />

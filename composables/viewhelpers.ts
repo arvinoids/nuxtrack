@@ -18,3 +18,16 @@ const toast = useNuxtApp().$toast;
         hideProgressBar:true,
     })
 }
+
+export function useFormatDate(date:Date){
+  let formatted = new Date(date).toLocaleString(
+      'en-us',
+      {
+          timeStyle: 'medium',
+          timeZone: 'Asia/Manila',
+          dateStyle: 'medium'
+      }
+  )
+  return formatted
+}
+

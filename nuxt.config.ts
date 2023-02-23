@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  typescript: {
+    strict:true
+  },
   ssr: false,
 
   // https://tailwindcss.com/docs/guides/nuxtjs#3
@@ -19,7 +22,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "Rotation Tracker",
+      title: "Solutions Team Rotation Tracker",
     },
     pageTransition: { name: "page", mode: "out-in" },
   },

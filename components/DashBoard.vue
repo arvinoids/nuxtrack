@@ -7,7 +7,7 @@
         :key="group.id"
         class="m-3 rounded-2xl flex items-stretch"
       >
-        <ReactiveProductCard :group="group.id" class="flex-grow" />
+        <NewProductCard :group="group.id" class="flex-grow" />
       </div>
     </div>
   </div>

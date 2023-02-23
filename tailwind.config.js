@@ -39,6 +39,7 @@ module.exports = {
         "success": "#16A34A",
         "warning": "#D97706",
         "error": "#DC2626",
+        "--btn-text-case": "none",
         },
     }, "emerald", "forest"],
     darkTheme: "darkLex"

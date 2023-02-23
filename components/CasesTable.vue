@@ -18,7 +18,7 @@
             <td>{{ item.case }}</td>
             <td>{{ item.expand.group.description }}</td>
             <td>{{ item.assignedBy }}</td>
-            <td>{{ item.created }}</td>
+            <td>{{ useFormatDate(new Date(item.created)) }}</td>
             <td v-if="userIsAdmin()">
               <label :for="item.id + 'edit'" class="btn btn-sm btn-warning mx-1"
                 >Edit</label
@@ -55,9 +55,6 @@ const updated = useDataUpdated();
 const loading = ref(true);
 async function getCases() {
   const record = await useGetFilteredCases(props.userId, props.group);
-  // const record = await getUserCases(props.userId, group.value.group);
-  // console.log("getting cases table for user:", props.userId);
-  // console.log(record);
   const cases = record.items;
   loading.value = false;
   return cases;
@@ -66,7 +63,7 @@ let cases = await getCases();
 // console.log("these are the cases: ", cases);
 
 function userIsAdmin() {
-  if (pb.authStore.model.role === "lead" || pb.authStore.model.role === "admin")
+  if (pb.authStore.model!.role === "lead" || pb.authStore.model!.role === "admin")
     return true;
   else return false;
 }

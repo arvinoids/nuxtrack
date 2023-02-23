@@ -39,7 +39,7 @@
       </h1>
     </div>
     <div class="navbar-end">
-      <h1 class="mx-2 font-bold text-gray-200 text-lg">
+      <h1 class="mx-2 font-bold text-gray-200 text-lg" v-if="auth.isAuthenticated">
         <NuxtLink to="/Cases">All Cases</NuxtLink>
       </h1>
     </div>
@@ -58,7 +58,7 @@ async function logout() {
 }
 
 function setUserPage() {
-  user.value.user = pb.authStore.model.id;
+  user.value.user = pb.authStore.model!.id;
 }
 </script>
 

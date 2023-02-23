@@ -3,9 +3,7 @@
     class="flex flex-col rounded-xl text-center p-5 m-2 w-[250px] shadow-lg border bg-base-100"
   >
     <h2 class="font-semibold mb-5 text-secondary text-xl">
-      <NuxtLink :to="`/groups/${group.name}`" @click="setFromGroup(group.id)">{{
-        group.description
-      }}</NuxtLink>
+      <NuxtLink :to="`/groups/${group.name}`">{{ group.description }}</NuxtLink>
     </h2>
     <div v-if="users.totalItems > 0" :key="updateCard">
       <div v-for="(user, id) in users.items" :key="id" class="text-base">
@@ -34,12 +32,20 @@
       </div>
     </div>
     <div class="flex flex-col flex-grow mt-3">
-      <a
-        class="btn mt-auto w-32 self-center my-3 btn-circle"
-        :href="anchor"
-        @click="clearCaseId"
-        >Select</a
-      >
+      <div class="flex justify-center mt-auto gap-2">
+        <a
+          class="btn mt-auto w-24 self-center my-3 btn-circle"
+          :href="anchor"
+          @click="clearCaseId"
+          >Assign</a
+        >
+        <a
+          class="btn mt-auto w-24 self-center my-3 btn-circle"
+          :href="skipAnchor"
+          @click="clearCaseId"
+          >Skip User</a
+        >
+      </div>
     </div>
     <AddCase
       :groupId="props.group"
@@ -47,6 +53,8 @@
       :nextUserId="nextUserId"
       :nextUserName="nextUserName"
     />
+    <SkipCatch :group="group.id" :users="users" />
+    <SkipUser :users="users" :group="group" />
   </div>
 </template>
 
@@ -55,6 +63,7 @@ const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
 const props = defineProps<{ group: string }>();
 const anchor: string = "#" + props.group;
+const skipAnchor: string = "#" + props.group + "skip";
 const group = await pb.collection("groups").getOne(props.group);
 const originGroup = useFromGroup();
 const selectedUser = useSelector();

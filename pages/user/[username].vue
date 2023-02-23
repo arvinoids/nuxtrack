@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-const fromGroup = useFromGroup();
+const fromGroup = localStorage.getItem("fromGroup");
 const pb = useNuxtApp().$pb;
 const selector = useSelector();
 const user = selector.value.user;

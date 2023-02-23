@@ -14,7 +14,9 @@
       <div class="modal-action justify-center">
         <a :href="'#' + skipAnchorCatch" class="btn btn-outline">Skip - Catch up later</a>
         <a :href="'#' + skipAnchorOut" class="btn btn-outline">Skip - Out of office</a>
-        <a href="#"> <label class="btn btn-success" @click="submitCase">Assign</label></a>
+        <a href="#">
+          <label class="btn btn-secondary" @click="submitCase">Assign</label></a
+        >
         <a href="#" class="btn btn-warning">Cancel</a>
       </div>
     </div>

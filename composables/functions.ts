@@ -1,4 +1,4 @@
-import PocketBase from "pocketbase";
+import PocketBase, { ListResult } from "pocketbase";
 
 const cnf = useRuntimeConfig().public;
 const pb = new PocketBase(cnf.pocketBaseURL);
@@ -15,7 +15,7 @@ interface result {
 
 //We need a way to refresh the counter every time changes are made.
 
-// I made this function because pocketbase hates me creating my own filter string ad hoc
+
 function createFilter(field: string, value: string) {
   let filter = field + "='" + value + "'";
   return filter;
@@ -53,7 +53,7 @@ async function getCount(user: string, group: string) {
   return res.totalItems;
 }
 
-export async function assignCase(caseId: string, user: string, group: string) {
+export async function useAssignCase(caseId: string, user: string, group: string) {
   const data = {
     user: user,
     group: group,
@@ -128,8 +128,8 @@ export async function createCurrentList(groupId: string) {
 }
 
 interface result {
-  message:string,
-  status:string,
+  message: string,
+  status: string,
 }
 
 
@@ -141,14 +141,15 @@ export async function useSkipOut(userId: string, groupId: string) {
     case: "OutOfOffice-" + random,
     assignedBy: pb.authStore.model!.username,
   };
-  const result:result = { message:'', status:''}
-  try { 
+  const result: result = { message: '', status: '' }
+  try {
     await pb.collection("cases").create(data);
     await updateCounter(groupId, userId);
     await createCurrentList(groupId)
-    result.message = "User has been skipped."
+    const user = await pb.collection('users').getOne(userId)
+    result.message = `${user.fullname} is out of the office and was skipped.`
     result.status = "success"
-  } catch(e:any) { result.message = e.message; result.status = "failed" }
+  } catch (e: any) { result.message = e.message; result.status = "failed" }
   return result
 }
 
@@ -179,10 +180,10 @@ export async function getUserCases(userId?: string, group?: string) {
 
 export async function useGetFilteredCases(user?: string, group?: string) {
   const sorting = "-created"
-  if ((user == undefined) && (group == undefined))
+  if ((user === undefined || user === '') && (group === undefined) || group === '')
     return await pb.collection('cases').getList(1, 10000, { expand: "user, group", sort: sorting })
-  else if (user == undefined) return await pb.collection('cases').getList(1, 1000, { filter: `group="${group}"`, expand: "user, group", sort: sorting })
-  else if (group == undefined) return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"`, expand: "user, group", sort: sorting })
+  else if (user === undefined || user === '') return await pb.collection('cases').getList(1, 1000, { filter: `group="${group}"`, expand: "user, group", sort: sorting })
+  else if (group == undefined|| group === '') return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"`, expand: "user, group", sort: sorting })
   else return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"&&group="${group}"`, expand: "user, group", sort: sorting })
 }
 
@@ -234,8 +235,8 @@ export async function useSubmitCase(
   user: string,
   group: string
 ) {
-  const res = await assignCase(caseId, user, group);
-  const result = { message: res.message, submitStatus: res.status };
+  const res = await useAssignCase(caseId, user, group);
+  const result = { message: res.message, status: res.status };
   return result;
 }
 
@@ -256,4 +257,15 @@ export async function useRefreshAll() {
     //createcurrentlist for group
     await createCurrentList(group.id);
   });
+}
+
+export async function useGetUsers(group?: string) {
+  let users: ListResult
+  if (group === null) {
+    users = await pb.collection("users").getList()
+  } else
+    users = await pb
+      .collection("users")
+      .getList(1, 1000, { filter: `memberOf~"${group}"` });
+  return users
 }
