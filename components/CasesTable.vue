@@ -1,25 +1,25 @@
 <template>
   <div :key="updateTable">
-    <div class="overflow-x-auto border rounded-lg shadow-md" v-if="cases.length > 0">
-      <table class="table table-compact w-full" v-if="!loading">
-        <thead class="">
+    <div class="overflow-x-auto shadow-lg" v-if="cases.length > 0">
+      <table class="table table-compact" v-if="!loading">
+        <thead>
           <tr>
-            <th>Owner</th>
+            <th class="rounded-none">Owner</th>
             <th>Case ID</th>
             <th>Product Set</th>
             <th>Assigned By</th>
-            <th>Assigned on</th>
-            <th v-if="userIsAdmin()">Actions</th>
+            <th class="rounded-none">Assigned on</th>
+            <th v-if="userIsAdmin()" class="rounded-none">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="">
           <tr v-for="item in cases" :key="item.id" class="hover">
-            <td>{{ item.expand.user.username }}</td>
+            <td class="rounded-none">{{ item.expand.user.username }}</td>
             <td>{{ item.case }}</td>
             <td>{{ item.expand.group.description }}</td>
             <td>{{ item.assignedBy }}</td>
             <td>{{ useFormatDate(new Date(item.created)) }}</td>
-            <td v-if="userIsAdmin()">
+            <td v-if="userIsAdmin()" class="rounded-none">
               <label :for="item.id + 'edit'" class="btn btn-sm btn-warning mx-1"
                 >Edit</label
               >

@@ -1,4 +1,5 @@
 import PocketBase, { ListResult } from "pocketbase";
+import { LogData } from "custom-types";
 
 const cnf = useRuntimeConfig().public;
 const pb = new PocketBase(cnf.pocketBaseURL);
@@ -216,16 +217,16 @@ export async function useUpdateCase(
 
 export async function useDeleteCase(id: string) {
   const result: result = { message: "", status: "success" };
-  // console.log("deleting id ", id);
   try {
+    const caseRecord = await pb.collection("cases").getOne(id)
+    const caseId = caseRecord.case
     await pb.collection("cases").delete(id);
-    result.message = `Case ${id} is deleted`;
+    result.message = `${caseId} is deleted`;
     useRefreshAll();
     return result;
   } catch (e: any) {
     result.status = "failed";
     result.message = e.message;
-    // console.log(e.message);
     return result;
   }
 }
@@ -268,4 +269,15 @@ export async function useGetUsers(group?: string) {
       .collection("users")
       .getList(1, 1000, { filter: `memberOf~"${group}"` });
   return users
+}
+
+export async function useGetUsernameFromId(id:string) {
+  const res = await pb.collection('users').getOne(id)
+  return res.username
+}
+
+export async function logActivity(data:LogData) {
+  try{ 
+      const res = pb.collection('logs').create(data)
+  } catch (e:any) { console.log(e.message)}
 }

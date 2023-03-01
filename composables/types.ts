@@ -36,3 +36,12 @@ declare module 'pocketbase-types'{
                 "items": expanded[]
         }
 }
+
+declare module 'custom-types' {
+    interface LogData {
+        user:string,
+        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" |  "skipped user",
+        details?:string
+      }
+      
+}

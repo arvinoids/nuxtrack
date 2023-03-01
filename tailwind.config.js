@@ -19,15 +19,16 @@ module.exports = {
         "primary": "#00C425",
         "secondary": "#008A44",
         "accent": "#1C64B4",
-        "neutral": "#CACACA",
-        "base-100": "#EBEBEB",
+        "neutral": "#EBEBEB",
+        "base-100": "#ffffff",
         "base-200": "#CACACA",
         "base-300": "#8a8a8a",
         "info": "#006446",
         "success": "#3AF23A",
         "warning": "#FAA519",
         "error": "#dc2626",
-        "--btn-text-case":"none"
+        "--btn-text-case":"none",
+        "--rounded-btn":"none",
       },
       dark: {
         "primary": "#a3e635", 
@@ -40,8 +41,9 @@ module.exports = {
         "warning": "#D97706",
         "error": "#DC2626",
         "--btn-text-case": "none",
+        "--rounded-btn":"none",
         },
-    }, "emerald", "forest"],
+    }, ],
     darkTheme: "darkLex"
   }
 }

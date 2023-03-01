@@ -1,9 +1,7 @@
 <template>
-  <Navbar />
-  <div class="flex flex-col items-center">
+  <NuxtLayout>
     <NuxtPage />
-  </div>
-  <Footer />
+  </NuxtLayout>
 </template>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Cabin&display=swap");

@@ -49,16 +49,11 @@
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
 const auth = useAuth();
-const user = useSelector();
 if (await pb.authStore.isValid) auth.value.isAuthenticated = true;
 async function logout() {
   pb.authStore.clear();
   navigateTo("/Login");
   auth.value.isAuthenticated = false;
-}
-
-function setUserPage() {
-  user.value.user = pb.authStore.model!.id;
 }
 </script>
 

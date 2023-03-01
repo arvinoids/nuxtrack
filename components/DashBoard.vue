@@ -2,12 +2,8 @@
   <div>
     <h1 class="text-2xl font-bold text-secondary text-start"></h1>
     <div class="flex flex-row flex-wrap justify-center">
-      <div
-        v-for="group in groups"
-        :key="group.id"
-        class="m-3 rounded-2xl flex items-stretch"
-      >
-        <NewProductCard :group="group.id" class="flex-grow" />
+      <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
+        <ProductCard :group="group.id" class="flex-grow" />
       </div>
     </div>
   </div>

@@ -36,15 +36,17 @@
 
 <script setup lang="ts">
 import { expandedUsers, user } from "pocketbase-types";
+import { LogData } from "custom-types";
 
 const props = defineProps<{
   group: string;
   users: expandedUsers;
 }>();
+const pb = useNuxtApp().$pb;
 const emit = defineEmits(["skip"]);
+const loggedInUser = useLoggedInUsername();
 
 let caseId: string;
-
 let cursor = ref(0);
 let userlist = props.users.items;
 
@@ -65,18 +67,37 @@ async function skipOut(user: string, group: string) {
   useShowToast(res.message, res.status);
   emit("skip");
   moveCursor();
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "skipped user",
+    details: res.message,
+  };
+  logActivity(logData);
 }
 
 async function skipCatch(user: user) {
-  useShowToast(`${user.fullname} was skipped to catch up later.`, "success");
+  const message = `${user.fullname} was skipped to catch up later.`;
+  useShowToast(message, "success");
   emit("skip");
   moveCursor();
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "skipped user",
+    details: message,
+  };
+  logActivity(logData);
 }
 
 async function submitCase(caseId: string, id: string, group: string) {
   const res = await useSubmitCase(caseId, id, group);
   useShowToast(res.message, res.status);
   useDataUpdated().value++;
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "assigned case",
+    details: await useGetUsernameFromId(id),
+  };
+  logActivity(logData);
 }
 </script>
 

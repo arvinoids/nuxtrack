@@ -6,11 +6,6 @@ useState(() => ({
 
 export const useDisabled = ref(true)
 
-export const useSelector = ()=> 
-useState(() => ({
-    user: '',
-    group: ''
-}))
 
 export const useRefresher = ()=>
 useState(()=> ({
@@ -26,4 +21,4 @@ export const useTheme = ()=> useState(()=>('mytheme'))
 export const useReload = ()=> useState(()=> (0))
 export const useSelectedUser = ()=> useState(()=> (''))
 
-
+export const useLoggedInUsername = ()=> useState(()=> (''))

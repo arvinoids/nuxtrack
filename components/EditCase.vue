@@ -2,7 +2,7 @@
   <!-- Put this part before </body> tag -->
   <input type="checkbox" :id="props.id + 'edit'" class="modal-toggle" />
   <div class="modal">
-    <div class="modal-box w-min max-w-5xl">
+    <div class="modal-box w-min max-w-5xl rounded-none">
       <h3 class="font-bold text-lg text-center">Edit case...</h3>
       <div class="flex gap-4 my-2">
         <div class="form-control w-full max-w-xs">
