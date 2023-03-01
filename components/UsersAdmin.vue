@@ -33,7 +33,17 @@ console.log(users);
 
 const groups = await pb.collection("groups").getFullList(100);
 
-async function groupNameOf(id) {}
+async function groupNameOf(id:string) {
+
+}
+
+async function getGroups(membership:string[]){
+    const delimiter = ', '
+    membership.forEach(groupNameOf(item)){
+        
+    }
+    return groups
+}
 </script>
 
 <style></style>

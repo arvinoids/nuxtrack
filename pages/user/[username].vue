@@ -1,6 +1,6 @@
 <template>
-  <div class="flex gap-2">
-    <div class="m-1">
+  <div class="flex gap-2 ">
+    <div class="">
       <UserCard :user="user" />
     </div>
     <div class="flex flex-col items-center gap-3">
