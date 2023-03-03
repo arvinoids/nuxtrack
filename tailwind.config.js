@@ -29,6 +29,7 @@ module.exports = {
         "error": "#dc2626",
         "--btn-text-case":"none",
         "--rounded-btn":"none",
+        "--rounded-box":"none",
       },
       dark: {
         "primary": "#a3e635", 
@@ -42,6 +43,7 @@ module.exports = {
         "error": "#DC2626",
         "--btn-text-case": "none",
         "--rounded-btn":"none",
+        "--rounded-box":"none",
         },
     }, ],
     darkTheme: "darkLex"

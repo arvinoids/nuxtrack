@@ -32,11 +32,9 @@
       </div>
       <div v-if="message">
         <div class="border p-3 m-2 border-base-300">
-          <p class="text-error text-center">{{ message }}</p>
+          <p class="text-error text-center text-sm">{{ message }}</p>
         </div>
       </div>
-
-      <!-- <div class="social" position="center">Contact</div> -->
       <Footer />
     </form>
   </div>
@@ -72,27 +70,6 @@ async function login() {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-}
-
-.background {
-  width: 430px;
-  height: 520px;
-  position: absolute;
-  transform: translate(-50%, -50%);
-  left: 50%;
-  top: 50%;
-}
-
-.shape:first-child {
-  background: linear-gradient(#1845ad, #23a2f6);
-  left: -80px;
-  top: -80px;
-}
-
-.shape:last-child {
-  background: linear-gradient(to right, #ff512f, #f09819);
-  right: -30px;
-  bottom: -80px;
 }
 
 form {
@@ -151,37 +128,9 @@ button {
   width: 100%;
   background-color: #ffffff;
   color: #080710;
-
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-}
-
-.social {
-  margin-top: 30px;
-  display: flex;
-}
-
-.social div {
-  background: red;
-  width: 150px;
-  border-radius: 3px;
-  padding: 5px 10px 10px 5px;
-  background-color: rgba(255, 255, 255, 0.27);
-  color: #eaf0fb;
-  text-align: center;
-}
-
-.social div:hover {
-  background-color: rgba(255, 255, 255, 0.47);
-}
-
-.social .fb {
-  margin-left: 25px;
-}
-
-.social i {
-  margin-right: 4px;
 }
 
 img {
