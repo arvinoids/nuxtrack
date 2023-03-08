@@ -41,13 +41,13 @@
     <div class="navbar-end">
       <h1
         class="mx-2 text-gray-200 text-lg hover:font-semibold"
-        v-if="auth.role === 'admin'"
+        v-if="userRole === 'admin'"
       >
         <NuxtLink to="/Admin">Admin</NuxtLink>
       </h1>
       <h1
         class="mx-2 text-gray-200 text-lg hover:font-semibold"
-        v-if="auth.role === 'admin'"
+        v-if="userRole === 'admin'"
       >
         <NuxtLink to="/Logs">Logs</NuxtLink>
       </h1>
@@ -65,6 +65,7 @@
 const pb = useNuxtApp().$pb;
 const auth = useAuth();
 const loggedInUser = useLoggedInUsername();
+const userRole = ref(pb.authStore.model.role);
 
 if (await pb.authStore.isValid) {
   auth.value.isAuthenticated = true;
