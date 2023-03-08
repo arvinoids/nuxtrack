@@ -12,7 +12,7 @@
             <th v-if="userIsAdmin()" class="rounded-none">Actions</th>
           </tr>
         </thead>
-        <tbody class="">
+        <tbody>
           <tr v-for="item in cases" :key="item.id" class="hover">
             <td class="rounded-none">{{ item.expand.user.username }}</td>
             <td>{{ item.case }}</td>

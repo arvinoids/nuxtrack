@@ -39,7 +39,22 @@
       </h1>
     </div>
     <div class="navbar-end">
-      <h1 class="mx-2 font-bold text-gray-200 text-lg" v-if="auth.isAuthenticated">
+      <h1
+        class="mx-2 text-gray-200 text-lg hover:font-semibold"
+        v-if="auth.role === 'admin'"
+      >
+        <NuxtLink to="/Admin">Admin</NuxtLink>
+      </h1>
+      <h1
+        class="mx-2 text-gray-200 text-lg hover:font-semibold"
+        v-if="auth.role === 'admin'"
+      >
+        <NuxtLink to="/Logs">Logs</NuxtLink>
+      </h1>
+      <h1
+        class="mx-2 text-gray-200 text-lg hover:font-semibold"
+        v-if="auth.isAuthenticated"
+      >
         <NuxtLink to="/Cases">All Cases</NuxtLink>
       </h1>
     </div>
@@ -49,7 +64,13 @@
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
 const auth = useAuth();
-if (await pb.authStore.isValid) auth.value.isAuthenticated = true;
+const loggedInUser = useLoggedInUsername();
+
+if (await pb.authStore.isValid) {
+  auth.value.isAuthenticated = true;
+  loggedInUser.value = pb.authStore.model!.username;
+}
+
 async function logout() {
   pb.authStore.clear();
   navigateTo("/Login");

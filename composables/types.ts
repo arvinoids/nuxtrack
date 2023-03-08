@@ -40,7 +40,7 @@ declare module 'pocketbase-types'{
 declare module 'custom-types' {
     interface LogData {
         user:string,
-        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" |  "skipped user",
+        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" |  "skipped user" | "deleted user" | "updated user",
         details?:string
       }
       

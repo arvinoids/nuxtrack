@@ -281,3 +281,19 @@ export async function logActivity(data:LogData) {
       const res = pb.collection('logs').create(data)
   } catch (e:any) { console.log(e.message)}
 }
+
+export async function useDeleteUser(id:string) {
+  const result: result = { message: "", status: "success" };
+  try {
+    const userRecord = await pb.collection("users").getOne(id)
+    const username = userRecord.username
+    await pb.collection("users").delete(id);
+    result.message = `${username} is deleted`;
+    useRefreshAll();
+    return result;
+  } catch (e: any) {
+    result.status = "failed";
+    result.message = e.message;
+    return result;
+  }
+}

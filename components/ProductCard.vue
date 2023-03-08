@@ -68,7 +68,6 @@ async function getCurrentList(group: string) {
 }
 
 watch(updated, async () => {
-  console.log("data updated");
   users = await getCurrentList(props.group);
   updateCard.value++;
 });

@@ -3,11 +3,9 @@
   <input type="checkbox" :id="props.id + 'del'" class="modal-toggle" />
   <div class="modal">
     <div class="modal-box w-min max-w-5xl rounded-none">
-      <h3 class="font-bold text-lg">Deleting case...</h3>
-      <!-- <p class="py-4"> {{ message }}</p> -->
+      <h3 class="font-bold text-lg mb-2">Deleting case...</h3>
       <p>Are you sure you want to delete this case?</p>
-
-      <p class="font-bold text-error">{{ caseId }}</p>
+      <p class="font-bold text-error text-center">{{ caseId }}</p>
       <div class="modal-action">
         <label :for="props.id + 'del'" class="btn">Cancel</label>
         <label
@@ -16,15 +14,6 @@
           @click="deleteCase(props.id)"
           >Yes</label
         >
-      </div>
-    </div>
-  </div>
-  <input type="checkbox" id="deleted" class="modal-toggle" />
-  <div class="modal">
-    <div class="modal-box w-min">
-      <p>{{ message }}</p>
-      <div class="modal-action">
-        <label for="deleted" class="btn">OK</label>
       </div>
     </div>
   </div>
@@ -39,9 +28,7 @@ const props = defineProps<{
   caseId: string;
   caseOwner: string;
 }>();
-const user = props.caseOwner;
 const caseId = props.caseId;
-const message = ref("");
 const update = useDataUpdated();
 async function deleteCase(id: string) {
   const res = await useDeleteCase(id);

@@ -56,6 +56,7 @@ async function login() {
   try {
     const authData = await pb.collection("users").authWithPassword(username, password);
     authenticated.value.isAuthenticated = pb.authStore.isValid;
+    authenticated.value.role = authData.record.role;
     loggedInUser.value = pb.authStore.model!.username;
     navigateTo("/");
   } catch (error: any) {
