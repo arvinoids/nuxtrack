@@ -184,7 +184,7 @@ export async function useGetFilteredCases(user?: string, group?: string) {
   if ((user === undefined || user === '') && (group === undefined) || group === '')
     return await pb.collection('cases').getList(1, 10000, { expand: "user, group", sort: sorting })
   else if (user === undefined || user === '') return await pb.collection('cases').getList(1, 1000, { filter: `group="${group}"`, expand: "user, group", sort: sorting })
-  else if (group == undefined|| group === '') return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"`, expand: "user, group", sort: sorting })
+  else if (group == undefined || group === '') return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"`, expand: "user, group", sort: sorting })
   else return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"&&group="${group}"`, expand: "user, group", sort: sorting })
 }
 
@@ -271,18 +271,18 @@ export async function useGetUsers(group?: string) {
   return users
 }
 
-export async function useGetUsernameFromId(id:string) {
+export async function useGetUsernameFromId(id: string) {
   const res = await pb.collection('users').getOne(id)
   return res.username
 }
 
-export async function logActivity(data:LogData) {
-  try{ 
-      const res = pb.collection('logs').create(data)
-  } catch (e:any) { console.log(e.message)}
+export async function logActivity(data: LogData) {
+  try {
+    const res = pb.collection('logs').create(data)
+  } catch (e: any) { console.log(e.message) }
 }
 
-export async function useDeleteUser(id:string) {
+export async function useDeleteUser(id: string) {
   const result: result = { message: "", status: "success" };
   try {
     const userRecord = await pb.collection("users").getOne(id)
@@ -296,4 +296,32 @@ export async function useDeleteUser(id:string) {
     result.message = e.message;
     return result;
   }
+}
+
+export async function useCreateUser(
+  username: string,
+  email: string,
+  password: string,
+  passwordConfirm: string,
+  fullname: string,
+  memberOf: string[],
+  role: "user" | "admin"
+) {
+  const data = {
+    username,
+    email,
+    "emailVisibility": true,
+    password,
+    passwordConfirm,
+    fullname,
+    memberOf,
+    role
+  };
+  const result: result = { status: 'failed', message: '' }
+  try {
+    const res = await pb.collection('users').create(data)
+    result.status = 'success'
+    result.message = `User ${data.fullname.toUpperCase()} has been created.`
+  } catch (e: any) { result.message = e.message; result.status = 'failed' }
+  return result
 }

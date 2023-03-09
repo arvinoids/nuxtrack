@@ -29,7 +29,7 @@
         </tr>
       </tbody>
     </table>
-    <label for="adduser" class="btn my-3">Add User</label>
+    <nuxt-link to="/Admin/AddUser" for="adduser" class="btn my-3">Add User</nuxt-link>
     <AddUser />
   </div>
 </template>
