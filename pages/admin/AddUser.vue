@@ -71,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+import { userEntry } from "custom-types";
+
 const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });
 console.log(groups);
@@ -85,7 +87,7 @@ let memberOf: string[];
 let role: "user" | "admin";
 
 async function addUser() {
-  const data = {
+  const data: userEntry = {
     username,
     email,
     emailVisibility,
@@ -95,7 +97,10 @@ async function addUser() {
     memberOf,
     role,
   };
-  const res = await useCreateUser(...data);
+  const res = await useCreateUser(data);
+  useShowToast(res.message, res.status);
+  if (res.status === "success") navigateTo("/Admin/index");
+  else message.value = res.message;
 }
 </script>
 

@@ -1,5 +1,5 @@
 import PocketBase, { ListResult } from "pocketbase";
-import { LogData } from "custom-types";
+import { LogData, userEntry } from "custom-types";
 
 const cnf = useRuntimeConfig().public;
 const pb = new PocketBase(cnf.pocketBaseURL);
@@ -298,30 +298,12 @@ export async function useDeleteUser(id: string) {
   }
 }
 
-export async function useCreateUser(
-  username: string,
-  email: string,
-  password: string,
-  passwordConfirm: string,
-  fullname: string,
-  memberOf: string[],
-  role: "user" | "admin"
-) {
-  const data = {
-    username,
-    email,
-    "emailVisibility": true,
-    password,
-    passwordConfirm,
-    fullname,
-    memberOf,
-    role
-  };
+export async function useCreateUser(userData:userEntry) {
   const result: result = { status: 'failed', message: '' }
   try {
-    const res = await pb.collection('users').create(data)
+    const res = await pb.collection('users').create(userData)
     result.status = 'success'
-    result.message = `User ${data.fullname.toUpperCase()} has been created.`
+    result.message = `User ${userData.fullname.toUpperCase()} has been created.`
   } catch (e: any) { result.message = e.message; result.status = 'failed' }
   return result
 }

@@ -43,5 +43,16 @@ declare module 'custom-types' {
         type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" |  "skipped user" | "deleted user" | "updated user",
         details?:string
       }
+
+    interface userEntry {
+        username: string,
+        email: string,
+        emailVisibility:boolean,
+        password: string,
+        passwordConfirm: string,
+        fullname: string,
+        memberOf: string[],
+        role: "user" | "admin"
+    }
       
 }
