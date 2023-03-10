@@ -95,7 +95,7 @@ async function submitCase(caseId: string, id: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: await useGetUsernameFromId(id),
+    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(id)),
   };
   logActivity(logData);
 }
