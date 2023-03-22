@@ -1,52 +1,65 @@
 <template>
   <div class="flex flex-col items-center gap-2">
     <h1 class="text-lg text-center">Add User</h1>
-    <div class="border m-2 p-5">
-      <form action="submit" class="flex flex-col gap-4">
+    <div class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap">
+      <VForm action="submit" class="flex flex-col gap-4 w-[300px]">
         <div class="flex flex-col">
           <label for="name" class="label">Name: </label>
-          <input
+          <VField
             type="text"
+            name="name"
             class="input input-bordered input-sm"
             placeholder="Full Name"
             v-model="fullname"
+            :rules="{ required: true, min: 3 }"
           />
+          <VErrorMessage name="name" class="alert alert-error" />
         </div>
         <div class="flex flex-col">
-          <label for="username" class="label">Username: </label
-          ><input
+          <label for="username" class="label">Username: </label>
+          <VField
             type="text"
             class="input input-bordered input-sm"
             placeholder="username"
+            name="username"
             v-model="username"
+            :rules="{ required: true }"
           />
+          <VErrorMessage name="username" class="alert alert-error" />
         </div>
         <div class="flex flex-col">
           <label for="email" class="label">Email: </label>
-          <input
+          <VField
             type="text"
             class="input input-bordered input-sm"
             placeholder="example@lexmark.com"
             v-model="email"
+            name="email"
+            :rules="{ required: true, email }"
           />
+          <VErrorMessage name="email" class="alert alert-error" />
         </div>
         <div class="flex flex-col">
           <label for="password" class="label">Password: </label>
-          <input
+          <VField
             type="password"
             class="input input-bordered input-sm"
             placeholder="password"
             v-model="password"
+            name="password"
+            :rules="{ required: true, min: 8 }"
           />
-        </div>
-        <div class="flex flex-col">
+          <VErrorMessage name="password" class="alert alert-error" />
           <label for="confirm" class="label">Confirm password: </label>
-          <input
+          <VField
             type="password"
             class="input input-bordered input-sm"
             placeholder="confirm"
             v-model="passwordConfirm"
+            name="confirmation"
+            rules="confirmed:@password"
           />
+          <VErrorMessage name="confirmation" class="alert alert-error" />
         </div>
         <div class="flex flex-col form-control">
           <label for="group" class="label">Choose the group(s) for user:</label>
@@ -61,11 +74,34 @@
             </option>
           </select>
         </div>
-        <div class="alert" v-if="message">
+        <div class="form-control w-full max-w-xs">
+          <label class="label">
+            <span class="label">Role</span>
+          </label>
+          <select class="select select-bordered select-sm" v-model="role">
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+          </select>
+        </div>
+        <div class="flex justify-center">
+          <ValidatedButton @click.prevent="addUser" class="btn btn-primary w-min"
+            >Submit</ValidatedButton
+          >
+        </div>
+      </VForm>
+      <div class="flex flex-col items-stretch">
+        <div class="border p-5 w-[300px] flex-grow bg-base-100">
+          <h5 class="font-semibold">Please note:</h5>
+          <ul class="text-accent mt-2">
+            <li>Username should match the user's corporate shortname.</li>
+            <li>Password must be 8 characters or longer.</li>
+            <li>Only users with <strong>admin</strong> role can edit or delete cases.</li>
+          </ul>
+        </div>
+        <div class="border alert alert-error items-end" v-if="message">
           <p>{{ message }}</p>
         </div>
-        <button @click.prevent="addUser" class="btn btn-primary">Submit</button>
-      </form>
+      </div>
     </div>
   </div>
 </template>
@@ -73,18 +109,24 @@
 <script setup lang="ts">
 import { userEntry } from "custom-types";
 
+const isRequired = (value: string) => {
+  if (value && value.trim()) {
+    return true;
+  }
+  return "This is required.";
+};
+
 const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });
-console.log(groups);
-const message = ref("Hello");
+const message = ref("");
 let username: string;
 let email: string;
-let emailVisibility: true;
+let emailVisibility: boolean = true;
 let password: string;
 let passwordConfirm: string;
 let fullname: string;
-let memberOf: string[];
-let role: "user" | "admin";
+let memberOf: string[] = [];
+let role: "user" | "admin" = "user";
 
 async function addUser() {
   const data: userEntry = {
@@ -99,9 +141,14 @@ async function addUser() {
   };
   const res = await useCreateUser(data);
   useShowToast(res.message, res.status);
-  if (res.status === "success") navigateTo("/Admin/index");
+  if (res.status === "success") navigateTo("/Admin/");
   else message.value = res.message;
 }
 </script>
 
-<style></style>
+<style scoped>
+ul {
+  list-style-type: circle;
+  margin-left: 2rem;
+}
+</style>

@@ -179,13 +179,15 @@ export async function getUserCases(userId?: string, group?: string) {
   return cases;
 }
 
-export async function useGetFilteredCases(user?: string, group?: string) {
+export async function useGetFilteredCases(user?: string, group?: string, pageNumber?:number, perPage?:number) {
   const sorting = "-created"
+  if (pageNumber === undefined) pageNumber = 1
+  if (perPage === undefined) perPage = 10
   if ((user === undefined || user === '') && (group === undefined) || group === '')
-    return await pb.collection('cases').getList(1, 10000, { expand: "user, group", sort: sorting })
-  else if (user === undefined || user === '') return await pb.collection('cases').getList(1, 1000, { filter: `group="${group}"`, expand: "user, group", sort: sorting })
-  else if (group == undefined || group === '') return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"`, expand: "user, group", sort: sorting })
-  else return await pb.collection('cases').getList(1, 1000, { filter: `user="${user}"&&group="${group}"`, expand: "user, group", sort: sorting })
+    return await pb.collection('cases').getList(pageNumber, perPage, { expand: "user, group", sort: sorting })
+  else if (user === undefined || user === '') return await pb.collection('cases').getList(pageNumber, perPage, { filter: `group="${group}"`, expand: "user, group", sort: sorting })
+  else if (group == undefined || group === '') return await pb.collection('cases').getList(pageNumber, perPage, { filter: `user="${user}"`, expand: "user, group", sort: sorting })
+  else return await pb.collection('cases').getList(pageNumber, perPage, { filter: `user="${user}"&&group="${group}"`, expand: "user, group", sort: sorting })
 }
 
 export async function useUpdateCase(
@@ -221,7 +223,7 @@ export async function useDeleteCase(id: string) {
     const caseRecord = await pb.collection("cases").getOne(id)
     const caseId = caseRecord.case
     await pb.collection("cases").delete(id);
-    result.message = `${caseId} is deleted`;
+    result.message = caseId;
     useRefreshAll();
     return result;
   } catch (e: any) {
@@ -302,8 +304,16 @@ export async function useCreateUser(userData:userEntry) {
   const result: result = { status: 'failed', message: '' }
   try {
     const res = await pb.collection('users').create(userData)
+    console.log(res)
     result.status = 'success'
     result.message = `User ${userData.fullname.toUpperCase()} has been created.`
-  } catch (e: any) { result.message = e.message; result.status = 'failed' }
+  } catch (e: any) { result.message = e.message; result.status = 'failed'; console.log(e) }
   return result
+}
+
+export async function useGetGroupName(group:string) {
+  try {
+    const res = await pb.collection('groups').getOne(group)
+    return res.name
+  } catch (e) { console.log(e) }
 }

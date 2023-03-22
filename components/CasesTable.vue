@@ -1,6 +1,6 @@
 <template>
   <div :key="updateTable">
-    <div class="overflow-x-auto shadow-lg" v-if="cases.length > 0">
+    <div class="overflow-x-auto shadow-lg" v-if="cases.length !== 0">
       <table class="table table-compact" v-if="!loading">
         <thead>
           <tr>
@@ -50,11 +50,18 @@ const pb = useNuxtApp().$pb;
 const props = defineProps<{
   userId?: string;
   group?: string;
+  pageNum?: number;
+  perPage?: number;
 }>();
 const updated = useDataUpdated();
 const loading = ref(true);
 async function getCases() {
-  const record = await useGetFilteredCases(props.userId, props.group);
+  const record = await useGetFilteredCases(
+    props.userId,
+    props.group,
+    props.pageNum,
+    props.perPage
+  );
   const cases = record.items;
   loading.value = false;
   return cases;

@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col items-center">
-    <table class="table table-zebra table-compact shadow-md">
+  <div class="flex flex-col items-center" :key="updateTable">
+    <table class="table table-zebra table-compact shadow-md" :key="updateTable">
       <thead>
         <tr>
           <th class="rounded-none">Name</th>
@@ -37,11 +37,24 @@
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
 
-const users = await pb
-  .collection("users")
-  .getFullList(1000, { sort: "+username", expand: "memberOf" });
+const updated = useDataUpdated();
 
-const groups = await pb.collection("groups").getFullList(100);
+let users = await getUsers();
+
+async function getUsers() {
+  const res = await pb
+    .collection("users")
+    .getFullList(1000, { sort: "+username", expand: "memberOf" });
+  return res;
+}
+
+// const groups = await pb.collection("groups").getFullList(100);
+
+let updateTable = ref(0);
+watch(updated, async () => {
+  users = await getUsers();
+  updateTable.value++;
+});
 </script>
 
 <style></style>

@@ -4,12 +4,14 @@
       <th>User</th>
       <th>Transaction</th>
       <th>Details</th>
+      <th>Time</th>
     </thead>
     <tbody>
       <tr v-for="log in logs">
         <td class="rounded-none">{{ log.user }}</td>
         <td>{{ log.type }}</td>
-        <td class="rounded-none">{{ log.details }}</td>
+        <td>{{ log.details }}</td>
+        <td class="rounded-none">{{ useFormatDate(new Date(log.created)) }}</td>
       </tr>
     </tbody>
   </table>

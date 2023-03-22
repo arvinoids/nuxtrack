@@ -33,7 +33,7 @@ const update = useDataUpdated();
 async function deleteCase(id: string) {
   const res = await useDeleteCase(id);
   update.value++;
-  useShowToast(res.message, res.status);
+  useShowToast(res.message + " has been deleted.", res.status);
   const logData: LogData = {
     user: loggedInUser.value,
     type: "deleted case",

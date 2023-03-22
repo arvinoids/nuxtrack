@@ -10,7 +10,7 @@
           <Users :group="group.id" :users="users" />
         </div>
         <div class="mx-5 w-min" :key="reloadTable">
-          <CasesTable :group="group.id" />
+          <PaginatedCases :group="group.id" />
         </div>
       </div>
     </div>
