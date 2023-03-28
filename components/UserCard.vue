@@ -7,10 +7,13 @@
       Shortname: <span class="text-accent">{{ user.username }}</span>
     </h5>
     <h5>
+      Role: <span class="text-accent">{{ user.role }}</span>
+    </h5>
+    <h5>
       Email: <span class="text-accent">{{ user.email }}</span>
     </h5>
 
-    <div class="flex justify-center">
+    <div class="flex justify-center mt-1">
       <nuxt-link :to="`/user/${user.username}`" class="link-secondary"
         >All Cases</nuxt-link
       >

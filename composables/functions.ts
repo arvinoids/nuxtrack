@@ -1,13 +1,9 @@
-import PocketBase, { ListResult } from "pocketbase";
+import PocketBase, { ListResult, Record } from "pocketbase";
 import { LogData, userEntry } from "custom-types";
 
 const cnf = useRuntimeConfig().public;
 const pb = new PocketBase(cnf.pocketBaseURL);
 pb.autoCancellation(false);
-interface result {
-  status: string;
-  message: string;
-}
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -58,7 +54,7 @@ export async function useAssignCase(caseId: string, user: string, group: string)
   const data = {
     user: user,
     group: group,
-    case: caseId,
+    case: caseId.trim(),
     assignedBy: pb.authStore.model!.username,
   };
 
@@ -74,8 +70,9 @@ export async function useAssignCase(caseId: string, user: string, group: string)
     await pb.collection("cases").create(data);
     await updateCounter(group, user);
     await createCurrentList(group);
+    let owner = (await useGetUsernameFromId(user)).toUpperCase()
     result.message =
-      "Case has been assigned. The owner should receive a notification shortly.";
+      `Case has been assigned. ${owner} should receive a notification shortly.`;
     result.status = "success";
     return result;
   }
@@ -128,12 +125,6 @@ export async function createCurrentList(groupId: string) {
   });
 }
 
-interface result {
-  message: string,
-  status: string,
-}
-
-
 export async function useSkipOut(userId: string, groupId: string) {
   const random = Math.random().toString(36).substring(3, 9);
   const data = {
@@ -142,7 +133,7 @@ export async function useSkipOut(userId: string, groupId: string) {
     case: "OutOfOffice-" + random,
     assignedBy: pb.authStore.model!.username,
   };
-  const result: result = { message: '', status: '' }
+  const result = { message: '', status: '' }
   try {
     await pb.collection("cases").create(data);
     await updateCounter(groupId, userId);
@@ -218,7 +209,7 @@ export async function useUpdateCase(
 }
 
 export async function useDeleteCase(id: string) {
-  const result: result = { message: "", status: "success" };
+  const result = { message: "", status: "success" };
   try {
     const caseRecord = await pb.collection("cases").getOne(id)
     const caseId = caseRecord.case
@@ -285,7 +276,7 @@ export async function logActivity(data: LogData) {
 }
 
 export async function useDeleteUser(id: string) {
-  const result: result = { message: "", status: "success" };
+  const result = { message: "", status: "success" };
   try {
     const userRecord = await pb.collection("users").getOne(id)
     const username = userRecord.username
@@ -301,7 +292,7 @@ export async function useDeleteUser(id: string) {
 }
 
 export async function useCreateUser(userData:userEntry) {
-  const result: result = { status: 'failed', message: '' }
+  const result = { status: 'failed', message: '' }
   try {
     const res = await pb.collection('users').create(userData)
     console.log(res)
@@ -315,5 +306,72 @@ export async function useGetGroupName(group:string) {
   try {
     const res = await pb.collection('groups').getOne(group)
     return res.name
+  } catch (e) { console.log(e) }
+}
+
+export async function useSearchCase(id:string) {
+  id = id.trim()
+  let result = { message: '', status: 'failed'}
+  let data:Record|undefined
+  try {
+    data = await pb.collection('cases').getFirstListItem(`case="${id}"`, { expand: 'user'})
+    result = { message: `Case ${id} found.`, status: 'success'}
+  } catch (e:any) { result = { message: e.message, status: "failed"}; data=undefined}
+  return { data, result }
+}
+
+export async function useCaseExists(id:string) {
+  try {
+    let res = await pb.collection('cases').getFirstListItem(`case="${id}"`)
+    return true
+  } catch (e) { return false }
+}
+
+export async function useCaseIsEscalated(id:string){
+  try {
+    let res = await pb.collection('cases').getFirstListItem(`case="${id}-escalated"`)
+    return true
+  } catch (e) { return false }
+}
+
+export async function useEscalateCase(caseId: string, user: string, group: string) { 
+  let caseRec = await getCase(caseId.trim())
+  await renameOldCase(caseRec)
+
+  const data = {
+    user: user,
+    group: group,
+    case: caseId.trim(),
+    assignedBy: pb.authStore.model!.username,
+  };
+
+  const result = { message: "", status: "" };
+  try {
+    await pb.collection("cases").create(data);
+    await updateCounter(group, user);
+    await createCurrentList(group);
+    let owner = (await useGetUsernameFromId(user)).toUpperCase()
+    result.message =
+      `Case has been escalated. ${owner} should receive a notification shortly.`;
+    result.status = "success";
+  } catch(e) { result.message = 'Failed to escalate.'
+  result.status = 'failed'
+  }
+  return result
+}
+
+async function getCase(id:string) {
+  const rec = await pb.collection('cases').getFirstListItem(`case="${id}"`)
+  return rec
+}
+
+async function renameOldCase(rec:Record) {
+  let newCaseId = rec.case+"-escalated"
+  rec.case = newCaseId
+  const newData = {
+    ...rec
+  }
+  try {
+    await pb.collection('cases').update(rec.id,newData)
   } catch (e) { console.log(e) }
 }

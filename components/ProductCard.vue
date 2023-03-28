@@ -31,8 +31,13 @@
     </div>
     <div class="flex flex-col flex-grow mt-3">
       <div class="flex justify-center mt-auto gap-2">
-        <a class="btn mt-auto w-24 self-center mb-3 hover:btn-primary" :href="anchor"
-          >Select</a
+        <a :href="anchor"
+          ><button
+            class="btn mt-auto w-24 self-center mb-3 hover:btn-primary"
+            @click="setCurrentCase"
+          >
+            Select
+          </button></a
         >
       </div>
     </div>
@@ -77,6 +82,10 @@ function nextUser() {
   if (cursor === users.totalItems - 1) {
     selectedUser.value = 0;
   } else selectedUser.value++;
+}
+
+function setCurrentCase() {
+  console.log(useCaseId().value);
 }
 </script>
 

@@ -76,7 +76,7 @@ async function doUpdate() {
     newUser,
     newGroup,
     newCase,
-    pb.authStore.model.username
+    pb.authStore.model!.username
   );
   updated.value++;
   useShowToast(res.message, res.status);

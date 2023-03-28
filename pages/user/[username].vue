@@ -1,10 +1,10 @@
 <template>
-  <div class="flex gap-2 ">
+  <div class="flex gap-2">
     <div class="">
       <UserCard :user="user" />
     </div>
     <div class="flex flex-col items-center gap-3">
-      <CasesTable :userId="user.id" />
+      <PaginatedCases :userId="user.id" />
       <a
         href="#assign"
         class="btn btn-warning shadow-md btn-outl w-[100px]"

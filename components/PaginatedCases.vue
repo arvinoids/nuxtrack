@@ -16,16 +16,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in cases.items" :key="item.id" class="hover">
+          <tr
+            v-for="item in (cases as unknown as expandedCaseRecordList).items"
+            :key="item.id"
+            class="hover"
+          >
             <td class="rounded-none">{{ item.expand.user.username }}</td>
             <td>{{ item.case }}</td>
             <td>{{ item.expand.group.description }}</td>
             <td>{{ item.assignedBy }}</td>
             <td>{{ useFormatDate(new Date(item.created)) }}</td>
             <td v-if="userIsAdmin()" class="rounded-none">
-              <label :for="item.id + 'edit'" class="btn btn-sm btn-warning mx-1"
-                >Escalate</label
-              >
               <label :for="item.id + 'edit'" class="btn btn-sm btn-warning mx-1"
                 >Edit</label
               >
@@ -63,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+import { expandedCaseRecordList } from "pocketbase-types";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{
   userId?: string;
@@ -107,6 +109,7 @@ watch(updated, async () => {
 
 async function getPage(page: number) {
   cases = await getCases(page);
+  console.log(cases);
   updateTable.value++;
 }
 </script>

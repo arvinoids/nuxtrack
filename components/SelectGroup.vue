@@ -12,6 +12,7 @@
           class="input input-bordered my-2 w-[300px]"
           v-model="caseId"
         />
+        <div class="text-xs text-error">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
         <a class="btn btn-outline btn-secondary" @click="skipCatch(firstUser)"
@@ -25,10 +26,19 @@
         <a
           href="#"
           class="btn btn-primary"
+          :class="{ hidden: caseExists||caseId==='' }"
           @click="submitCase(caseId, firstUser.id, group)"
           >Assign</a
         >
-        <a href="#" class="btn btn-outline btn-error">Cancel</a>
+        <a
+          href="#"
+          class="btn btn-warning btn-primary"
+          :class="{ hidden: !caseExists || disableEscalate }"
+          @click="escalateCase(caseId, firstUser.id, group)"
+          >Escalate</a
+        >
+
+        <a href="#" class="btn btn-outline btn-error" @click="clearCase">Cancel</a>
       </div>
     </div>
   </div>
@@ -42,13 +52,17 @@ const props = defineProps<{
   group: string;
   users: expandedUsers;
 }>();
-const pb = useNuxtApp().$pb;
+
 const emit = defineEmits(["skip"]);
 const loggedInUser = useLoggedInUsername();
-
-let caseId: string;
+let caseId = ref(useCaseId().value);
 let cursor = ref(0);
 let userlist = props.users.items;
+const caseExists = ref(false);
+const caseIsEscalated = ref(false);
+const message = ref("");
+const disableEscalate = ref(false);
+const caseIsBlank = ref(false)
 
 const firstUser = ref(userlist[cursor.value].expand.user);
 
@@ -98,6 +112,44 @@ async function submitCase(caseId: string, id: string, group: string) {
     details: `assigned ${caseId} to ` + (await useGetUsernameFromId(id)),
   };
   logActivity(logData);
+}
+
+async function escalateCase(caseId: string, id: string, group: string) {
+  const res = await useEscalateCase(caseId, id, group);
+  useShowToast(res.message, res.status);
+  useDataUpdated().value++;
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "assigned case",
+    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(id)),
+  };
+  logActivity(logData);
+}
+
+watch(caseId, async (caseId) => {
+  caseExists.value = await useCaseExists(caseId.trim());
+  caseIsEscalated.value = await useCaseIsEscalated(caseId.trim());
+  if (caseId.trim().includes("escalated")) {
+    message.value = "Remove -escalated operator.";
+  } else {
+    message.value = errorMessage(caseExists.value, caseIsEscalated.value,caseId);
+  }
+  if (caseId.trim()==='') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
+});
+
+function errorMessage(caseExists: boolean, caseIsEscalated: boolean,caseId:string) {
+  if (caseExists && caseIsEscalated) {
+    disableEscalate.value = true;
+    return "Already escalated. Please check case number.";
+  }
+  if (caseExists && !caseIsEscalated)
+    return "This case is in the database. Escalate to continue.";
+  if (!caseExists) return "Assign case to proceed.";
+  else return "";
+}
+
+function clearCase() {
+  caseId.value = "";
 }
 </script>
 

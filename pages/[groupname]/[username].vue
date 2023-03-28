@@ -3,7 +3,7 @@
     <div>
       <UserCard :user="user" />
     </div>
-    <CasesTable :userId="user.id" :group="group.id" />
+    <PaginatedCases :userId="user.id" :group="group.id" />
   </div>
 </template>
 
