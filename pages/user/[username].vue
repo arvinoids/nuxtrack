@@ -5,13 +5,6 @@
     </div>
     <div class="flex flex-col items-center gap-3">
       <PaginatedCases :userId="user.id" />
-      <a
-        href="#assign"
-        class="btn btn-warning shadow-md btn-outl w-[100px]"
-        @click="useCaseId().value = ''"
-        >Assign</a
-      >
-      <AssignUser :userId="user.id" />
     </div>
   </div>
 </template>
