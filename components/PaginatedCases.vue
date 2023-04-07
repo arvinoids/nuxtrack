@@ -50,7 +50,7 @@
       <button
         class="btn"
         v-for="page in cases.totalPages"
-        :class="{ 'btn-active': page === cases.page }"
+        :class="{ 'btn-active btn-disabled': page === cases.page }"
         @click="getPage(page)"
       >
         {{ page }}
@@ -113,5 +113,3 @@ async function getPage(page: number) {
   updateTable.value++;
 }
 </script>
-
-<style></style>

@@ -181,6 +181,17 @@ export async function useGetFilteredCases(user?: string, group?: string, pageNum
   else return await pb.collection('cases').getList(pageNumber, perPage, { filter: `user="${user}"&&group="${group}"`, expand: "user, group", sort: sorting })
 }
 
+export async function useGetFilteredLogs(type?:string,pageNumber?:number,perPage?:number) {
+  const sorting = "-created"
+  if (pageNumber === undefined) pageNumber = 1
+  if (perPage === undefined) perPage = 10
+  try {
+    if(type===undefined||type==='')
+  return await pb.collection('logs').getList(pageNumber,perPage,{sort: sorting})
+    else return await pb.collection('logs').getList(pageNumber,perPage,{filter:`type="${type}"`,sort: sorting})
+  } catch (e) { console.log(e)}
+}
+
 export async function useUpdateCase(
   recordId: string,
   user: string,

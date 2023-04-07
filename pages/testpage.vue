@@ -1,6 +1,6 @@
 <template>
   <div>
-    <PaginatedCases />
+    <PaginatedLogs />
   </div>
 </template>
 
