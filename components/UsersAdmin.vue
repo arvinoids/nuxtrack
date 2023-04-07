@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
+pb.autoCancellation(false);
 
 const updated = useDataUpdated();
 

@@ -1,5 +1,6 @@
 import PocketBase, { ListResult, Record } from "pocketbase";
 import { LogData, userEntry } from "custom-types";
+import { Result } from "postcss";
 
 const cnf = useRuntimeConfig().public;
 const pb = new PocketBase(cnf.pocketBaseURL);
@@ -170,7 +171,7 @@ export async function getUserCases(userId?: string, group?: string) {
   return cases;
 }
 
-export async function useGetFilteredCases(user?: string, group?: string, pageNumber?:number, perPage?:number) {
+export async function useGetFilteredCases(user?: string, group?: string, pageNumber?: number, perPage?: number) {
   const sorting = "-created"
   if (pageNumber === undefined) pageNumber = 1
   if (perPage === undefined) perPage = 10
@@ -181,15 +182,15 @@ export async function useGetFilteredCases(user?: string, group?: string, pageNum
   else return await pb.collection('cases').getList(pageNumber, perPage, { filter: `user="${user}"&&group="${group}"`, expand: "user, group", sort: sorting })
 }
 
-export async function useGetFilteredLogs(type?:string,pageNumber?:number,perPage?:number) {
+export async function useGetFilteredLogs(type?: string, pageNumber?: number, perPage?: number) {
   const sorting = "-created"
   if (pageNumber === undefined) pageNumber = 1
   if (perPage === undefined) perPage = 10
   try {
-    if(type===undefined||type==='')
-  return await pb.collection('logs').getList(pageNumber,perPage,{sort: sorting})
-    else return await pb.collection('logs').getList(pageNumber,perPage,{filter:`type="${type}"`,sort: sorting})
-  } catch (e) { console.log(e)}
+    if (type === undefined || type === '')
+      return await pb.collection('logs').getList(pageNumber, perPage, { sort: sorting })
+    else return await pb.collection('logs').getList(pageNumber, perPage, { filter: `type="${type}"`, sort: sorting })
+  } catch (e) { console.log(e) }
 }
 
 export async function useUpdateCase(
@@ -288,6 +289,7 @@ export async function logActivity(data: LogData) {
 
 export async function useDeleteUser(id: string) {
   const result = { message: "", status: "success" };
+
   try {
     const userRecord = await pb.collection("users").getOne(id)
     const username = userRecord.username
@@ -302,7 +304,7 @@ export async function useDeleteUser(id: string) {
   }
 }
 
-export async function useCreateUser(userData:userEntry) {
+export async function useCreateUser(userData: userEntry) {
   const result = { status: 'failed', message: '' }
   try {
     const res = await pb.collection('users').create(userData)
@@ -313,39 +315,39 @@ export async function useCreateUser(userData:userEntry) {
   return result
 }
 
-export async function useGetGroupName(group:string) {
+export async function useGetGroupName(group: string) {
   try {
     const res = await pb.collection('groups').getOne(group)
     return res.name
   } catch (e) { console.log(e) }
 }
 
-export async function useSearchCase(id:string) {
+export async function useSearchCase(id: string) {
   id = id.trim()
-  let result = { message: '', status: 'failed'}
-  let data:Record|undefined
+  let result = { message: '', status: 'failed' }
+  let data: Record | undefined
   try {
-    data = await pb.collection('cases').getFirstListItem(`case="${id}"`, { expand: 'user'})
-    result = { message: `Case ${id} found.`, status: 'success'}
-  } catch (e:any) { result = { message: e.message, status: "failed"}; data=undefined}
+    data = await pb.collection('cases').getFirstListItem(`case="${id}"`, { expand: 'user' })
+    result = { message: `Case ${id} found.`, status: 'success' }
+  } catch (e: any) { result = { message: e.message, status: "failed" }; data = undefined }
   return { data, result }
 }
 
-export async function useCaseExists(id:string) {
+export async function useCaseExists(id: string) {
   try {
     let res = await pb.collection('cases').getFirstListItem(`case="${id}"`)
     return true
   } catch (e) { return false }
 }
 
-export async function useCaseIsEscalated(id:string){
+export async function useCaseIsEscalated(id: string) {
   try {
     let res = await pb.collection('cases').getFirstListItem(`case="${id}-escalated"`)
     return true
   } catch (e) { return false }
 }
 
-export async function useEscalateCase(caseId: string, user: string, group: string) { 
+export async function useEscalateCase(caseId: string, user: string, group: string) {
   let caseRec = await getCase(caseId.trim())
   await renameOldCase(caseRec)
 
@@ -365,24 +367,98 @@ export async function useEscalateCase(caseId: string, user: string, group: strin
     result.message =
       `Case has been escalated. ${owner} should receive a notification shortly.`;
     result.status = "success";
-  } catch(e) { result.message = 'Failed to escalate.'
-  result.status = 'failed'
+  } catch (e) {
+    result.message = 'Failed to escalate.'
+    result.status = 'failed'
   }
   return result
 }
 
-async function getCase(id:string) {
+async function getCase(id: string) {
   const rec = await pb.collection('cases').getFirstListItem(`case="${id}"`)
   return rec
 }
 
-async function renameOldCase(rec:Record) {
-  let newCaseId = rec.case+"-escalated"
+async function renameOldCase(rec: Record) {
+  let newCaseId = rec.case + "-escalated"
   rec.case = newCaseId
   const newData = {
     ...rec
   }
   try {
-    await pb.collection('cases').update(rec.id,newData)
+    await pb.collection('cases').update(rec.id, newData)
   } catch (e) { console.log(e) }
 }
+
+/**
+ * Reassigns cases before deleting the user.
+ */
+export async function useReassignCases(oldUser: string, newUser: string) {
+  const res = { message: "Reassign failed", status: "failed" }
+  const userCases = await pb.collection('cases').getList(1, 10000, { filter: `user="${oldUser}"` })
+  const newUserName = await useGetUsernameFromId(newUser)
+  if (userCases.totalItems > 0) {
+    userCases.items.forEach(async (item) => {
+      const data = {
+        "user": newUser,
+        "group": item.group,
+        "case": item.case,
+        "assignedBy": item.assignedBy
+      }
+      try {
+        const rec = await pb.collection('cases').update(item.id, data)
+        res.message = `Cases assigned to user ${newUserName}.`
+        res.status = "success"
+      } catch (e) { console.log(e) }
+    });
+  } else {
+    res.message = 'No cases to reassign.'
+    res.status = 'success'
+  }
+  return res
+}
+
+async function removeCounters(userId: string) {
+  // remove items with matching user id
+  const res = { message: 'Unable to remove counters', status: ' failed' }
+  const countersData = await pb.collection('counter').getList(1, 100, { filter: `user="${userId}"` })
+  try {
+    countersData.items.forEach(async (item) => {
+      await pb.collection('counter').delete(item.id)
+    })
+  } catch (e: any) {
+    res.message = e.message
+    res.status = 'success'
+  }
+  return res
+}
+
+async function removeLists(userId:string) {
+  const res = { message: 'Unable to remove from lists', status: ' failed' }
+  const listsData = await pb.collection('currentlist').getList(1, 100, { filter: `user="${userId}"` })
+  try {
+    listsData.items.forEach(async (item) => {
+      await pb.collection('currentlist').delete(item.id)
+    })
+  } catch (e: any) {
+    res.message = e.message
+    res.status = 'success'
+  }
+  return res
+}
+
+export async function useRemoveUserFromGroups(id: string) {
+  const res = { message: 'Remove failed', status: 'failed' }
+  const user = await pb.collection('users').getOne(id)
+  try {
+    await removeCounters(id)
+    await removeLists(id)
+    await pb.collection('users').update(id, { "memberOf": [''] })
+    res.message = "User has been removed from all groups"
+    res.status = "success"
+  } catch (e: any) {
+    res.message = e.message
+  }
+  return res
+}
+
