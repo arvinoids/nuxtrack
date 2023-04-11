@@ -65,7 +65,7 @@
 const pb = useNuxtApp().$pb;
 const auth = useAuth();
 const loggedInUser = useLoggedInUsername();
-const userRole = ref(pb.authStore.model.role);
+const userRole = ref(pb.authStore.model!.role);
 
 if (await pb.authStore.isValid) {
   auth.value.isAuthenticated = true;
