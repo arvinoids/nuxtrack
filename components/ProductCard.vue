@@ -59,16 +59,18 @@ const updateCard = ref(0);
 const selectedUser = ref(0);
 
 let users = await getCurrentList(props.group);
-if (users.totalItems === 0) {
-  await createCurrentList(props.group);
-  users = await getCurrentList(props.group);
-}
-
+console.log("group ID ", props.group);
+console.log(group.description, users);
 async function getCurrentList(group: string) {
-  const groupFilter = `group="${group}"`;
   let users = await pb
     .collection("currentlist")
-    .getList(1, 100, { filter: groupFilter, expand: "user", sort: "+order" });
+    .getList(1, 100, { filter: `group="${group}"`, expand: "user", sort: "+order" });
+  if (users.totalItems === 0) {
+    await createCurrentList(group);
+    users = await pb
+      .collection("currentlist")
+      .getList(1, 100, { filter: `group="${group}"`, expand: "user", sort: "+order" });
+  }
   return (users as unknown) as expandedUsers;
 }
 

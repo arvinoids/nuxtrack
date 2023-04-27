@@ -1,8 +1,8 @@
 import PocketBase, { ListResult, Record } from "pocketbase";
 import { LogData, userEntry, emailContent } from "custom-types";
 
-const cnf = useRuntimeConfig().public;
-const pb = new PocketBase(cnf.pocketBaseURL);
+//const cnf = useRuntimeConfig().public;
+const pb = new PocketBase('https://solutionsteam.lrdc.lexmark.com/pb/');
 pb.autoCancellation(false);
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
@@ -28,15 +28,19 @@ async function updateCounter(group: string, user: string) {
     group: group,
     count: newCount,
   };
-  const record = await pb
-    .collection("counter")
-    .getFirstListItem(groupFilter + "&&" + userFilter);
-  // console.log("counter record ", record);
+  let record;
   try {
+    record = await pb
+      .collection("counter")
+      .getFirstListItem(groupFilter + "&&" + userFilter);
+  } catch {
+    console.log('No record in counter yet')
+  }
+
+  // console.log("counter record ", record);
+  if (record !== undefined) {
     let res = await pb.collection("counter").update(record.id, data);
     // console.log("result", res);
-  } catch (e) {
-    console.log(e);
   }
 }
 
@@ -108,17 +112,23 @@ export async function createCurrentList(groupId: string) {
   const queryFilter = 'group="' + groupId + '"';
   //delete existing entries first
   await deleteCurrentList(groupId);
-  const list = await pb.collection("counter").getList(1, 500, {
+  let list = await pb.collection("counter").getList(1, 500, {
     filter: queryFilter,
     sort: "+count",
     $autoCancel: false,
   });
-  //  console.log("generating currentlist for group ", groupId);
+
+  // if group has no cases yet
+  if (list.totalItems === 0) {
+    list = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${groupId}"` })
+  }
+
+  console.log("list items: ", list.items)
   list.items.forEach(async (item: any, i: number) => {
     let data = {
-      user: item.user,
+      user: item.id,
       group: groupId,
-      count: item.count,
+      count: 0,
       order: i + 1,
     };
     await pb.collection("currentlist").create(data);
@@ -432,7 +442,7 @@ async function removeCounters(userId: string) {
   return res
 }
 
-async function removeLists(userId:string) {
+async function removeLists(userId: string) {
   const res = { message: 'Unable to remove from lists', status: ' failed' }
   const listsData = await pb.collection('currentlist').getList(1, 100, { filter: `user="${userId}"` })
   try {
@@ -461,9 +471,11 @@ export async function useRemoveUserFromGroups(id: string) {
   return res
 }
 
-export async function useSendEmail(email:emailContent) {
+export async function useSendEmail(email: emailContent) {
   const emailurl = (await pb.collection('settings').getFirstListItem(`field="emailservice"`)).value
   const token = (await pb.collection('settings').getFirstListItem(`field="emailtoken"`)).value
+  console.log(emailurl)
+  console.log(token)
   const res = await $fetch(emailurl, {
     method: 'POST',
     body: email,
