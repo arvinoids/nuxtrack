@@ -20,7 +20,10 @@
           class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
         >
           <li>
-            <label>Color Mode <ColorToggle /></label>
+            <label
+              >Color Mode
+              <ColorToggle />
+            </label>
           </li>
           <li><nuxt-link to="/ChangePassword">Change Password</nuxt-link></li>
           <li>
@@ -39,6 +42,7 @@
       </h1>
     </div>
     <div class="navbar-end">
+      <Notifier />
       <h1
         class="mx-2 text-gray-200 text-lg hover:font-semibold"
         v-if="userRole === 'admin'"
@@ -66,6 +70,7 @@ const pb = useNuxtApp().$pb;
 const auth = useAuth();
 const loggedInUser = useLoggedInUsername();
 const userRole = ref(pb.authStore.model!.role);
+const newEvent = useNotify();
 
 if (await pb.authStore.isValid) {
   auth.value.isAuthenticated = true;

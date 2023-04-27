@@ -47,6 +47,8 @@
 </template>
 
 <script setup lang="ts">
+import { LogData } from "custom-types";
+const loggedInUser = useLoggedInUsername();
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
 const props = defineProps<{
@@ -80,5 +82,11 @@ async function doUpdate() {
   );
   updated.value++;
   useShowToast(res.message, res.status);
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "updated case",
+    details: res.message,
+  };
+  logActivity(logData);
 }
 </script>

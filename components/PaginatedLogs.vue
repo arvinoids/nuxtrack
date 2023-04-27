@@ -27,7 +27,7 @@
     <div class="flex flex-row gap-10">
       <select class="select select-bordered w-full max-w-xs" v-model="itemsPerPage">
         <option disabled>Items per page</option>
-        <option selected>10</option>
+        <option>10</option>
         <option>20</option>
         <option>100</option>
       </select>
@@ -59,8 +59,9 @@ const props = defineProps<{
 const loading = ref(true);
 const updateTable = ref(0);
 
-const currentPage = ref(props.pageNum);
+// const currentPage = ref(props.pageNum);
 const itemsPerPage = ref(props.perPage);
+if (props.perPage === undefined) itemsPerPage.value = 10;
 
 async function getLogs(page: number) {
   const record = await useGetFilteredLogs(props.type, page, itemsPerPage.value);
@@ -78,4 +79,10 @@ async function getPage(page: number) {
   logs = await getLogs(page);
   updateTable.value++;
 }
+
+watch(itemsPerPage, async () => {
+  getPage(1);
+  logs = await getLogs(1);
+  updateTable.value++;
+});
 </script>

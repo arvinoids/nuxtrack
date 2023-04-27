@@ -89,4 +89,9 @@ declare module 'custom-types' {
         role: "user" | "admin"
     }
 
+    interface emailContent {
+        to: string,
+        subject: string,
+        body: string,
+      }
 }

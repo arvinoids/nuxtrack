@@ -1,6 +1,5 @@
 import PocketBase, { ListResult, Record } from "pocketbase";
-import { LogData, userEntry } from "custom-types";
-import { Result } from "postcss";
+import { LogData, userEntry, emailContent } from "custom-types";
 
 const cnf = useRuntimeConfig().public;
 const pb = new PocketBase(cnf.pocketBaseURL);
@@ -212,10 +211,10 @@ export async function useUpdateCase(
   }
   try {
     const res = await pb.collection("cases").update(recordId, data);
-    result.message = "Case has been updated."
+    result.message = `Case ${caseId} has been updated.`
     return result
   } catch (e: any) {
-    result.message = "There is a problem with the update."
+    result.message = "There is a problem with the update - " + e.message
     return result
   }
 }
@@ -462,3 +461,15 @@ export async function useRemoveUserFromGroups(id: string) {
   return res
 }
 
+export async function useSendEmail(email:emailContent) {
+  const emailurl = (await pb.collection('settings').getFirstListItem(`field="emailservice"`)).value
+  const token = (await pb.collection('settings').getFirstListItem(`field="emailtoken"`)).value
+  const res = await $fetch(emailurl, {
+    method: 'POST',
+    body: email,
+    headers: {
+      Authorization: token
+    }
+  })
+  return res;
+}

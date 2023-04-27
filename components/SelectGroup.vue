@@ -47,6 +47,7 @@
 <script setup lang="ts">
 import { expandedUsers, user } from "pocketbase-types";
 import { LogData } from "custom-types";
+const pb = useNuxtApp().$pb
 
 const props = defineProps<{
   group: string;
@@ -106,6 +107,16 @@ async function submitCase(caseId: string, id: string, group: string) {
   const res = await useSubmitCase(caseId, id, group);
   useShowToast(res.message, res.status);
   useDataUpdated().value++;
+  if(res.status==='success') {
+    const user = (await pb.collection('users').getOne(id))
+    const email = {
+      to: user.email,
+      subject: "New case assigned to you",
+      body: `Hello, ${user.fullname}, ${caseId} has been assigned to you. -Rotation Tracker`
+    }
+    const emailres = await useSendEmail(email)
+    useShowToast(emailres.message,emailres.status)
+  }
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",

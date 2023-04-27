@@ -46,17 +46,24 @@
       </table>
       <div class="text-center" v-else>Loading...</div>
     </div>
-    <div class="btn-group justify-center">
-      <button
-        class="btn"
-        v-for="page in cases.totalPages"
-        :class="{ 'btn-active btn-disabled': page === cases.page }"
-        @click="getPage(page)"
-      >
-        {{ page }}
-      </button>
+    <div class="flex flex-row gap-10">
+      <select class="select select-bordered w-full max-w-xs" v-model="itemsPerPage">
+        <option disabled>Items per page</option>
+        <option>10</option>
+        <option>20</option>
+        <option>100</option>
+      </select>
+      <div class="btn-group justify-center">
+        <button
+          class="btn"
+          v-for="page in cases.totalPages"
+          :class="{ 'btn-active btn-disabled': page === cases.page }"
+          @click="getPage(page)"
+        >
+          {{ page }}
+        </button>
+      </div>
     </div>
-
     <p class="text-center my-3 text-sm">
       Total <span class="text-accent">{{ cases.totalItems }}</span> Cases
     </p>
@@ -72,12 +79,14 @@ const props = defineProps<{
   pageNum?: number;
   perPage?: number;
 }>();
+
 const updated = useDataUpdated();
 const loading = ref(true);
 const updateTable = ref(0);
 
 const currentPage = ref(props.pageNum);
 const itemsPerPage = ref(props.perPage);
+if (props.perPage === undefined) itemsPerPage.value = 10;
 
 async function getCases(page: number) {
   const record = await useGetFilteredCases(
@@ -109,7 +118,12 @@ watch(updated, async () => {
 
 async function getPage(page: number) {
   cases = await getCases(page);
-  console.log(cases);
   updateTable.value++;
 }
+
+watch(itemsPerPage, async () => {
+  getPage(1);
+  cases = await getCases(1);
+  updateTable.value++;
+});
 </script>
