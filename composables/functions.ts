@@ -19,8 +19,8 @@ function createFilter(field: string, value: string) {
 }
 
 async function updateCounter(group: string, user: string) {
-  let groupFilter = createFilter("group", group);
-  let userFilter = createFilter("user", user);
+  // let groupFilter = createFilter("group", group);
+  // let userFilter = createFilter("user", user);
   let newCount = await getCount(user, group);
   // console.log("new count: ", newCount);
   let data = {
@@ -32,7 +32,7 @@ async function updateCounter(group: string, user: string) {
   try {
     record = await pb
       .collection("counter")
-      .getFirstListItem(groupFilter + "&&" + userFilter);
+      .getFirstListItem(`group="${group}"&&user="${user}"`);
   } catch {
     console.log('No record in counter yet')
   }
@@ -106,32 +106,34 @@ async function deleteCurrentList(groupId: string) {
   });
 }
 
-//create current list for when all users have been assigned a case
 export async function createCurrentList(groupId: string) {
-  // console.log("starting create current list for ", groupId);
-  const queryFilter = 'group="' + groupId + '"';
-  //delete existing entries first
+  console.log('creating currentlist for ', groupId)
   await deleteCurrentList(groupId);
   let list = await pb.collection("counter").getList(1, 500, {
-    filter: queryFilter,
+    filter: `group="${groupId}"`,
     sort: "+count",
     $autoCancel: false,
   });
 
-  // if group has no cases yet
-  if (list.totalItems === 0) {
-    list = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${groupId}"` })
-  }
+  // if no counters exist yet
+  if (list.totalItems === 0) { await useGenerateCounters() }
+  list = await pb.collection("counter").getList(1, 500, {
+    filter: `group="${groupId}"`,
+    $autoCancel: false,
+  });
 
   list.items.forEach(async (item: any, i: number) => {
     let data = {
-      user: item.id,
+      user: item.user,
       group: groupId,
-      count: 0,
+      count: item.count,
       order: i + 1,
     };
+    console.log('currentlist data ',data)
+  try {
     await pb.collection("currentlist").create(data);
-  });
+  } catch (e: any) { console.log(e.message) }
+});
 }
 
 export async function useSkipOut(userId: string, groupId: string) {
@@ -271,6 +273,7 @@ export async function useRefreshAll() {
     //createcurrentlist for group
     await createCurrentList(group.id);
   });
+  console.log('Refresh done.')
 }
 
 export async function useGetUsers(group?: string) {
@@ -480,4 +483,35 @@ export async function useSendEmail(email: emailContent) {
     }
   })
   return res;
+}
+
+export async function useGenerateCounters() {
+  console.log('generating counters...')
+  const groups = await pb.collection('groups').getFullList()
+  groups.forEach(async (group) => {
+    const users = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${group.id}"` })
+    console.log(`users of group ${group.description}:`, users)
+    if (users.totalItems > 0) {
+      users.items.forEach(async (user) => {
+        // first delete old counter if it exists
+        old = await pb.collection('counter').getFirstListItem()
+        createCounter(user.id, group.id)
+      })
+    }
+  })
+}
+
+async function createCounter(user: string, group: string) {
+  console.log(`creating counter for ${user} on ${group}.`)
+  const count = await pb.collection('cases').getList(1, 1000, {
+    filter: `user="${user}" && group="${group}"`
+  })
+  const data = {
+    'user': user,
+    'group': group,
+    'count': count.totalItems
+  }
+  try {
+    const res = await pb.collection('counter').create(data)
+  } catch (e: any) { console.log(e.message) }
 }

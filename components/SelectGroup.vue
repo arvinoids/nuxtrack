@@ -129,6 +129,16 @@ async function escalateCase(caseId: string, id: string, group: string) {
   const res = await useEscalateCase(caseId, id, group);
   useShowToast(res.message, res.status);
   useDataUpdated().value++;
+  if(res.status==='success') {
+    const user = (await pb.collection('users').getOne(id))
+    const email = {
+      to: user.email,
+      subject: "New case assigned to you",
+      body: `Hello, ${user.fullname}, ${caseId} has been escalated to you. -Rotation Tracker`
+    }
+    const emailres = await useSendEmail(email)
+    useShowToast(emailres.message,emailres.status)
+  }
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
