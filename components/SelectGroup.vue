@@ -114,6 +114,7 @@ async function submitCase(caseId: string, id: string, group: string) {
       subject: "New case assigned to you",
       body: `Hello, ${user.fullname}, ${caseId} has been assigned to you. -Rotation Tracker`
     }
+    console.log(email)
     const emailres = await useSendEmail(email)
     useShowToast(emailres.message,emailres.status)
   }
