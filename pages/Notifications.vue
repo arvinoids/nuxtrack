@@ -20,5 +20,4 @@ pb.collection("logs").subscribe("*", async function (e) {
 });
 </script>
 
-<style>
-</style>
+<style></style>

@@ -123,7 +123,6 @@ export async function createCurrentList(groupId: string) {
     list = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${groupId}"` })
   }
 
-  console.log("list items: ", list.items)
   list.items.forEach(async (item: any, i: number) => {
     let data = {
       user: item.id,
@@ -317,7 +316,6 @@ export async function useCreateUser(userData: userEntry) {
   const result = { status: 'failed', message: '' }
   try {
     const res = await pb.collection('users').create(userData)
-    console.log(res)
     result.status = 'success'
     result.message = `User ${userData.fullname.toUpperCase()} has been created.`
   } catch (e: any) { result.message = e.message; result.status = 'failed'; console.log(e) }
@@ -474,8 +472,6 @@ export async function useRemoveUserFromGroups(id: string) {
 export async function useSendEmail(email: emailContent) {
   const emailurl = (await pb.collection('settings').getFirstListItem(`field="emailservice"`)).value
   const token = (await pb.collection('settings').getFirstListItem(`field="emailtoken"`)).value
-  console.log(emailurl)
-  console.log(token)
   const res = await $fetch(emailurl, {
     method: 'POST',
     body: email,

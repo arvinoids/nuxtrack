@@ -59,8 +59,6 @@ const updateCard = ref(0);
 const selectedUser = ref(0);
 
 let users = await getCurrentList(props.group);
-console.log("group ID ", props.group);
-console.log(group.description, users);
 async function getCurrentList(group: string) {
   let users = await pb
     .collection("currentlist")
@@ -86,9 +84,7 @@ function nextUser() {
   } else selectedUser.value++;
 }
 
-function setCurrentCase() {
-  console.log(useCaseId().value);
-}
+function setCurrentCase() {}
 </script>
 
 <style>
