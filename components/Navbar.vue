@@ -1,7 +1,11 @@
 <template>
   <div class="navbar bg-[#44434e] shadow-md mb-3">
     <div class="navbar-start">
-      <img src="logo_darkmode.svg" alt="Logo" class="h-[25px] md:ml-[5rem] mr-5" />
+      <img
+        src="~/assets/img/logo_darkmode.svg"
+        alt="Logo"
+        class="h-[25px] md:ml-[5rem] mr-5"
+      />
       <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
         <NuxtLink to="/">Rotation Tracker</NuxtLink>
       </h1>
