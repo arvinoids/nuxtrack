@@ -58,6 +58,7 @@ const updated = useDataUpdated();
 const updateCard = ref(0);
 const selectedUser = ref(0);
 
+await useMakeCounter(props.group);
 let users = await getCurrentList(props.group);
 async function getCurrentList(group: string) {
   let users = await pb

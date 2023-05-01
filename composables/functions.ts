@@ -19,8 +19,6 @@ function createFilter(field: string, value: string) {
 }
 
 async function updateCounter(group: string, user: string) {
-  let groupFilter = createFilter("group", group);
-  let userFilter = createFilter("user", user);
   let newCount = await getCount(user, group);
   // console.log("new count: ", newCount);
   let data = {
@@ -32,7 +30,7 @@ async function updateCounter(group: string, user: string) {
   try {
     record = await pb
       .collection("counter")
-      .getFirstListItem(groupFilter + "&&" + userFilter);
+      .getFirstListItem(`group="${group}"&&user="${user}"`);
   } catch {
     console.log('No record in counter yet')
   }
@@ -73,7 +71,7 @@ export async function useAssignCase(caseId: string, user: string, group: string)
   } else {
     await pb.collection("cases").create(data);
     await updateCounter(group, user);
-    await createCurrentList(group);
+    // await createCurrentList(group);
     let owner = (await useGetUsernameFromId(user)).toUpperCase()
     result.message =
       `Case has been assigned. ${owner} should receive a notification shortly.`;
@@ -108,28 +106,29 @@ async function deleteCurrentList(groupId: string) {
 
 //create current list for when all users have been assigned a case
 export async function createCurrentList(groupId: string) {
-  // console.log("starting create current list for ", groupId);
-  const queryFilter = 'group="' + groupId + '"';
   //delete existing entries first
   await deleteCurrentList(groupId);
   let list = await pb.collection("counter").getList(1, 500, {
-    filter: queryFilter,
+    filter: `group="${groupId}"`,
     sort: "+count",
     $autoCancel: false,
   });
 
-  // if group has no cases yet
+  // if group has no currentlist, get members of group
   if (list.totalItems === 0) {
     list = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${groupId}"` })
   }
 
+  // for each member, create currentlist entry
   list.items.forEach(async (item: any, i: number) => {
+    const count = (await pb.collection('counter').getList(1, 1000, { filter: `group="${groupId}"&&user="${item.id}"` })).totalItems
     let data = {
       user: item.id,
       group: groupId,
-      count: 0,
+      count,
       order: i + 1,
     };
+    console.log('currentlist data', data)
     await pb.collection("currentlist").create(data);
   });
 }
@@ -269,7 +268,7 @@ export async function useRefreshAll() {
       await updateCounter(group.id, user.id);
     });
     //createcurrentlist for group
-    await createCurrentList(group.id);
+    // await createCurrentList(group.id);
   });
 }
 
@@ -470,6 +469,13 @@ export async function useRemoveUserFromGroups(id: string) {
 }
 
 export async function useSendEmail(email: emailContent) {
+  const enabled = await pb.collection('settings').getFirstListItem(`field="emailnotification"`)
+  if(enabled.value='false') {
+    return { 
+      message: "Email notifications are currently disabled.",
+      status:"failed",
+    }
+  }
   const emailurl = (await pb.collection('settings').getFirstListItem(`field="emailservice"`)).value
   const token = (await pb.collection('settings').getFirstListItem(`field="emailtoken"`)).value
   const res = await $fetch(emailurl, {
@@ -480,4 +486,42 @@ export async function useSendEmail(email: emailContent) {
     }
   })
   return res;
+}
+
+export async function useMakeCounter(group: string, users: ListResult) {
+  users.items.forEach(async (user) => {
+    const count = (await pb.collection('cases').getList(1, 10000, { filter: `user="${user.id}"&&group="${group}"` })).totalItems
+    let data = {
+      user: user.id,
+      group,
+      count
+    }
+    console.log('counter data', data)
+    const oldCounter = await pb.collection('counter').getList(1, 1, { filter: `user="${user.id}"&&group="${group}"` })
+    if (oldCounter.totalItems === 1) { await pb.collection('counter').delete(oldCounter.items[0].id) }
+    // create new counter
+    const res = await pb.collection('counter').create(data)
+    console.log('create result', res)
+  })
+}
+
+export async function useUpdateCounter(group: string, users: ListResult) {
+  users.items.forEach(async (user) => {
+    const oldCounter = await pb.collection('counter').getFirstListItem(`user="${user.id}" && group="${group}"`)
+    let newCount = countCases(user.id, group)
+    let data = {
+      user: user.id,
+      group,
+      count: newCount
+    }
+  });
+}
+
+async function countCases(user: string, group: string) {
+  const res = await pb.collection('cases').getList(1, 10000, { filter: `user="${user}"&&group="${group}"` })
+  return res.totalItems
+}
+
+export async function useUpdateCurrentList(group: string) {
+  const counter = await pb.collection('counter').getList(1, 1000, { filter: `group="${group}"`, sort: "+count" })
 }

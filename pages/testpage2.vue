@@ -1,26 +1,21 @@
 <template>
-  <div>
-    {{ users }}
+  <div class="flex flex-col">
+    <div class="self-center mt-3">
+      <p class="text-lg text-secondary">
+        Hello, {{ currentUser }}. To assign or escalate a case, please select a group
+        below.
+      </p>
+    </div>
+    <div class="flex flex-row flex-wrap justify-center">
+      <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
+        <NewProductCard :group="group.id" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
-let group = "67gqz0wjmk8l8ky";
-const users = await getCurrentList(group);
-
-async function getCurrentList(group: string) {
-  let users = await pb
-    .collection("currentlist")
-    .getList(1, 100, { filter: `group="${group}"`, expand: "user", sort: "+order" });
-  if (users.totalItems === 0) {
-    await createCurrentList(group);
-    users = await pb
-      .collection("currentlist")
-      .getList(1, 100, { filter: `group="${group}"`, expand: "user", sort: "+order" });
-  }
-  return users;
-}
+const groups = (await pb.collection("groups").getList(1, 100, { sort: "+order" })).items;
+const currentUser = await pb.authStore.model!.fullname;
 </script>
-
-<style></style>

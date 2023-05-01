@@ -25,4 +25,6 @@ export const useLoggedInUsername = ()=> useState(()=> (''))
 export const useEscalation = ()=> useState(()=> (false))
 
 export const useNotify = ()=> useState(()=> (false))
+
+export const useLoading = ()=> useState(()=>(true))
  

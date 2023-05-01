@@ -4,7 +4,7 @@
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 448 512"
       class="w-5 mx-2"
-      :class="{ 'fill-red-400': newEvent, 'fill-gray-200': !newEvent }"
+      :class="{ 'fill-primary-focus': newEvent, 'fill-gray-200': !newEvent }"
       @click="seenEvent()"
     >
       <!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
@@ -18,10 +18,18 @@
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
 const newEvent = useNotify();
+const currentUser = pb.authStore.model!.username;
 
 // Subscribe to changes in any logs record
-pb.collection("logs").subscribe("*", async function (e) {
-  console.log(e.record);
+pb.collection("logs").subscribe("*", async () => {
+  const latest = await pb
+    .collection("logs")
+    .getList(1, 1, { filter: `created >="${Date.now()}"`, sort: "-created" });
+  const update = latest.items[0];
+
+  if (currentUser !== update.user) {
+    useShowToast(`${update.user} ${update.type} - ${update.details}`, "success");
+  }
   newEvent.value = true;
 });
 
