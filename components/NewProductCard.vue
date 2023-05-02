@@ -23,7 +23,7 @@
               ' case(s) in group.'
             "
           >
-            <p class="hover:font-semibold hover:text-accent">
+            <p class="hover:font-semibold hover:text-accent text-sm">
               {{ user.expand.user.fullname }}({{ user.count }})
             </p>
           </nuxt-link>
@@ -42,7 +42,12 @@
         >
       </div>
     </div>
-    <SelectGroup :group="group.id" :users="users" @skip="nextUser" />
+    <SelectGroup
+      :group="group.id"
+      :users="users"
+      @skip="nextUser"
+      @reset="resetSelection"
+    />
     <div class="bg-gray-100 pt-[7px]"></div>
   </div>
 </template>
@@ -93,6 +98,10 @@ function nextUser() {
   } else selectedUser.value++;
 }
 
+function resetSelection() {
+  selectedUser.value = 0;
+}
+
 let users = ref(await getSortedUsers(props.group));
 
 onMounted(async () => {
@@ -109,6 +118,6 @@ pb.collection("counter").subscribe("*", async function (e) {
 
 <style>
 .next {
-  @apply text-accent-focus text-lg my-2;
+  @apply text-accent-focus text-lg my-2 font-semibold;
 }
 </style>

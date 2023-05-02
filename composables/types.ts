@@ -72,6 +72,11 @@ declare module 'pocketbase-types' {
 }
 
 declare module 'custom-types' {
+
+    interface result {
+        message:string,
+        status:"success"|"failed"
+    }
     interface LogData {
         user: string,
         type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user",

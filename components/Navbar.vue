@@ -16,7 +16,7 @@
       <div class="dropdown dropdown-end" v-if="auth.isAuthenticated">
         <label
           tabindex="0"
-          class="btn btn-ghost btn-circle text-secondary mx-3 md:mr-[5rem]"
+          class="btn btn-ghost btn-square text-secondary mx-3 md:mr-[5rem]"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -13,10 +13,10 @@ pb.autoCancellation(false);
 //We need a way to refresh the counter every time changes are made.
 
 
-function createFilter(field: string, value: string) {
-  let filter = field + "='" + value + "'";
-  return filter;
-}
+// function createFilter(field: string, value: string) {
+//   let filter = field + "='" + value + "'";
+//   return filter;
+// }
 
 async function updateCounter(group: string, user: string) {
   let newCount = await getCount(user, group);
@@ -43,10 +43,10 @@ async function updateCounter(group: string, user: string) {
 }
 
 async function getCount(user: string, group: string) {
-  const groupFilter = createFilter("group", group);
-  const userFilter = createFilter("user", user);
+  // const groupFilter = createFilter("group", group);
+  // const userFilter = createFilter("user", user);
   const res = await pb.collection("cases").getList(1, 10000, {
-    filter: groupFilter + "&&" + userFilter,
+    filter: `group="${group}"&&user="${user}"`,
     $autoCancel: false,
   });
   return res.totalItems;

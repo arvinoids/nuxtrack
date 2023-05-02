@@ -38,7 +38,7 @@
           >Escalate</a
         >
 
-        <a href="#" class="btn btn-outline btn-error" @click="clearCase">Cancel</a>
+        <a href="#" class="btn btn-outline btn-error" @click="resetSelection">Cancel</a>
       </div>
     </div>
   </div>
@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import { expandedUsers, user } from "pocketbase-types";
-import { LogData } from "custom-types";
+import { LogData,result } from "custom-types";
 const pb = useNuxtApp().$pb
 
 const props = defineProps<{
@@ -54,7 +54,7 @@ const props = defineProps<{
   users: expandedUsers;
 }>();
 
-const emit = defineEmits(["skip"]);
+const emit = defineEmits(["skip","reset"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
@@ -114,7 +114,7 @@ async function submitCase(caseId: string, id: string, group: string) {
       subject: "New case assigned to you",
       body: `Hello, ${user.fullname}, ${caseId} has been assigned to you. -Rotation Tracker`
     }
-    const emailres = await useSendEmail(email)
+    const emailres:result = (await useSendEmail(email)) as result
     useShowToast(emailres.message,emailres.status)
   }
   const logData: LogData = {
@@ -159,8 +159,10 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean,caseId:strin
   else return "";
 }
 
-function clearCase() {
+async function resetSelection() {
+  await pb.collection('logs').create({ user:pb.authStore.model!.username, type:'canceled assign', details: "Canceled assign case" })
   caseId.value = "";
+  emit('reset')
 }
 </script>
 
