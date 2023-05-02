@@ -470,7 +470,7 @@ export async function useRemoveUserFromGroups(id: string) {
 
 export async function useSendEmail(email: emailContent) {
   const enabled = await pb.collection('settings').getFirstListItem(`field="emailnotification"`)
-  if(enabled.value='false') {
+  if(enabled.value==='false') {
     return { 
       message: "Email notifications are currently disabled.",
       status:"failed",

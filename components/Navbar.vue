@@ -21,7 +21,7 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="text-primary w-5 fill-gray-200"
+            class="text-primary w-5 fill-gray-200 hover:fill-gray-50"
             viewBox="0 0 448 512"
           >
             <!--! Font Awesome Pro 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
