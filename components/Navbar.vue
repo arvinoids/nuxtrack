@@ -13,10 +13,11 @@
     <div class="navbar-center"></div>
     <div class="navbar-end">
       <Notifier />
-      <div class="dropdown dropdown-end" v-if="auth.isAuthenticated">
-        <label
-          tabindex="0"
-          class="btn btn-ghost btn-square text-secondary mx-3 md:mr-[5rem]"
+      <div class="relative mx-3 md:mr-[5rem]">
+        <!-- Dropdown toggle button -->
+        <button
+          @click="show = !show"
+          class="flex items-center btn btn-ghost btn-square p-2 text-secondary"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -28,37 +29,48 @@
               d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"
             />
           </svg>
-        </label>
-        <ul
-          tabindex="0"
-          v-if="auth"
-          class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
-        >
-          <li>
-            <label
-              >Color Mode
-              <ColorToggle />
-            </label>
-          </li>
-          <li>
-            <div v-if="userRole === 'admin'">
-              <NuxtLink to="/Admin">Admin</NuxtLink>
-            </div>
-          </li>
-          <li>
-            <div v-if="auth.isAuthenticated">
-              <NuxtLink to="/Cases">All Cases</NuxtLink>
-            </div>
-          </li>
-          <li><nuxt-link to="/ChangePassword">Change Password</nuxt-link></li>
-          <li>
-            <nuxt-link to="/user/Profile">My Page</nuxt-link>
-          </li>
+        </button>
 
-          <li>
-            <div @click="logout()">Logout</div>
-          </li>
-        </ul>
+        <!-- Dropdown menu -->
+        <div
+          v-show="show"
+          class="absolute right-0 mt-2 py-2 bg-base-100 shadow-xl w-44 border z-40"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <label class="block px-4 text-sm hover:bg-neutral">Color </label>
+            <ColorToggle />
+          </div>
+          <div
+            v-if="userRole === 'admin'"
+            class="block px-4 py-2 text-sm hover:bg-neutral"
+          >
+            <NuxtLink to="/Admin">Admin</NuxtLink>
+          </div>
+          <div
+            v-if="auth.isAuthenticated"
+            class="block px-4 py-2 text-sm hover:bg-neutral"
+          >
+            <NuxtLink to="/Cases">All Cases</NuxtLink>
+          </div>
+          <div>
+            <nuxt-link to="/user/Profile" class="block px-4 py-2 text-sm hover:bg-neutral"
+              >My Page</nuxt-link
+            >
+          </div>
+          <div>
+            <nuxt-link
+              to="/ChangePassword"
+              class="block px-4 py-2 text-sm hover:bg-neutral"
+              >Change Password</nuxt-link
+            >
+          </div>
+          <div
+            class="block px-4 py-2 text-sm hover:bg-neutral cursor-pointer"
+            @click="logout()"
+          >
+            Logout
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -69,6 +81,7 @@ const pb = useNuxtApp().$pb;
 const auth = useAuth();
 const loggedInUser = useLoggedInUsername();
 const userRole = ref(pb.authStore.model!.role);
+const show = ref(false);
 // const newEvent = useNotify();
 
 if (await pb.authStore.isValid) {
