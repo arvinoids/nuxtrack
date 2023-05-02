@@ -105,6 +105,8 @@ async function skipCatch(user: user) {
 
 async function submitCase(caseId: string, id: string, group: string) {
   const res = await useSubmitCase(caseId, id, group);
+  const currentUser = pb.authStore.model!.fullname
+  const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);
   useDataUpdated().value++;
   if(res.status==='success') {
@@ -112,7 +114,7 @@ async function submitCase(caseId: string, id: string, group: string) {
     const email = {
       to: user.email,
       subject: "New case assigned to you",
-      body: `Hello, ${user.fullname}, ${caseId} has been assigned to you. -Rotation Tracker`
+      body: `Hi ${user.fullname}, \n\n${caseId} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
     }
     const emailres:result = (await useSendEmail(email)) as result
     useShowToast(emailres.message,emailres.status)
