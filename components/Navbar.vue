@@ -43,30 +43,36 @@
           <div
             v-if="userRole === 'admin'"
             class="block px-4 py-2 text-sm hover:bg-neutral"
+            @click="show = !show"
           >
             <NuxtLink to="/Admin">Admin</NuxtLink>
           </div>
           <div
             v-if="auth.isAuthenticated"
             class="block px-4 py-2 text-sm hover:bg-neutral"
+            @click="show = !show"
           >
             <NuxtLink to="/Cases">All Cases</NuxtLink>
           </div>
-          <div>
-            <nuxt-link to="/user/Profile" class="block px-4 py-2 text-sm hover:bg-neutral"
-              >My Page</nuxt-link
-            >
+          <div class="block px-4 py-2 text-sm hover:bg-neutral" @click="show = !show">
+            <nuxt-link to="/user/Profile">My Page</nuxt-link>
           </div>
           <div>
             <nuxt-link
               to="/ChangePassword"
               class="block px-4 py-2 text-sm hover:bg-neutral"
+              @click="show = !show"
               >Change Password</nuxt-link
             >
           </div>
           <div
             class="block px-4 py-2 text-sm hover:bg-neutral cursor-pointer"
-            @click="logout()"
+            @click="
+              {
+                logout();
+                show = !show;
+              }
+            "
           >
             Logout
           </div>

@@ -36,9 +36,7 @@
     <div class="flex flex-col flex-grow mt-3">
       <div class="flex justify-center mt-auto gap-2">
         <a :href="anchor"
-          ><button class="btn mt-auto w-24 self-center mb-3 hover:btn-primary">
-            Select
-          </button></a
+          ><button class="btn mt-auto w-24 self-center mb-3">Select</button></a
         >
       </div>
     </div>

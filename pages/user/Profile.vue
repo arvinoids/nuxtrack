@@ -11,7 +11,6 @@
 const pb = useNuxtApp().$pb;
 
 const userData = await pb.collection("users").getOne(pb.authStore.model!.id);
-console.log(userData);
 </script>
 
 <style></style>

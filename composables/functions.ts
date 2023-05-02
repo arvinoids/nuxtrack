@@ -12,12 +12,6 @@ pb.autoCancellation(false);
 
 //We need a way to refresh the counter every time changes are made.
 
-
-// function createFilter(field: string, value: string) {
-//   let filter = field + "='" + value + "'";
-//   return filter;
-// }
-
 async function updateCounter(group: string, user: string) {
   let newCount = await getCount(user, group);
   // console.log("new count: ", newCount);
@@ -71,7 +65,6 @@ export async function useAssignCase(caseId: string, user: string, group: string)
   } else {
     await pb.collection("cases").create(data);
     await updateCounter(group, user);
-    // await createCurrentList(group);
     let owner = (await useGetUsernameFromId(user)).toUpperCase()
     result.message =
       `Case has been assigned. ${owner} should receive a notification shortly.`;
@@ -92,47 +85,6 @@ export async function caseExists(caseId: string) {
   }
 }
 
-async function deleteCurrentList(groupId: string) {
-  // console.log("deleting currentlist for ", groupId);
-  const groupFilter: string = "group=" + '"' + groupId + '"';
-  const old = await pb
-    .collection("currentlist")
-    .getList(1, 100, { filter: groupFilter });
-  const items = old.items;
-  items.forEach(async (item) => {
-    await pb.collection("currentlist").delete(item.id);
-  });
-}
-
-//create current list for when all users have been assigned a case
-export async function createCurrentList(groupId: string) {
-  //delete existing entries first
-  await deleteCurrentList(groupId);
-  let list = await pb.collection("counter").getList(1, 500, {
-    filter: `group="${groupId}"`,
-    sort: "+count",
-    $autoCancel: false,
-  });
-
-  // if group has no currentlist, get members of group
-  if (list.totalItems === 0) {
-    list = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${groupId}"` })
-  }
-
-  // for each member, create currentlist entry
-  list.items.forEach(async (item: any, i: number) => {
-    const count = (await pb.collection('counter').getList(1, 1000, { filter: `group="${groupId}"&&user="${item.id}"` })).totalItems
-    let data = {
-      user: item.id,
-      group: groupId,
-      count,
-      order: i + 1,
-    };
-    console.log('currentlist data', data)
-    await pb.collection("currentlist").create(data);
-  });
-}
-
 export async function useSkipOut(userId: string, groupId: string) {
   const random = Math.random().toString(36).substring(3, 9);
   const data = {
@@ -145,7 +97,7 @@ export async function useSkipOut(userId: string, groupId: string) {
   try {
     await pb.collection("cases").create(data);
     await updateCounter(groupId, userId);
-    await createCurrentList(groupId)
+    // await createCurrentList(groupId)
     const user = await pb.collection('users').getOne(userId)
     result.message = `${user.fullname} is out of the office and was skipped.`
     result.status = "success"
@@ -267,8 +219,6 @@ export async function useRefreshAll() {
     users.forEach(async (user) => {
       await updateCounter(group.id, user.id);
     });
-    //createcurrentlist for group
-    // await createCurrentList(group.id);
   });
 }
 
@@ -368,7 +318,7 @@ export async function useEscalateCase(caseId: string, user: string, group: strin
   try {
     await pb.collection("cases").create(data);
     await updateCounter(group, user);
-    await createCurrentList(group);
+    // await createCurrentList(group);
     let owner = (await useGetUsernameFromId(user)).toUpperCase()
     result.message =
       `Case has been escalated. ${owner} should receive a notification shortly.`;
@@ -455,7 +405,7 @@ async function removeLists(userId: string) {
 
 export async function useRemoveUserFromGroups(id: string) {
   const res = { message: 'Remove failed', status: 'failed' }
-  const user = await pb.collection('users').getOne(id)
+  // const user = await pb.collection('users').getOne(id)
   try {
     await removeCounters(id)
     await removeLists(id)
