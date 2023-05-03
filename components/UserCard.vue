@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3 mx-2 shadow-lg border w-[300px]">
+  <div class="p-3 shadow-lg border w-[300px]">
     <h5 class="">
       User: <span class="text-accent">{{ user.fullname }}</span>
     </h5>

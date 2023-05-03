@@ -9,7 +9,9 @@
     <div v-if="!loading">
       <div ref="dashboard" class="flex flex-row flex-wrap justify-center">
         <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
-          <NewProductCard :group="group.id" class="flex-grow" />
+          <transition>
+            <NewProductCard :group="group.id" class="flex-grow" />
+          </transition>
         </div>
       </div>
     </div>
@@ -31,3 +33,13 @@ onMounted(async () => {
   loading.value = false;
 });
 </script>
+
+<style scoped>
+.v-enter-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from {
+  opacity: 0;
+}
+</style>

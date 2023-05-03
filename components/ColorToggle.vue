@@ -1,8 +1,14 @@
 <template>
-  <div class="d-toggle-switch">
-    <label class="label">
-      <input type="checkbox" v-model="mode" class="toggle toggle-sm" />
-      <span class="label-text ml-2">{{ colorMode.preference }}</span>
+  <div class="btn btn-ghost btn-circle">
+    <label class="swap swap-rotate">
+      <!-- this hidden checkbox controls the state -->
+      <input type="checkbox" v-model="mode" />
+
+      <!-- sun icon -->
+      <Icon name="ic:outline-brightness-4" class="swap-off text-gray-200" size="1.6rem" />
+
+      <!-- moon icon -->
+      <Icon name="ic:outline-brightness-5" class="swap-on" size="1.6rem" />
     </label>
   </div>
 </template>

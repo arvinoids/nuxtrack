@@ -61,7 +61,6 @@ const anchor: string = "#" + props.group + "select";
 const updateCard = ref(0);
 const selectedUser = ref(0);
 const loading = ref(true);
-const list = ref();
 
 // query for groups and users
 const group = await pb.collection("groups").getOne(props.group);

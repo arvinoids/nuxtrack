@@ -6,37 +6,18 @@
         <span class="text-accent">{{ firstUser.fullname }}</span>
       </h3>
       <p class="py-4">
-        <input
-          type="text"
-          placeholder="CAS-XXXXXXXXXXX"
-          class="input input-bordered my-2 w-[300px]"
-          v-model="caseId"
-        />
-        <div class="text-xs text-error">{{ message }}</div>
+        <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]" v-model="caseId" />
+      <div class="text-xs text-error">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
-        <a class="btn btn-outline btn-secondary" @click="skipCatch(firstUser)"
-          >Catch Up Later</a
-        >
+        <a class="btn btn-outline btn-secondary" @click="skipCatch(firstUser)">Catch Up Later</a>
         <div>
-          <a class="btn btn-outline btn-secondary" @click="skipOut(firstUser.id, group)"
-            >Out of Office</a
-          >
+          <a class="btn btn-outline btn-secondary" @click="skipOut(firstUser.id, group)">Out of Office</a>
         </div>
-        <a
-          href="#"
-          class="btn btn-primary"
-          :class="{ hidden: caseExists||caseId==='' }"
-          @click="submitCase(caseId, firstUser.id, group)"
-          >Assign</a
-        >
-        <a
-          href="#"
-          class="btn btn-warning btn-primary"
-          :class="{ hidden: !caseExists || disableEscalate }"
-          @click="escalateCase(caseId, firstUser.id, group)"
-          >Escalate</a
-        >
+        <a href="#" class="btn btn-primary" :class="{ hidden: caseExists || caseId === '' }"
+          @click="submitCase(caseId, firstUser.id, group)">Assign</a>
+        <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: !caseExists || disableEscalate }"
+          @click="escalateCase(caseId, firstUser.id, group)">Escalate</a>
 
         <a href="#" class="btn btn-outline btn-error" @click="resetSelection">Cancel</a>
       </div>
@@ -46,7 +27,7 @@
 
 <script setup lang="ts">
 import { expandedUsers, user } from "pocketbase-types";
-import { LogData,result } from "custom-types";
+import { LogData, result } from "custom-types";
 const pb = useNuxtApp().$pb
 
 const props = defineProps<{
@@ -54,7 +35,7 @@ const props = defineProps<{
   users: expandedUsers;
 }>();
 
-const emit = defineEmits(["skip","reset"]);
+const emit = defineEmits(["skip", "reset"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
@@ -95,6 +76,7 @@ async function skipCatch(user: user) {
   useShowToast(message, "success");
   emit("skip");
   moveCursor();
+  console.log("cursor moved: ",cursor.value)
   const logData: LogData = {
     user: loggedInUser.value,
     type: "skipped user",
@@ -109,15 +91,15 @@ async function submitCase(caseId: string, id: string, group: string) {
   const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);
   useDataUpdated().value++;
-  if(res.status==='success') {
+  if (res.status === 'success') {
     const user = (await pb.collection('users').getOne(id))
     const email = {
       to: user.email,
       subject: "New case assigned to you",
       body: `Hi ${user.fullname}, \n\n${caseId} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
     }
-    const emailres:result = (await useSendEmail(email)) as result
-    useShowToast(emailres.message,emailres.status)
+    const emailres: result = (await useSendEmail(email)) as result
+    useShowToast(emailres.message, emailres.status)
   }
   const logData: LogData = {
     user: loggedInUser.value,
@@ -145,12 +127,12 @@ watch(caseId, async (caseId) => {
   if (caseId.trim().includes("escalated")) {
     message.value = "Remove -escalated operator.";
   } else {
-    message.value = errorMessage(caseExists.value, caseIsEscalated.value,caseId);
+    message.value = errorMessage(caseExists.value, caseIsEscalated.value, caseId);
   }
-  if (caseId.trim()==='') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
+  if (caseId.trim() === '') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
 });
 
-function errorMessage(caseExists: boolean, caseIsEscalated: boolean,caseId:string) {
+function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
   if (caseExists && caseIsEscalated) {
     disableEscalate.value = true;
     return "Already escalated. Please check case number.";
@@ -162,9 +144,10 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean,caseId:strin
 }
 
 async function resetSelection() {
-  await pb.collection('logs').create({ user:pb.authStore.model!.username, type:'canceled assign', details: "Canceled assign case" })
-  caseId.value = "";
-  emit('reset')
+  console.log('reset cursor',cursor.value)
+    await pb.collection('logs').create({ user: pb.authStore.model!.username, type: 'canceled assign', details: "Canceled assign case" })
+    emit('reset')
+    caseId.value = "";
 }
 </script>
 

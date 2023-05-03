@@ -10,5 +10,5 @@ const isDisabled = computed(() => {
 </script>
 
 <template>
-  <button :disabled="isDisabled">Submit</button>
+  <button :disabled="isDisabled"><slot /></button>
 </template>
