@@ -11,11 +11,11 @@
 
     <!-- Dialog -->
     <label for="finder" class="modal cursor-pointer">
-      <label class="modal-box relative w-[22rem] flex flex-col" for="">
-        <h3 class="text-lg font-bold self-start">Find a case</h3>
+      <label class="modal-box relative w-[22rem] flex flex-col gap-2" for="">
+        <h3 class="text-lg font-bold">Find a case</h3>
         <label for="caseId"
           ><input
-            class="input my-3 bg-neutral text-center"
+            class="input my-3 bg-neutral text-center w-[19rem]"
             type="text"
             v-model="caseId"
             placeholder="Enter CAS here"
@@ -44,17 +44,22 @@
               <span class="font-semibold">Assigned by:</span>
               {{ caseData.data.assignedBy.toUpperCase() }}
             </p>
+            <div class="border p-3 text-sm my-3">
+              To escalate the case, close this window and select a group in the homepage.
+            </div>
           </div>
         </div>
         <div v-else>
           <p class="text-accent text-center" v-if="caseId">Case not found</p>
         </div>
+        <label for="finder" class="btn btn-sm w-min self-center text-sm">Close</label>
       </label>
     </label>
   </div>
 </template>
 
 <script setup lang="ts">
+const escPressed = ref(false);
 const show = ref(false);
 const caseFound = ref(false);
 const caseId = ref("");

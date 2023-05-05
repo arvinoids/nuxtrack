@@ -96,7 +96,7 @@ const itemsPerPage = ref(props.perPage);
 if (props.perPage === undefined) itemsPerPage.value = 10;
 
 async function getLogs(page: number | null | undefined) {
-  if (page === null || page === undefined) page = 1;
+  if (page === null || page === undefined || page === 0) page = 1;
   const record = await useGetFilteredLogs(props.type, page, itemsPerPage.value);
 
   const logs = record;
