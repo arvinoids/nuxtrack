@@ -145,7 +145,10 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
 }
 
 async function resetSelection() {
+  if(cursor.value>0){
     await pb.collection('logs').create({ user: pb.authStore.model!.username, type: 'canceled assign', details: "Canceled assign case" })
+    useShowToast("Canceled assign after skips","warn")
+  }
     emit('reset')
     caseId.value = "";
 }

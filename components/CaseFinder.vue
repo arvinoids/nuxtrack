@@ -50,7 +50,10 @@
           </div>
         </div>
         <div v-else>
-          <p class="text-accent text-center" v-if="caseId">Case not found</p>
+          <p class="text-accent text-center" v-if="caseId">
+          <div v-if="loading">Looking for case...</div>
+          <div v-else>Case not found</div>
+          </p>
         </div>
         <label for="finder" class="btn btn-sm w-min self-center text-sm">Close</label>
       </label>
@@ -59,17 +62,21 @@
 </template>
 
 <script setup lang="ts">
-const escPressed = ref(false);
 const show = ref(false);
 const caseFound = ref(false);
 const caseId = ref("");
+const loading = ref(true);
 
 let caseData = ref();
 
 watch(caseId, async (caseId) => {
+  loading.value = true;
   caseData.value = await useFindCase(caseId);
-  if (caseData.value.data !== null) caseFound.value = true;
+  if (caseData.value.data !== null) {
+     caseFound.value = true;
+  }
   else caseFound.value = false;
+  loading.value = false
   if (caseId === "") caseFound.value = false;
 });
 </script>

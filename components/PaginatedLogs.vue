@@ -114,9 +114,7 @@ async function getPage(page: number | null) {
   }
   logs = await getLogs(page);
   currentPage.value = page;
-  console.log("setting value of currentpage to ", currentPage.value!.toString());
   localStorage.setItem("tracker-currentpagelogs", currentPage.value!.toString());
-  console.log("stored value ", localStorage.getItem("tracker-currentpagelogs"));
   updateTable.value++;
 }
 
