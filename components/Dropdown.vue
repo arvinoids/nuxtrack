@@ -1,24 +1,29 @@
 <template>
   <div class="relative">
     <!-- Dropdown toggle button -->
-    <button @click="show = !show" class="flex items-center btn btn-ghost btn-square p-2">
-      <div class="text-gray-200 hover:text-gray-50">
+    <div
+      class="flex items-center btn btn-ghost btn-square p-2"
+      ref="menubutton"
+      @click.stop="show = !show"
+    >
+      <button class="text-gray-200 hover:text-gray-50">
         <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />
-      </div>
-    </button>
+      </button>
+    </div>
 
     <!-- Dropdown menu -->
     <transition>
       <div
         v-show="show"
-        class="absolute right-0 mt-3 py-2 px-2 bg-base-100 shadow-xl w-[20rem] border z-40"
+        class="absolute right-0 mt-3 py-2 bg-base-100 shadow-xl w-[20rem] border z-40"
+        ref="menu"
       >
         <div class="flex flex-row items-center">
           <div class="block px-4 py-2 text-sm justify-start">
             Logged in as {{ loggedInUser.toUpperCase() }}
           </div>
           <div
-            class="text-sm hover:bg-warning cursor-pointer justify-end ml-auto mr-3 border px-2 py-1"
+            class="btn btn-sm btn-outline btn-warning justify-end ml-auto mr-3 px-2 py-1"
             @click="
               {
                 logout();
@@ -26,7 +31,7 @@
               }
             "
           >
-            LOGOUT
+            Log out
           </div>
         </div>
         <div
@@ -77,6 +82,15 @@ async function logout() {
   navigateTo("/Login");
   auth.value.isAuthenticated = false;
 }
+
+// const menu = ref(null);
+// onClickOutside(
+//   menu,
+//   (event) => {
+//     show.value = false;
+//   },
+//   { ignore: ["menubutton"] }
+// );
 </script>
 
 <style scoped>

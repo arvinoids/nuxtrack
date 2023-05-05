@@ -27,15 +27,17 @@
         v-model="password"
       />
 
-      <div class="flex flex-row justify-center">
+      <div class="flex flex-col items-center h-4/5">
         <button class="btn-hover color-1 formlabel">Log In</button>
-      </div>
-      <div v-if="message">
-        <div class="border p-3 m-2 border-base-300">
-          <p class="text-error text-center text-sm">{{ message }}</p>
+        <div v-if="message" class="">
+          <div class="border p-3 border-base-300">
+            <p class="text-error text-center text-sm">{{ message }}</p>
+          </div>
+        </div>
+        <div class="mt-auto">
+          <Footer />
         </div>
       </div>
-      <Footer />
     </form>
   </div>
 </template>
@@ -89,10 +91,7 @@ form {
 
 .formlabel {
   font-family: "Inter", sans-serif;
-  color: #ffffff;
-  letter-spacing: 0.5px;
-  outline: none;
-  border: none;
+  @apply text-gray-50;
 }
 
 form h3 {

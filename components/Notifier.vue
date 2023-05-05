@@ -2,7 +2,7 @@
   <nuxt-link to="/Logs" class="btn btn-circle btn-ghost">
     <Icon
       name="ic:baseline-notifications-active"
-      size="2rem"
+      size="1.8rem"
       :class="newEvent ? 'text-error' : 'text-gray-200'"
       @click="newEvent = false"
     />
@@ -27,9 +27,15 @@ pb.collection("logs").subscribe("*", async () => {
   newEvent.value = true;
 });
 
-async function seenEvent() {
-  newEvent.value = false;
-}
+watch(newEvent, (x = newEvent.value) => {
+  localStorage.setItem("newEvent-tracker", x ? "true" : "false");
+});
+
+onMounted(() => {
+  newEvent.value = useGetBooleanFromLocalStorage(
+    localStorage.getItem("newEvent-tracker")
+  );
+});
 </script>
 
 <style></style>

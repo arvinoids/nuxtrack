@@ -32,14 +32,36 @@
           <option>20</option>
           <option>100</option>
         </select>
-        <div class="btn-group justify-center" :key="updateTable">
+
+        <div class="btn-group">
           <button
             class="btn"
-            v-for="page in logs!.totalPages"
-            :class="{ 'btn-active btn-disabled': page === logs!.page }"
-            @click="getPage(page)"
+            :class="{ 'btn-disabled': currentPage === 1 }"
+            @click="currentPage = 1"
           >
-            {{ page }}
+            ‹
+          </button>
+          <button
+            class="btn"
+            :class="{ 'btn-disabled': currentPage === 1 }"
+            @click="currentPage--"
+          >
+            «
+          </button>
+          <button class="btn">Page {{ currentPage }} of {{ logs?.totalPages }}</button>
+          <button
+            class="btn"
+            :class="{ 'btn-disabled': currentPage === logs?.totalPages }"
+            @click="currentPage++"
+          >
+            »
+          </button>
+          <button
+            class="btn"
+            :class="{ 'btn-disabled': currentPage === 1 }"
+            @click="currentPage = logs!.totalPages"
+          >
+            ›
           </button>
         </div>
       </div>
@@ -51,9 +73,6 @@
 </template>
 
 <script setup lang="ts">
-import { ListResult } from "pocketbase";
-
-const pb = useNuxtApp().$pb;
 const props = defineProps<{
   type?: string;
   pageNum?: number;
@@ -61,12 +80,23 @@ const props = defineProps<{
 }>();
 const loading = ref(true);
 const updateTable = ref(0);
+const currentPage = ref(1);
+
+onMounted(async () => {
+  let pageData = localStorage.getItem("tracker-currentpagelogs");
+  let page = pageData === "NaN" ? 1 : Number(pageData);
+  currentPage.value = page;
+
+  logs = await getLogs(page);
+  loading.value = false;
+});
 
 // const currentPage = ref(props.pageNum);
 const itemsPerPage = ref(props.perPage);
 if (props.perPage === undefined) itemsPerPage.value = 10;
 
-async function getLogs(page: number) {
+async function getLogs(page: number | null | undefined) {
+  if (page === null || page === undefined) page = 1;
   const record = await useGetFilteredLogs(props.type, page, itemsPerPage.value);
 
   const logs = record;
@@ -78,21 +108,31 @@ let page = props.pageNum === undefined ? 1 : props.pageNum;
 
 let logs = await getLogs(page);
 
-async function getPage(page: number) {
+async function getPage(page: number | null) {
+  if (page === null) {
+    page = 1;
+  }
   logs = await getLogs(page);
+  currentPage.value = page;
+  console.log("setting value of currentpage to ", currentPage.value!.toString());
+  localStorage.setItem("tracker-currentpagelogs", currentPage.value!.toString());
+  console.log("stored value ", localStorage.getItem("tracker-currentpagelogs"));
   updateTable.value++;
 }
 
 watch(itemsPerPage, async () => {
   getPage(1);
+  currentPage.value = 1;
   loading.value = true;
   logs = await getLogs(1);
   loading.value = false;
   updateTable.value++;
 });
 
-onMounted(async () => {
-  logs = await getLogs(page);
-  loading.value = false;
+watch(currentPage, async (p = currentPage.value) => {
+  getPage(p);
+  logs = await getLogs(itemsPerPage.value);
+
+  updateTable.value++;
 });
 </script>

@@ -15,10 +15,9 @@
           <a class="btn btn-outline btn-secondary" @click="skipOut(firstUser.id, group)">Out of Office</a>
         </div>
         <a href="#" class="btn btn-primary" :class="{ hidden: caseExists || caseId === '' }"
-          @click="submitCase(caseId, firstUser.id, group)">Assign</a>
+          @click="submitCase(caseId, firstUser.id, group) ">Assign</a>
         <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: !caseExists || disableEscalate }"
           @click="escalateCase(caseId, firstUser.id, group)">Escalate</a>
-
         <a href="#" class="btn btn-outline btn-error" @click="resetSelection">Cancel</a>
       </div>
     </div>
@@ -90,6 +89,7 @@ async function submitCase(caseId: string, id: string, group: string) {
   const currentUser = pb.authStore.model!.fullname
   const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);
+  await resetSelection();
   useDataUpdated().value++;
   if (res.status === 'success') {
     const user = (await pb.collection('users').getOne(id))
@@ -112,6 +112,7 @@ async function submitCase(caseId: string, id: string, group: string) {
 async function escalateCase(caseId: string, id: string, group: string) {
   const res = await useEscalateCase(caseId, id, group);
   useShowToast(res.message, res.status);
+  resetSelection();
   useDataUpdated().value++;
   const logData: LogData = {
     user: loggedInUser.value,
@@ -144,7 +145,6 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
 }
 
 async function resetSelection() {
-  console.log('reset cursor',cursor.value)
     await pb.collection('logs').create({ user: pb.authStore.model!.username, type: 'canceled assign', details: "Canceled assign case" })
     emit('reset')
     caseId.value = "";

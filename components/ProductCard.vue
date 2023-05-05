@@ -11,23 +11,20 @@
 
     <div v-else>
       <div v-if="users.totalItems > 0" :key="updateCard">
-        <div v-for="(user, id) in users.items" :key="user.id">
+        <div v-for="(user, id) in users.items" :key="user.id" ref="persons">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
             class="tooltip tooltip-right"
+            :class="{ next: id === selectedUser }"
             :data-tip="
               user.expand.user.username.toUpperCase() +
               ' has ' +
               user.count +
-              ' case(s) in ' +
-              group.description
+              ' case(s) in group.'
             "
           >
-            <p
-              class="hover:font-semibold hover:text-accent"
-              :class="id === selectedUser ? 'text-accent font-bold my-3' : 'text-sm'"
-            >
-              {{ user.expand.user.fullname }}
+            <p class="hover:font-semibold hover:text-accent text-sm">
+              {{ user.expand.user.fullname }}({{ user.count }})
             </p>
           </nuxt-link>
         </div>
@@ -36,17 +33,17 @@
         <p>No users in this group.</p>
       </div>
     </div>
-    <div class="flex flex-col flex-grow mt-3" :key="dataUpdated">
+    <div class="flex flex-col flex-grow mt-3">
       <div class="flex justify-center mt-auto gap-2">
         <a :href="anchor"><button class="btn w-24 self-center mb-3">Select</button></a>
       </div>
-      <SelectGroup
-        :group="group.id"
-        :users="users"
-        @skip="nextUser"
-        @reset="resetSelection"
-      />
     </div>
+    <SelectGroup
+      :group="group.id"
+      :users="users"
+      @skip="nextUser"
+      @reset="resetSelection"
+    />
     <div class="bg-gray-100 pt-[7px]"></div>
   </div>
 </template>
@@ -54,6 +51,7 @@
 <script setup lang="ts">
 import { expandedUsers } from "pocketbase-types";
 import { ListResult } from "pocketbase";
+import { useAutoAnimate } from "@formkit/auto-animate/vue";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -62,7 +60,6 @@ const anchor: string = "#" + props.group + "select";
 const updateCard = ref(0);
 const selectedUser = ref(0);
 const loading = ref(true);
-const dataUpdated = useDataUpdated();
 
 // query for groups and users
 const group = await pb.collection("groups").getOne(props.group);
@@ -86,7 +83,11 @@ async function counterIsEmpty(group: string, users: ListResult) {
 async function getSortedUsers(group: string) {
   const users = await pb
     .collection("counter")
-    .getList(1, 1000, { filter: `group="${group}"`, sort: "+count", expand: "user" });
+    .getList(1, 1000, {
+      filter: `group="${group}"`,
+      sort: "+count,+updated",
+      expand: "user",
+    });
   return (users as unknown) as expandedUsers;
 }
 
@@ -108,6 +109,8 @@ onMounted(async () => {
   loading.value = false;
 });
 
+const [persons] = useAutoAnimate();
+
 // subscribe to changes in the counter
 pb.collection("counter").subscribe("*", async function (e) {
   users.value = await getSortedUsers(props.group);
@@ -115,4 +118,8 @@ pb.collection("counter").subscribe("*", async function (e) {
 });
 </script>
 
-<style scoped></style>
+<style>
+.next {
+  @apply text-accent-focus text-lg my-2 font-semibold;
+}
+</style>

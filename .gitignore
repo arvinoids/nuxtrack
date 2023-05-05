@@ -6,3 +6,6 @@ node_modules
 .output
 .env
 dist
+pb_date/
+pb_migrations/
+pages/testpage.vue
