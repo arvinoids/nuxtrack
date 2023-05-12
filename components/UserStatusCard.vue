@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md bg-base-100 text-xs shadow-sm border mx-2">
+  <div class="rounded-md bg-base-100 text-xs shadow-sm border mx-2 w-[200px]">
     <div class="flex flex-col items-center p-3 gap-1">
       <div class="indicator">
         <span
@@ -8,7 +8,9 @@
         ></span>
         <img :src="avatarUrl" alt="" class="h-10 w-10 flex-none rounded-full" />
       </div>
-      <div class="font-medium text-sm">{{ user.fullname }}</div>
+      <nuxt-link :to="`/user/${user.username}`" class="font-medium text-sm">{{
+        user.fullname
+      }}</nuxt-link>
       <div
         class="badge badge-sm cursor-pointer min-w-max"
         :class="{ [`badge-${badgeColor}`]: true }"
@@ -22,9 +24,18 @@
       <transition>
         <div
           v-show="show"
-          class="absolute p-2 rounded mt-3 shadow-xl w-auto border right-1 bg-base-100"
+          class="absolute p-2 rounded mt-3 shadow-xl w-auto border left-[150px] bg-base-100"
           ref="menu"
         >
+          <div class="flex min-w-max items-center justify-between mb-1">
+            <p class="text-xs font-semibold">Edit Status...</p>
+            <p
+              class="text-xs font-semibold self-end border px-1 hover:bg-error hover:text-white"
+              @click="show = false"
+            >
+              ✕
+            </p>
+          </div>
           <input
             type="text"
             class="input-xs input-border bg-neutral-100 rounded mb-1"

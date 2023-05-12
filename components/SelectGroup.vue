@@ -5,7 +5,7 @@
         Assign case to
         <span class="text-accent">{{ firstUser.fullname }}</span>
       </h3>
-      <p>Agent is currently {{ firstUser.status }}</p>
+      <p class="text-sm">Status: <span class="font-semibold" :class="{ [`text-${getColor(firstUser.status)}`]: true }">{{ firstUser.status }}</span></p>
       <p class="py-4">
         <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]" v-model="caseId" />
       <div class="text-xs text-error">{{ message }}</div>
@@ -15,7 +15,7 @@
         <div>
           <a class="btn btn-outline btn-secondary" @click="skipOut(firstUser.id, group)">Out of Office</a>
         </div>
-        <a href="#" class="btn btn-primary" :class="{ hidden: caseExists || caseId === '' }"
+        <a href="#" class="btn btn-primary" :class="{ hidden: caseExists || caseId === '' || firstUser.status === 'Busy'}"
           @click="submitCase(caseId, firstUser.id, group) ">Assign</a>
         <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: !caseExists || disableEscalate }"
           @click="escalateCase(caseId, firstUser.id, group)">Escalate</a>

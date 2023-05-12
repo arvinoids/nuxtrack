@@ -34,3 +34,13 @@ export function useFormatDate(date: Date) {
   return formatted
 }
 
+export function getColor(status:string){
+  const choices  =STATUS_CHOICES
+  for (const choice of choices) {
+    if (choice.status === status) {
+      return choice.color;
+    }
+  }
+  return "gray-500";
+}
+
