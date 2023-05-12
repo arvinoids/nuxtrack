@@ -20,15 +20,23 @@
               ' has ' +
               user.count +
               ' case(s) in ' +
-              group.description
+              group.description +
+              '\nStatus: ' +
+              user.expand.user.status
             "
           >
-            <p
+            <Icon
+              name="ic:sharp-circle"
+              :class="`text-${getColor(user.expand.user.status)}`"
+              class="mx-1"
+              size="0.6rem"
+            />
+            <span
               class="hover:font-semibold hover:text-accent"
               :class="id === selectedUser ? 'text-accent font-bold my-3' : 'text-sm'"
             >
               {{ user.expand.user.fullname }}
-            </p>
+            </span>
           </nuxt-link>
         </div>
       </div>
@@ -110,6 +118,11 @@ onMounted(async () => {
 
 // subscribe to changes in the counter
 pb.collection("counter").subscribe("*", async function (e) {
+  users.value = await getSortedUsers(props.group);
+  updateCard.value++;
+});
+
+pb.collection("users").subscribe("*", async function (e) {
   users.value = await getSortedUsers(props.group);
   updateCard.value++;
 });

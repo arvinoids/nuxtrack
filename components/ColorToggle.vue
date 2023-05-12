@@ -4,11 +4,11 @@
       <!-- this hidden checkbox controls the state -->
       <input type="checkbox" v-model="mode" />
 
+      <!-- moon icon -->
+      <Icon name="ic:outline-brightness-5" class="swap-on text-gray-200" size="1.6rem" />
+
       <!-- sun icon -->
       <Icon name="ic:outline-brightness-4" class="swap-off text-gray-200" size="1.6rem" />
-
-      <!-- moon icon -->
-      <Icon name="ic:outline-brightness-5" class="swap-on" size="1.6rem" />
     </label>
   </div>
 </template>
@@ -17,6 +17,11 @@
 const colorMode = useColorMode();
 const storedMode = ref(localStorage.getItem("colorMode"));
 let mode = ref(getStoredMode());
+onMounted(() => {
+  if (storedMode.value === null) localStorage.setItem("colorMode", "light");
+  mode.value = false;
+});
+
 function getStoredMode() {
   if (storedMode.value === "dark" || storedMode.value === null) return true;
   else return false;

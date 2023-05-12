@@ -8,6 +8,7 @@
             <th>Username</th>
             <th>Group</th>
             <th>Created</th>
+            <th>Status</th>
             <th class="rounded-none">Actions</th>
           </tr>
         </thead>
@@ -21,6 +22,9 @@
               </span>
             </td>
             <td>{{ useFormatDate(new Date(user.created)) }}</td>
+            <td>
+              <UserStatusSelect :user="user" />
+            </td>
             <td>
               <label :for="`delete-${user.id}`" class="btn btn-sm btn-warning"
                 >Delete</label

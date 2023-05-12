@@ -8,7 +8,7 @@
         ></span>
         <img :src="avatarUrl" alt="" class="h-10 w-10 flex-none rounded-full" />
       </div>
-      <nuxt-link :to="`/user/${user.username}`" class="font-medium text-sm">{{
+      <nuxt-link :to="`/user/${user.username}`" class="text-sm">{{
         user.fullname
       }}</nuxt-link>
       <div
@@ -38,7 +38,7 @@
           </div>
           <input
             type="text"
-            class="input-xs input-border bg-neutral-100 rounded mb-1"
+            class="input-xs input-border bg-base-200 rounded mb-1"
             v-model="status.message"
           />
           <p v-for="choice in choices">
@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+const cnf = useRuntimeConfig().public;
 import { statuschoice } from "custom-types";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{
@@ -70,7 +71,7 @@ const props = defineProps<{
 }>();
 const user = pb.authStore.model!;
 const show = ref(false);
-const avatarUrl = `https://solutionsteam.lrdc.lexmark.com/pb/api/files/_pb_users_auth_/${user.id}/${user.avatar}`;
+const avatarUrl = `${cnf.pocketBaseURL}/api/files/_pb_users_auth_/${user.id}/${user.avatar}`;
 
 const status = ref(await useGetUserStatus(props.id));
 const auth = useAuth();

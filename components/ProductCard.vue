@@ -7,14 +7,13 @@
         }}</NuxtLink>
       </h2>
     </div>
-    <div v-if="loading">Loading...</div>
-    <div v-else>
+
+    <div v-if="!loading">
       <div v-if="users.totalItems > 0" :key="updateCard">
         <div v-for="(user, id) in users.items" :key="user.id" ref="persons">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
             class="tooltip tooltip-right"
-            :class="{ next: id === selectedUser }"
             :data-tip="
               user.expand.user.username.toUpperCase() +
               ' has ' +
@@ -22,9 +21,15 @@
               ' case(s) in group.'
             "
           >
-            <p class="hover:font-semibold hover:text-accent text-sm">
-              {{ user.expand.user.fullname }}({{ user.count }})
-            </p>
+            <div class="indicator">
+              <span class="indicator-item badge badge-primary">{{ user.status }}</span>
+              <p
+                class="hover:font-semibold hover:text-accent text-sm"
+                :class="{ next: id === selectedUser }"
+              >
+                {{ user.expand.user.fullname }}({{ user.count }})
+              </p>
+            </div>
           </nuxt-link>
         </div>
       </div>
@@ -32,6 +37,7 @@
         <p>No users in this group.</p>
       </div>
     </div>
+    <div v-else><p>Loading...</p></div>
     <div class="flex flex-col flex-grow mt-3">
       <div class="flex justify-center mt-auto gap-2">
         <a :href="anchor"><button class="btn w-24 self-center mb-3">Select</button></a>
