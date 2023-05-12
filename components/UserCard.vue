@@ -7,6 +7,9 @@
       Shortname: <span class="text-accent">{{ user.username }}</span>
     </h5>
     <h5>
+      Status: <span class="text-accent">{{ user.status }}</span>
+    </h5>
+    <h5>
       Role: <span class="text-accent">{{ user.role }}</span>
     </h5>
     <h5>

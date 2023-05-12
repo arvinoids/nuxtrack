@@ -8,7 +8,6 @@
       </h2>
     </div>
     <div v-if="loading">Loading...</div>
-
     <div v-else>
       <div v-if="users.totalItems > 0" :key="updateCard">
         <div v-for="(user, id) in users.items" :key="user.id" ref="persons">
@@ -81,13 +80,11 @@ async function counterIsEmpty(group: string, users: ListResult) {
 }
 
 async function getSortedUsers(group: string) {
-  const users = await pb
-    .collection("counter")
-    .getList(1, 1000, {
-      filter: `group="${group}"`,
-      sort: "+count,+updated",
-      expand: "user",
-    });
+  const users = await pb.collection("counter").getList(1, 1000, {
+    filter: `group="${group}"`,
+    sort: "+count,+updated",
+    expand: "user",
+  });
   return (users as unknown) as expandedUsers;
 }
 

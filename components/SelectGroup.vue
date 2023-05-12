@@ -5,6 +5,7 @@
         Assign case to
         <span class="text-accent">{{ firstUser.fullname }}</span>
       </h3>
+      <p>Agent is currently {{ firstUser.status }}</p>
       <p class="py-4">
         <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]" v-model="caseId" />
       <div class="text-xs text-error">{{ message }}</div>
@@ -45,7 +46,7 @@ const message = ref("");
 const disableEscalate = ref(false);
 const caseIsBlank = ref(false)
 
-const firstUser = ref(userlist[cursor.value].expand.user);
+const firstUser = ref(userlist[cursor.value].expand.user as user);
 
 function moveCursor() {
   if (cursor.value === props.users.totalItems - 1) {

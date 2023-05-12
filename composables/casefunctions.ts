@@ -1,9 +1,8 @@
-import { ErrorMessage } from "vee-validate";
 import PocketBase, { ListResult, Record } from "pocketbase";
-import { LogData, userEntry, emailContent } from "custom-types";
 
-//const cnf = useRuntimeConfig().public;
+// //const cnf = useRuntimeConfig().public;
 const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
+// const pb = useNuxtApp().$pb
 pb.autoCancellation(false);
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
@@ -90,11 +89,10 @@ export async function caseExists(caseId: string) {
 }
 
 export async function useSkipOut(userId: string, groupId: string) {
-  const random = Math.random().toString(36).substring(3, 9);
   const data = {
     user: userId,
     group: groupId,
-    case: "OutOfOffice-" + random,
+    case: generateDummyCase('OutOfOffice-'),
     assignedBy: pb.authStore.model!.username,
   };
   const result = { message: "", status: "" };
@@ -274,61 +272,6 @@ export async function useRefreshAll() {
   });
 }
 
-export async function useGetUsers(group?: string) {
-  let users: ListResult;
-  if (group === null) {
-    users = await pb.collection("users").getList();
-  } else
-    users = await pb
-      .collection("users")
-      .getList(1, 1000, { filter: `memberOf~"${group}"` });
-  return users;
-}
-
-export async function useGetUsernameFromId(id: string) {
-  const res = await pb.collection("users").getOne(id);
-  return res.username;
-}
-
-export async function logActivity(data: LogData) {
-  try {
-    const res = pb.collection("logs").create(data);
-  } catch (e: any) {
-    console.log(e.message);
-  }
-}
-
-export async function useDeleteUser(id: string) {
-  const result = { message: "", status: "success" };
-
-  try {
-    const userRecord = await pb.collection("users").getOne(id);
-    const username = userRecord.username;
-    await pb.collection("users").delete(id);
-    result.message = `${username} is deleted`;
-    useRefreshAll();
-    return result;
-  } catch (e: any) {
-    result.status = "failed";
-    result.message = e.message;
-    return result;
-  }
-}
-
-export async function useCreateUser(userData: userEntry) {
-  const result = { status: "failed", message: "" };
-  try {
-    const res = await pb.collection("users").create(userData);
-    result.status = "success";
-    result.message = `User ${userData.fullname.toUpperCase()} has been created.`;
-  } catch (e: any) {
-    result.message = e.message;
-    result.status = "failed";
-    console.log(e);
-  }
-  return result;
-}
-
 export async function useGetGroupName(group: string) {
   try {
     const res = await pb.collection("groups").getOne(group);
@@ -502,31 +445,7 @@ export async function useRemoveUserFromGroups(id: string) {
   return res;
 }
 
-export async function useSendEmail(email: emailContent) {
-  const enabled = await pb
-    .collection("settings")
-    .getFirstListItem(`field="emailnotification"`);
-  if (enabled.value === "false") {
-    return {
-      message: "Email notifications are currently disabled.",
-      status: "failed",
-    };
-  }
-  const emailurl = (
-    await pb.collection("settings").getFirstListItem(`field="emailservice"`)
-  ).value;
-  const token = (
-    await pb.collection("settings").getFirstListItem(`field="emailtoken"`)
-  ).value;
-  const res = await $fetch(emailurl, {
-    method: "POST",
-    body: email,
-    headers: {
-      Authorization: token,
-    },
-  });
-  return res;
-}
+
 
 export async function useMakeCounter(group: string, users: ListResult) {
   users.items.forEach(async (user) => {
@@ -597,4 +516,19 @@ export async function useFindCase(id: string) {
     res.status = 'failed'
   }
   return { res, data };
+}
+
+function generateDummyCase(prefix:string){
+  const random = Math.random().toString(36).substring(3, 9);
+  const caseId:string = prefix + random
+  return caseId
+}
+
+export function useCreateDummyCases(quantity:number,prefix:string) {
+  let cases:string[]=[]
+  while (quantity>0) {
+    cases.push(generateDummyCase(prefix))
+    quantity--
+  }
+  return cases
 }

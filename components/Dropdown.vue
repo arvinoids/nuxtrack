@@ -15,49 +15,36 @@
     <transition>
       <div
         v-show="show"
-        class="absolute right-0 mt-3 py-2 bg-base-100 shadow-xl w-[20rem] border z-40"
+        class="absolute right-0 mt-3 py-2 bg-base-100 shadow-xl min-w-[400px] border z-40 flex flex-row"
         ref="menu"
       >
-        <div class="flex flex-row items-center">
-          <div class="block px-4 py-2 text-sm justify-start">
-            Logged in as {{ loggedInUser.toUpperCase() }}
-          </div>
+        <UserStatusCard :id="userId" />
+        <div class="flex flex-col">
           <div
-            class="btn btn-sm btn-outline btn-warning justify-end ml-auto mr-3 px-2 py-1"
-            @click="
-              {
-                logout();
-                show = !show;
-              }
-            "
-          >
-            Log out
-          </div>
-        </div>
-        <div
-          v-if="userRole === 'admin'"
-          class="block px-4 py-2 text-sm hover:bg-neutral"
-          @click="show = !show"
-        >
-          <NuxtLink to="/Admin">Admin</NuxtLink>
-        </div>
-        <div
-          v-if="auth.isAuthenticated"
-          class="block px-4 py-2 text-sm hover:bg-neutral"
-          @click="show = !show"
-        >
-          <NuxtLink to="/Cases">All Cases</NuxtLink>
-        </div>
-        <div class="block px-4 py-2 text-sm hover:bg-neutral" @click="show = !show">
-          <nuxt-link to="/user/Profile">My Page</nuxt-link>
-        </div>
-        <div>
-          <nuxt-link
-            to="/ChangePassword"
+            v-if="userRole === 'admin'"
             class="block px-4 py-2 text-sm hover:bg-neutral"
             @click="show = !show"
-            >Change Password</nuxt-link
           >
+            <NuxtLink to="/Admin">Admin</NuxtLink>
+          </div>
+          <div
+            v-if="auth.isAuthenticated"
+            class="block px-4 py-2 text-sm hover:bg-neutral"
+            @click="show = !show"
+          >
+            <NuxtLink to="/Cases">All Cases</NuxtLink>
+          </div>
+          <div class="block px-4 py-2 text-sm hover:bg-neutral" @click="show = !show">
+            <nuxt-link to="/user/Profile">My Page</nuxt-link>
+          </div>
+          <div>
+            <nuxt-link
+              to="/ChangePassword"
+              class="block px-4 py-2 text-sm hover:bg-neutral"
+              @click="show = !show"
+              >Change Password</nuxt-link
+            >
+          </div>
         </div>
       </div>
     </transition>
@@ -69,18 +56,13 @@ const pb = useNuxtApp().$pb;
 const auth = useAuth();
 const loggedInUser = useLoggedInUsername();
 const userRole = ref(pb.authStore.model!.role);
+const userId = ref(pb.authStore.model!.id);
 const show = ref(false);
 // const newEvent = useNotify();
 
 if (await pb.authStore.isValid) {
   auth.value.isAuthenticated = true;
   loggedInUser.value = pb.authStore.model!.username;
-}
-
-async function logout() {
-  pb.authStore.clear();
-  navigateTo("/Login");
-  auth.value.isAuthenticated = false;
 }
 
 // const menu = ref(null);

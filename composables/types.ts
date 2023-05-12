@@ -10,7 +10,9 @@ declare module 'pocketbase-types' {
         "role": string,
         "updated": Date,
         "username": string,
-        "verified": boolean
+        "verified": boolean,
+        "status": string,
+        "statusmessage": string,
     }
 
     interface group {
@@ -36,7 +38,9 @@ declare module 'pocketbase-types' {
         "id": string,
         "order": number,
         "updated": Date,
-        "user": string
+        "user": string,
+        "status": string,
+        "statusmessage": string,
     }
 
     interface expandedUsers {
@@ -99,4 +103,11 @@ declare module 'custom-types' {
         subject: string,
         body: string,
       }
+
+    type statuschoice =  'Available'|'Busy'|'Outside shift'|'On leave'|'Not available'|'Unknown'
+
+    interface userStatus {
+        status:statuschoice,
+        message:string
+    }
 }
