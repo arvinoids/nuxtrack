@@ -18,7 +18,7 @@
       >
         {{ status.status }}
       </div>
-      <div class="text-secondary text-xs mx-1">{{ status.message }}</div>
+      <div class="text-xs mx-1">{{ status.message }}</div>
 
       <!-- start of status dropdown -->
       <transition>
@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 const cnf = useRuntimeConfig().public;
-import { statuschoice } from "custom-types";
+import { statuschoice, LogData } from "custom-types";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{
   id: string;
@@ -81,6 +81,12 @@ async function changeStatus(newStatus: statuschoice, newMessage: string) {
   try {
     await useChangeUserStatus(user.id, newStatus, status.value.message);
     status.value.status = newStatus;
+    const logData: LogData = {
+      user: user.username,
+      type: "changed status",
+      details: newStatus + " - " + status.value.message,
+    };
+    await logActivity(logData);
   } catch (e) {
     console.log(e);
   }

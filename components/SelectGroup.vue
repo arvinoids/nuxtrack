@@ -8,16 +8,17 @@
       <p class="text-sm">Status: <span class="font-semibold" :class="{ [`text-${getColor(firstUser.status)}`]: true }">{{ firstUser.status }}</span></p>
       <p class="py-4">
         <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]" v-model="caseId" />
-      <div class="text-xs text-error">{{ message }}</div>
+        <div class="flex flex-row justify-center items-center" v-if="firstUser.status!=='Available'"><input type="checkbox" v-model="forced" /><label class="text-xs mx-2">Force assign</label></div>
+      <div class="text-xs text-error pt-2">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
         <a class="btn btn-outline btn-secondary" @click="skipCatch(firstUser)">Catch Up Later</a>
         <div>
           <a class="btn btn-outline btn-secondary" @click="skipOut(firstUser.id, group)">Out of Office</a>
         </div>
-        <a href="#" class="btn btn-primary" :class="{ hidden: caseExists || caseId === '' || firstUser.status === 'Busy'}"
+        <a href="#" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') || ((firstUser.status !== 'Available') && !forced) }" 
           @click="submitCase(caseId, firstUser.id, group) ">Assign</a>
-        <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: !caseExists || disableEscalate }"
+        <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) || ((firstUser.status !== 'Available') &&!forced)}"
           @click="escalateCase(caseId, firstUser.id, group)">Escalate</a>
         <a href="#" class="btn btn-outline btn-error" @click="resetSelection">Cancel</a>
       </div>
@@ -45,8 +46,14 @@ const caseIsEscalated = ref(false);
 const message = ref("");
 const disableEscalate = ref(false);
 const caseIsBlank = ref(false)
+const forced = ref(false)
 
 const firstUser = ref(userlist[cursor.value].expand.user as user);
+
+function userUnavailable(status:string) {
+  if (status!=='Available')
+  return true
+}
 
 function moveCursor() {
   if (cursor.value === props.users.totalItems - 1) {
@@ -153,6 +160,11 @@ async function resetSelection() {
     emit('reset')
     caseId.value = "";
 }
+
+watch(forced,()=>{
+  console.log(forced.value)
+})
+
 </script>
 
 <style></style>
