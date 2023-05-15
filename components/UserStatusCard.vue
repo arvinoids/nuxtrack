@@ -6,7 +6,18 @@
           class="indicator-item badge badge-xs"
           :class="{ [`bg-${badgeColor}`]: true }"
         ></span>
-        <img :src="avatarUrl" alt="" class="h-10 w-10 flex-none rounded-full" />
+        <img
+          v-if="avatarUrl"
+          :src="avatarUrl"
+          alt=""
+          class="h-10 w-10 flex-none rounded-full"
+        />
+        <Icon
+          v-else
+          name="fluent:person-16-regular"
+          alt=""
+          class="h-10 w-10 flex-none rounded-full bg-gray-200"
+        />
       </div>
       <nuxt-link :to="`/user/${user.username}`" class="text-sm">{{
         user.fullname
@@ -71,7 +82,14 @@ const props = defineProps<{
 }>();
 const user = pb.authStore.model!;
 const show = ref(false);
-const avatarUrl = `${cnf.pocketBaseURL}/api/files/_pb_users_auth_/${user.id}/${user.avatar}`;
+const avatarUrl = getAvatarUrl();
+
+function getAvatarUrl() {
+  if (pb.authStore.model?.avatar === "") {
+    return null;
+  } else
+    return `${cnf.pocketBaseURL}/api/files/_pb_users_auth_/${user.id}/${user.avatar}`;
+}
 
 const status = ref(await useGetUserStatus(props.id));
 const auth = useAuth();
