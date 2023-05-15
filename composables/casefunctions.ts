@@ -477,12 +477,15 @@ export async function useUpdateCounter(group: string, users: ListResult) {
     const oldCounter = await pb
       .collection("counter")
       .getFirstListItem(`user="${user.id}" && group="${group}"`);
-    let newCount = countCases(user.id, group);
+    let newCount = await countCases(user.id, group);
     let data = {
       user: user.id,
       group,
       count: newCount,
     };
+    try {
+      const res = await pb.collection("counter").update(oldCounter.id, data);
+    } catch(e:any) { console.log(e.message)}
   });
 }
 
@@ -531,4 +534,25 @@ export function useCreateDummyCases(quantity:number,prefix:string) {
     quantity--
   }
   return cases
+}
+
+export async function useGetAllGroups() {
+  const res = await pb.collection('groups').getList()
+  return res
+}
+
+export async function useDeleteGroupCases(group:string){
+  const result = { message: '',status:'failed'}
+  try { 
+    const res  = await pb.collection('cases').getList(1,10000,{filter:`group="${group}"`})
+    res.items.forEach(async (item) => {
+      await pb.collection('cases').delete(item.id)
+      })
+      result.message = 'Cases deleted'
+      result.status = 'success'
+  } catch (e:any) {
+    result.message = e.message
+    console.log(e)
+  } 
+  return result
 }

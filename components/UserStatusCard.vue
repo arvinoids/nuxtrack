@@ -116,6 +116,10 @@ const menu = ref(null);
 onClickOutside(menu, (event) => {
   show.value = false;
 });
+
+pb.collection("users").subscribe(user.id, async () => {
+  status.value = await useGetUserStatus(user.id);
+});
 </script>
 
 <style scoped>

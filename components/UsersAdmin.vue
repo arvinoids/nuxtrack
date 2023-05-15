@@ -9,6 +9,7 @@
             <th>Group</th>
             <th>Created</th>
             <th>Status</th>
+            <th>Status Message</th>
             <th class="rounded-none">Actions</th>
           </tr>
         </thead>
@@ -23,7 +24,10 @@
             </td>
             <td>{{ useFormatDate(new Date(user.created)) }}</td>
             <td>
-              <UserStatusSelect :user="user" />
+              <AdminStatusSelect :user="user" />
+            </td>
+            <td>
+              {{ user.statusmessage }}
             </td>
             <td>
               <label :for="`delete-${user.id}`" class="btn btn-sm btn-warning"

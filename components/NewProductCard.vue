@@ -76,12 +76,12 @@ const dataUpdated = useDataUpdated();
 const group = await pb.collection("groups").getOne(props.group);
 const groupUsers = await pb
   .collection("users")
-  .getList(1, 100, { filter: `memberOf~"${group}"` });
+  .getList(1, 100, { filter: `memberOf~"${props.group}"` });
 
 // generate counters and replace old ones.
 if (await counterIsEmpty(props.group, groupUsers)) {
   await useMakeCounter(props.group, groupUsers);
-} else useUpdateCounter(props.group, groupUsers);
+} else await useUpdateCounter(props.group, groupUsers);
 
 async function counterIsEmpty(group: string, users: ListResult) {
   const counters = await pb

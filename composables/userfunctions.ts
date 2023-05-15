@@ -3,6 +3,10 @@ import { userEntry, userStatus, statuschoice } from "custom-types";
 const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
 pb.autoCancellation(false);
 
+export function useCurrentUser(){
+    return pb.authStore.model
+}
+
 export async function useDeleteUser(id: string) {
     const result = { message: "", status: "success" };
 

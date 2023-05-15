@@ -63,11 +63,30 @@
 </template>
 
 <script setup lang="ts">
-import { expanded } from "pocketbase-types";
+import { statuschoice, LogData } from "custom-types";
+import { user } from "pocketbase-types";
+const pb = useNuxtApp().$pb;
 
 const props = defineProps<{
-  user: expanded;
+  user: user;
 }>();
 const choices = STATUS_CHOICES;
 const selected = ref(props.user.status);
+
+watch(selected, async () => {
+  await useChangeUserStatus(props.user.id, selected.value as statuschoice, "");
+  const message = `${props.user.username.toUpperCase()} status was changed to ${selected.value.toUpperCase()} by ${pb.authStore.model!.username.toUpperCase()}`;
+  useShowToast(message, "success");
+  const logData: LogData = {
+    user: pb.authStore.model!.username,
+    type: "changed status",
+    details: message,
+  };
+
+  await logActivity(logData);
+});
+
+pb.collection("users").subscribe(props.user.id, async () => {
+  selected.value = (await pb.collection("users").getOne(props.user.id)).status;
+});
 </script>
