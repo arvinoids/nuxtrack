@@ -25,7 +25,7 @@ pb.collection("logs").subscribe("*", async () => {
   console.log("user who made the update:", update.user);
 
   if (currentUser !== update.user) {
-    useShowToast(`${update.user} ${update.type} - ${update.details}`, "success");
+    useShowToast(`${update.user} ${update.type} ${update.details}`, "success");
   }
   newEvent.value = true;
 });
