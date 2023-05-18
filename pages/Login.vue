@@ -60,6 +60,10 @@ async function login() {
     authenticated.value.isAuthenticated = pb.authStore.isValid;
     authenticated.value.role = authData.record.role;
     loggedInUser.value = pb.authStore.model!.username;
+    logActivity({
+      user: loggedInUser.value,
+      type: "logged in",
+    });
     navigateTo("/");
   } catch (error: any) {
     message.value = error.message;

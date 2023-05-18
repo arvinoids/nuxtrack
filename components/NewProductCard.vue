@@ -17,7 +17,7 @@
             class="btn btn-ghost btn-circle btn-sm mr-1"
             @click="updatedCase(group.id)"
           >
-            <Icon name="mdi:alarm-check" size="1.2rem" class="text-base-100" />
+            <Icon name="mdi:alarm-check" size="1.2rem" class="text-neutral-100" />
           </button>
         </div>
       </div>

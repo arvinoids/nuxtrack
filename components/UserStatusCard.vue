@@ -126,6 +126,10 @@ const badgeColor = computed(() => {
 });
 
 function logout() {
+  logActivity({
+    user: useCurrentUser()!.username,
+    type: "logged out",
+  });
   pb.authStore.clear();
   navigateTo("/Login");
   auth.value.isAuthenticated = false;

@@ -21,6 +21,9 @@ pb.collection("logs").subscribe("*", async () => {
     .getList(1, 1, { filter: `created >="${Date.now()}"`, sort: "-created" });
   const update = latest.items[0];
 
+  console.log("current user:", currentUser);
+  console.log("user who made the update:", update.user);
+
   if (currentUser !== update.user) {
     useShowToast(`${update.user} ${update.type} - ${update.details}`, "success");
   }

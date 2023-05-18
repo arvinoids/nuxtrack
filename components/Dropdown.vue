@@ -64,15 +64,6 @@ if (await pb.authStore.isValid) {
   auth.value.isAuthenticated = true;
   loggedInUser.value = pb.authStore.model!.username;
 }
-
-// const menu = ref(null);
-// onClickOutside(
-//   menu,
-//   (event) => {
-//     show.value = false;
-//   },
-//   { ignore: ["menubutton"] }
-// );
 </script>
 
 <style scoped>

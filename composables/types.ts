@@ -83,7 +83,7 @@ declare module 'custom-types' {
     }
     interface LogData {
         user: string,
-        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases",
+        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out",
         details?: string
     }
 
