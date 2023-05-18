@@ -27,4 +27,5 @@ export const useEscalation = ()=> useState(()=> (false))
 export const useNotify = ()=> useState(()=> (false))
 
 export const useLoading = ()=> useState(()=>(true))
+export const useStatusChanged = ()=> useState(()=>(0))
  

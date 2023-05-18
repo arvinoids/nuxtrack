@@ -23,9 +23,10 @@
         user.fullname
       }}</nuxt-link>
       <div
-        class="badge badge-sm cursor-pointer min-w-max"
-        :class="{ [`badge-${badgeColor}`]: true }"
-        @click="show = true"
+        v-if="userIsAdmin"
+        class="badge badge-sm min-w-max"
+        :class="{ [`badge-${badgeColor}`]: true, 'cursor-pointer': userIsAdmin() }"
+        @click="if (userIsAdmin()) show = true;"
       >
         {{ status.status }}
       </div>
@@ -138,6 +139,12 @@ onClickOutside(menu, (event) => {
 pb.collection("users").subscribe(user.id, async () => {
   status.value = await useGetUserStatus(user.id);
 });
+
+function userIsAdmin() {
+  if (useCurrentUser()!.role === "admin" || useCurrentUser()!.role === "lead")
+    return true;
+  else return false;
+}
 </script>
 
 <style scoped>

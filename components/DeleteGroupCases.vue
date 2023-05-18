@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Delete Cases in group:</p>
+    <p class="text-sm mb-2 font-bold">Delete Cases in group:</p>
     <div>
       <table class="table table-zebra table-compact border">
         <thead>

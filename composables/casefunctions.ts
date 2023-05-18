@@ -252,6 +252,7 @@ export async function useSubmitCase(
 ) {
   const res = await useAssignCase(caseId, user, group);
   const result = { message: res.message, status: res.status };
+  useUpdateGroup(group)
   return result;
 }
 
@@ -340,6 +341,7 @@ export async function useEscalateCase(
     let owner = (await useGetUsernameFromId(user)).toUpperCase();
     result.message = `Case has been escalated. ${owner} should receive a notification shortly.`;
     result.status = "success";
+    useUpdateGroup(group)
   } catch (e) {
     result.message = "Failed to escalate.";
     result.status = "failed";
@@ -527,13 +529,31 @@ function generateDummyCase(prefix:string){
   return caseId
 }
 
-export function useCreateDummyCases(quantity:number,prefix:string) {
+ function createDummyCases(quantity:number,prefix:string) {
   let cases:string[]=[]
   while (quantity>0) {
     cases.push(generateDummyCase(prefix))
     quantity--
   }
   return cases
+}
+
+export async function useAddDummyCases(quantity:number,user:string,group:string,prefix:string) {
+  const cases = createDummyCases(quantity,prefix)
+  cases.forEach(async (caseId) => {
+    let data = {
+      user,
+      group,
+      case: caseId,
+      assignedBy: useCurrentUser()!.username,
+    };
+    try {
+      const rec = await pb.collection("cases").create(data);
+    } catch (e) {
+      console.log(e);
+    }
+  });
+  return { status: 'success', message: `${quantity} Cases created` }
 }
 
 export async function useGetAllGroups() {
@@ -555,4 +575,43 @@ export async function useDeleteGroupCases(group:string){
     console.log(e)
   } 
   return result
+}
+
+export async function useGetGroupStats(group:string,description:string){
+  // find the total cases, highest count and lowest count in the group
+  const res = await pb.collection('counter').getList(1,10000,{filter:`group="${group}"`,order:'+order'})
+  // totalCases = sum of all 'count' in items
+  const totalCases = res.items.reduce((acc,item) => { 
+    return acc + item.count
+  }
+  ,0)
+  const highestCount = res.items.reduce((acc,item) => {
+    return item.count > acc ? item.count : acc
+  },0)
+  // get lowest count
+  const lowestCount = res.items.reduce((acc,item) => {
+    return item.count < acc ? item.count : acc
+  },0)
+  return {
+    group,
+    description,
+    totalCases, 
+    highestCount,
+    lowestCount
+  }
+}
+
+export async function useUpdateGroup(group:string) {
+  const res = { message: '',status:'failed'}
+  let timestamp = Date.now(); 
+  let currentTime = new Date(timestamp).toISOString();
+  try { 
+    await pb.collection('groups').update(group,{updated:currentTime})
+    res.message = 'Group timestamp updated'
+    res.status = 'success'
+  } catch (e:any) {
+    res.message = e.message
+    console.log(e)
+  } 
+  return res
 }

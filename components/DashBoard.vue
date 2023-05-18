@@ -15,7 +15,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="">Loading...</div>
+    <div v-else class=""><Spinner /></div>
   </div>
 </template>
 

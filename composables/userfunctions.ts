@@ -1,5 +1,6 @@
 import PocketBase, { ListResult } from "pocketbase";
 import { userEntry, userStatus, statuschoice } from "custom-types";
+import { expandedUsers } from "pocketbase-types";
 const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
 pb.autoCancellation(false);
 
@@ -76,3 +77,16 @@ export async function useChangeUserStatus(id:string,newStatus:statuschoice,newMe
         console.log(e)
      }
 }
+
+export async function useGetAllUsers() {
+    let users:ListResult;
+    users = await pb.collection("users").getList(1,1000,{expand:'memberOf',sort:'fullname'})
+    return users
+}
+/** Get users of a group sorted by count ascending */
+export async function useGetSortedUsers(group: string) {
+    const users = await pb
+      .collection("counter")
+      .getList(1, 1000, { filter: `group="${group}"`, sort: "+count", expand: "user" });
+    return (users as unknown) as expandedUsers;
+  }

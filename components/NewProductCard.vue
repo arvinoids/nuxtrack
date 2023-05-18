@@ -1,17 +1,32 @@
 <template>
   <div class="flex flex-col text-center m-3 w-[250px] shadow-lg border bg-base-100">
     <div class="bg-secondary">
-      <h2 class="my-2 text-secondary">
-        <NuxtLink :to="`/${group.name}`" class="text-white">{{
-          group.description
-        }}</NuxtLink>
-      </h2>
+      <div class="flex items-center justify-between">
+        <h2
+          class="ml-3 my-2 text-secondary max-w-[200px] overflow-hidden whitespace-nowrap"
+        >
+          <NuxtLink :to="`/${group.name}`" class="text-white">{{
+            group.description
+          }}</NuxtLink>
+        </h2>
+        <div
+          class="tooltip tooltip-bottom tooltip-accent"
+          data-tip="Click this if you checked for new cases and there are none."
+        >
+          <button
+            class="btn btn-ghost btn-circle btn-sm mr-1"
+            @click="updatedCase(group.id)"
+          >
+            <Icon name="mdi:alarm-check" size="1.2rem" class="text-base-100" />
+          </button>
+        </div>
+      </div>
     </div>
-    <div v-if="loading">Loading...</div>
+    <div v-if="loading" class="m-3"><Spinner /></div>
 
     <div v-else>
       <div v-if="users.totalItems > 0" :key="updateCard">
-        <div v-for="(user, id) in users.items" :key="user.id">
+        <div v-for="(user, id) in users.items" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
             class="tooltip tooltip-right"
@@ -29,7 +44,7 @@
               name="ic:sharp-circle"
               :class="`text-${getColor(user.expand.user.status)}`"
               class="mx-1"
-              size="0.6rem"
+              size="0.5rem"
             />
             <span
               class="hover:font-semibold hover:text-accent"
@@ -38,6 +53,12 @@
               {{ user.expand.user.fullname }}
             </span>
           </nuxt-link>
+        </div>
+        <div class="my-3">
+          <p class="text-xs">Last updated</p>
+          <p class="text-xs font-semibold text-warning">
+            {{ useFormatDate(new Date(group.updated)) }}
+          </p>
         </div>
       </div>
       <div v-else class="text-xs mt-3">
@@ -60,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { expandedUsers } from "pocketbase-types";
+import { LogData } from "custom-types";
 import { ListResult } from "pocketbase";
 
 const pb = useNuxtApp().$pb;
@@ -91,13 +112,6 @@ async function counterIsEmpty(group: string, users: ListResult) {
   else return true;
 }
 
-async function getSortedUsers(group: string) {
-  const users = await pb
-    .collection("counter")
-    .getList(1, 1000, { filter: `group="${group}"`, sort: "+count", expand: "user" });
-  return (users as unknown) as expandedUsers;
-}
-
 function nextUser() {
   const cursor = selectedUser.value;
   if (cursor === users.value.totalItems - 1) {
@@ -109,23 +123,42 @@ function resetSelection() {
   selectedUser.value = 0;
 }
 
-let users = ref(await getSortedUsers(props.group));
+let users = ref(await useGetSortedUsers(props.group));
 
 onMounted(async () => {
-  users.value = await getSortedUsers(props.group);
+  users.value = await useGetSortedUsers(props.group);
   loading.value = false;
 });
 
 // subscribe to changes in the counter
 pb.collection("counter").subscribe("*", async function (e) {
-  users.value = await getSortedUsers(props.group);
+  users.value = await useGetSortedUsers(props.group);
   updateCard.value++;
 });
 
 pb.collection("users").subscribe("*", async function (e) {
-  users.value = await getSortedUsers(props.group);
+  users.value = await useGetSortedUsers(props.group);
   updateCard.value++;
 });
+
+async function updatedCase(group: string) {
+  let result = { status: "failed", message: "" };
+  const logData: LogData = {
+    user: useCurrentUser()!.username,
+    type: "checked for new cases",
+    details: `in ${await useGetGroupName(group)}`,
+  };
+  try {
+    const res = await useUpdateGroup(group);
+    result.status = res.status;
+    result.message = res.message;
+    await logActivity(logData);
+    useShowToast(result.message, result.status);
+    updateCard.value++;
+  } catch (e: any) {
+    console.log(e.message);
+  }
+}
 </script>
 
 <style scoped></style>

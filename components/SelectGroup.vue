@@ -3,24 +3,24 @@
     <div class="modal-box">
       <h3 class="text-lg font">
         Assign case to
-        <span class="text-accent">{{ firstUser.fullname }}</span>
+        <span class="text-accent">{{ taggedUser.fullname }}</span>
       </h3>
-      <p class="text-sm">Status: <span class="font-semibold" :class="{ [`text-${getColor(firstUser.status)}`]: true }">{{ firstUser.status }}</span></p>
+      <p class="text-sm">Status: <span class="font-semibold" :class="{ [`text-${getColor(taggedUser.status)}`]: true }">{{ taggedUser.status }}</span></p>
       <p class="py-4">
         <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]" v-model="caseId" />
-        <div class="flex flex-row justify-center items-center" v-if="firstUser.status!=='Available'"><input type="checkbox" v-model="forced" /><label class="text-xs mx-2">Force assign</label></div>
+        <div class="flex flex-row justify-center items-center" v-if="taggedUser.status!=='Available'"><input type="checkbox" v-model="forced" /><label class="text-xs mx-2">Force assign</label></div>
       <div class="text-xs text-error pt-2">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
-        <a class="btn btn-outline btn-secondary" @click="skipCatch(firstUser)">Catch Up Later</a>
+        <a class="btn btn-outline btn-secondary" @click="skipCatch(taggedUser)">Catch Up Later</a>
         <div>
-          <a class="btn btn-outline btn-secondary" @click="skipOut(firstUser.id, group)">Out of Office</a>
+          <a class="btn btn-outline btn-secondary" @click="skipOut(taggedUser.id, group)">Out of Office</a>
         </div>
-        <a href="#" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') || ((firstUser.status !== 'Available') && !forced) }" 
-          @click="submitCase(caseId, firstUser.id, group) ">Assign</a>
-        <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) || ((firstUser.status !== 'Available') &&!forced)}"
-          @click="escalateCase(caseId, firstUser.id, group)">Escalate</a>
-        <a href="#" class="btn btn-outline btn-error" @click="resetSelection">Cancel</a>
+        <a href="#" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') || ((taggedUser.status !== 'Available') && !forced) }" 
+          @click="submitCase(caseId, taggedUser.id, group) ">Assign</a>
+        <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') &&!forced)}"
+          @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
+        <a href="#" class="btn btn-outline btn-error" @click="resetSelection(); cursor = 0">Cancel</a>
       </div>
     </div>
   </div>
@@ -40,7 +40,6 @@ const emit = defineEmits(["skip", "reset"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
-let userlist = props.users.items;
 const caseExists = ref(false);
 const caseIsEscalated = ref(false);
 const message = ref("");
@@ -48,22 +47,23 @@ const disableEscalate = ref(false);
 const caseIsBlank = ref(false)
 const forced = ref(false)
 
-const firstUser = ref(userlist[cursor.value].expand.user as user);
+let userlist=ref(await useGetSortedUsers(props.group))
 
-function userUnavailable(status:string) {
-  if (status!=='Available')
-  return true
-}
+pb.collection('users').subscribe('*',async ()=>{
+  userlist.value = await useGetSortedUsers(props.group)
+})
+
+//const taggedUser = ref(userlist.value.items[cursor.value].expand.user as user);
+
+const taggedUser = computed(()=>{
+  return userlist.value.items[cursor.value].expand.user
+})
 
 function moveCursor() {
   if (cursor.value === props.users.totalItems - 1) {
     cursor.value = 0;
   } else cursor.value++;
 }
-
-watch(cursor, () => {
-  firstUser.value = userlist[cursor.value].expand.user;
-});
 
 async function skipOut(user: string, group: string) {
   const res = await useSkipOut(user, group);
@@ -80,10 +80,9 @@ async function skipOut(user: string, group: string) {
 
 async function skipCatch(user: user) {
   const message = `${user.fullname} was skipped to catch up later.`;
-  useShowToast(message, "success");
+  // useShowToast(message, "success");
   emit("skip");
   moveCursor();
-  console.log("cursor moved: ",cursor.value)
   const logData: LogData = {
     user: loggedInUser.value,
     type: "skipped user",
@@ -161,8 +160,8 @@ async function resetSelection() {
     caseId.value = "";
 }
 
-watch(forced,()=>{
-  console.log(forced.value)
+pb.collection('users').subscribe('*',async ()=>{
+  userlist.value = await useGetSortedUsers(props.group)
 })
 
 </script>
