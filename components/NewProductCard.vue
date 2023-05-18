@@ -56,8 +56,8 @@
         </div>
         <div class="my-3">
           <p class="text-xs">Last updated</p>
-          <p class="text-xs font-semibold text-warning">
-            {{ useFormatDate(new Date(group.updated)) }}
+          <p class="text-sm font-semibold text-warning">
+            {{ lastUpdated }}
           </p>
         </div>
       </div>
@@ -94,10 +94,12 @@ const loading = ref(true);
 const dataUpdated = useDataUpdated();
 
 // query for groups and users
-const group = await pb.collection("groups").getOne(props.group);
+let group = await pb.collection("groups").getOne(props.group);
 const groupUsers = await pb
   .collection("users")
   .getList(1, 100, { filter: `memberOf~"${props.group}"` });
+
+const lastUpdated = ref(useFormatDate(new Date(group.updated)));
 
 // generate counters and replace old ones.
 if (await counterIsEmpty(props.group, groupUsers)) {
@@ -139,6 +141,11 @@ pb.collection("counter").subscribe("*", async function (e) {
 pb.collection("users").subscribe("*", async function (e) {
   users.value = await useGetSortedUsers(props.group);
   updateCard.value++;
+});
+
+pb.collection("groups").subscribe(props.group, async () => {
+  group = await pb.collection("groups").getOne(props.group);
+  lastUpdated.value = useFormatDate(new Date(group.updated));
 });
 
 async function updatedCase(group: string) {
