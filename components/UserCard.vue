@@ -17,7 +17,10 @@
     </h5>
 
     <div class="flex justify-center mt-1">
-      <nuxt-link :to="`/user/${user.username}`" class="link-secondary"
+      <nuxt-link
+        :to="`/User/${user.username}`"
+        class="link-secondary"
+        v-if="allCasesButton()"
         >All Cases</nuxt-link
       >
     </div>
@@ -26,10 +29,16 @@
 
 <script setup lang="ts">
 import { Record } from "pocketbase";
+const route = useRoute();
 
 const props = defineProps<{
   user: Record;
 }>();
+
+function allCasesButton() {
+  if (route.params.groupname !== undefined) return true;
+  else return false;
+}
 </script>
 
 <style></style>

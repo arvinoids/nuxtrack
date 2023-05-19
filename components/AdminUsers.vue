@@ -32,10 +32,12 @@
             <td>
               <NuxtLink
                 :to="`/Admin/User/${user.username}/Edit`"
-                class="btn btn-sm btn-warning"
+                class="btn btn-sm btn-warning mx-1 btn-outline"
                 ><Icon name="mdi:account-edit-outline" size="1.2rem"
               /></NuxtLink>
-              <label :for="`delete-${user.id}`" class="btn btn-sm btn-warning"
+              <label
+                :for="`delete-${user.id}`"
+                class="btn btn-sm btn-error mx-1 btn-outline"
                 ><Icon name="mdi:account-remove-outline" size="1.2rem"
               /></label>
               <DeleteUser :id="user.id" :username="user.username" />

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-start w-full">
-    <p class="text-sm mb-2 font-bold">Create Dummy Cases for user</p>
+    <p class="text-sm mb-2 font-bold">Create dummy cases for user</p>
     <div class="flex items-center gap-2">
       <HeadlessListbox v-model="selectedUser">
         <div class="relative">
@@ -123,6 +123,7 @@
 import { ListResult } from "pocketbase";
 import { LogData } from "custom-types";
 
+const casesChanged = useCaseCountChanged();
 const users: ListResult = await useGetAllUsers();
 const tickets = ref(1);
 const selectedUser = ref(users.items[0]);
@@ -160,6 +161,7 @@ async function AddDummyCases() {
     details: `${tickets.value} cases assigned to ${selectedUser.value.username} in ${selectedGroup.value.description}`,
   };
   logActivity(data);
+  casesChanged.value++;
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center items-center gap-2 w-auto">
     <p class="text-sm font-bold self-start">Case Stats</p>
-    <div v-if="!loading">
+    <div v-if="!loading" class="h-[320px] w-[450px]">
       <table class="border table table-compact table-zebra rounded-none">
         <thead>
           <th class="rounded-none">Group</th>
@@ -32,7 +32,12 @@
       </table>
     </div>
 
-    <div v-else class="my-2"><Spinner /></div>
+    <div
+      v-else
+      class="border h-[320px] w-[450px] flex flex-col justify-center items-center"
+    >
+      <Spinner />
+    </div>
     <div class="btn btn-sm btn-warning" @click="refresh">Refresh</div>
     <div>
       <input type="checkbox" id="deleteCases" class="modal-toggle" />
@@ -71,6 +76,7 @@ const selectedGroup = ref("");
 const selectedGroupDescription = ref("");
 const loading = ref(true);
 const groups = (await useGetAllGroups()).items;
+const casesChanged = useCaseCountChanged();
 
 async function deleteGroupCases(group: string) {
   const res = await useDeleteGroupCases(group);
@@ -81,7 +87,7 @@ async function deleteGroupCases(group: string) {
     details: `Deleted all cases in group ${group}`,
   };
   logActivity(logData);
-  refresh();
+  casesChanged.value++;
 }
 
 interface groupStat {
@@ -97,10 +103,6 @@ const stats = ref<groupStat[]>();
 async function getGroupStats() {
   // returns an array of groupstats with each item composed of totalCases, highestCount and lowestCount
   let data: groupStat[] = [];
-  //   groups.forEach(async (group) => {
-  //     let res = await useGetGroupStats(group.id, group.description);
-  //     data.push(res);
-  //   });
   for (let i = 0; i < groups.length; i++) {
     let group = groups[i];
     let res = await useGetGroupStats(group.id, group.description);
@@ -114,12 +116,17 @@ async function refresh() {
   loading.value = true;
   await useRefreshAll();
   stats.value = await getGroupStats();
+  console.log(stats.value);
   loading.value = false;
 }
 
 onMounted(async () => {
   stats.value = await getGroupStats();
   loading.value = false;
+});
+
+watch(casesChanged, async () => {
+  await refresh();
 });
 </script>
 

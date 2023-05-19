@@ -35,7 +35,7 @@
             <NuxtLink to="/Cases">All Cases</NuxtLink>
           </div>
           <div class="block px-4 py-2 text-sm hover:bg-neutral" @click="show = !show">
-            <nuxt-link to="/user/Profile">My Page</nuxt-link>
+            <nuxt-link to="/User/Profile">My Page</nuxt-link>
           </div>
           <div>
             <nuxt-link

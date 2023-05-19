@@ -260,17 +260,20 @@ export async function useRefreshAll() {
   //get groups
   const rec = await pb.collection("groups").getList(1, 100);
   const groups = rec.items;
-  //foreach group, get users
-  groups.forEach(async (group) => {
+
+  const groupsLength = groups.length;
+  for (let i = 0; i < groupsLength; i++) {
+    const group = groups[i];
     const userRec = await pb
       .collection("users")
       .getList(1, 100, { filter: `memberOf~"${group.id}"` });
     const users = userRec.items;
-    //for each user, update counter
-    users.forEach(async (user) => {
+    const usersLength = users.length;
+    for (let j = 0; j < usersLength; j++) {
+      const user = users[j];
       await updateCounter(group.id, user.id);
-    });
-  });
+    }
+  }
 }
 
 export async function useGetGroupName(group: string) {
@@ -487,7 +490,7 @@ export async function useUpdateCounter(group: string, users: ListResult) {
     };
     try {
       const res = await pb.collection("counter").update(oldCounter.id, data);
-    } catch(e:any) { console.log(e.message)}
+    } catch (e: any) { console.log(e.message) }
   });
 }
 
@@ -507,12 +510,12 @@ export async function useFindCase(id: string) {
     message: "",
     status: "",
   };
-  let data:Record|null;
+  let data: Record | null;
 
   try {
     data = await pb
       .collection("cases")
-      .getFirstListItem(`case="${id.trim()}"`,{ expand: "user,group"});
+      .getFirstListItem(`case="${id.trim()}"`, { expand: "user,group" });
     res.message = "Case found";
     res.status = "success";
   } catch (e: any) {
@@ -523,23 +526,23 @@ export async function useFindCase(id: string) {
   return { res, data };
 }
 
-function generateDummyCase(prefix:string){
+function generateDummyCase(prefix: string) {
   const random = Math.random().toString(36).substring(3, 9);
-  const caseId:string = prefix + random
+  const caseId: string = prefix + random
   return caseId
 }
 
- function createDummyCases(quantity:number,prefix:string) {
-  let cases:string[]=[]
-  while (quantity>0) {
+function createDummyCases(quantity: number, prefix: string) {
+  let cases: string[] = []
+  while (quantity > 0) {
     cases.push(generateDummyCase(prefix))
     quantity--
   }
   return cases
 }
 
-export async function useAddDummyCases(quantity:number,user:string,group:string,prefix:string) {
-  const cases = createDummyCases(quantity,prefix)
+export async function useAddDummyCases(quantity: number, user: string, group: string, prefix: string) {
+  const cases = createDummyCases(quantity, prefix)
   cases.forEach(async (caseId) => {
     let data = {
       user,
@@ -561,57 +564,61 @@ export async function useGetAllGroups() {
   return res
 }
 
-export async function useDeleteGroupCases(group:string){
-  const result = { message: '',status:'failed'}
-  try { 
-    const res  = await pb.collection('cases').getList(1,10000,{filter:`group="${group}"`})
+export async function useDeleteGroupCases(group: string) {
+  const result = { message: '', status: 'failed' }
+  try {
+    const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${group}"` })
     res.items.forEach(async (item) => {
       await pb.collection('cases').delete(item.id)
-      })
-      result.message = 'Cases deleted'
-      result.status = 'success'
-  } catch (e:any) {
+    })
+    result.message = 'Cases deleted'
+    result.status = 'success'
+  } catch (e: any) {
     result.message = e.message
     console.log(e)
-  } 
+  }
   return result
 }
 
-export async function useGetGroupStats(group:string,description:string){
-  // find the total cases, highest count and lowest count in the group
-  const res = await pb.collection('counter').getList(1,10000,{filter:`group="${group}"`,order:'+order'})
+/** 
+ * Find the total cases, highest count and lowest count in the group
+ * @param group - group id  
+ * @param description - the description is passed so we don't need to query again */
+export async function useGetGroupStats(group: string, description: string) {
+
+  const res = await pb.collection('counter').getList(1, 10000, { filter: `group="${group}"`, order: '+order' })
   // totalCases = sum of all 'count' in items
-  const totalCases = res.items.reduce((acc,item) => { 
+  const totalCases = res.items.reduce((acc, item) => {
     return acc + item.count
   }
-  ,0)
-  const highestCount = res.items.reduce((acc,item) => {
+    , 0)
+  const highestCount = res.items.reduce((acc, item) => {
     return item.count > acc ? item.count : acc
-  },0)
+  }, 0)
   // get lowest count
-  const lowestCount = res.items.reduce((acc,item) => {
+  const lowestCount = res.items.reduce((acc, item) => {
     return item.count < acc ? item.count : acc
-  },0)
+  }, 0)
   return {
     group,
     description,
-    totalCases, 
+    totalCases,
     highestCount,
     lowestCount
   }
 }
 
-export async function useUpdateGroup(group:string) {
-  const res = { message: '',status:'failed'}
-  let timestamp = Date.now(); 
+export async function useUpdateGroup(group: string) {
+  const res = { message: '', status: 'failed' }
+  let timestamp = Date.now();
   let currentTime = new Date(timestamp).toISOString();
-  try { 
-    await pb.collection('groups').update(group,{updated:currentTime})
+  try {
+    await pb.collection('groups').update(group, { updated: currentTime })
     res.message = 'Group timestamp updated'
     res.status = 'success'
-  } catch (e:any) {
+  } catch (e: any) {
     res.message = e.message
     console.log(e)
-  } 
+  }
   return res
 }
