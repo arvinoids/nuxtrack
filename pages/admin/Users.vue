@@ -1,5 +1,5 @@
 <template>
-  <UsersAdmin />
+  <AdminUsers />
 </template>
 
 <script setup lang="ts"></script>
