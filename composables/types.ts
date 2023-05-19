@@ -95,7 +95,9 @@ declare module 'custom-types' {
         passwordConfirm: string,
         fullname: string,
         memberOf: string[],
-        role: "user" | "admin"
+        role: "user" | "admin"|"lead",
+        status?: statuschoice,
+        statusmessage?: string,
     }
 
     interface emailContent {

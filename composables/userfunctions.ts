@@ -39,6 +39,27 @@ export async function useCreateUser(userData: userEntry) {
     return result;
 }
 
+export async function useUpdateUser(id: string, userData: {
+    email?: string,
+    password?: string,
+    passwordConfirm?: string,
+    fullname?: string,
+    memberOf?: string[],
+    role?: "user" | "admin"|"lead",
+}) {
+    const result = { status: "failed", message: "" };
+    try {
+        await pb.collection("users").update(id, userData);
+        result.status = "success";
+        result.message = `User ${userData.fullname!.toUpperCase()} has been updated.`;
+    } catch (e: any) {
+        result.message = e.message;
+        result.status = "failed";
+        console.log(e);
+    }
+    return result;
+}
+
 export async function useGetUsers(group?: string) {
     let users: ListResult;
     if (group === null) {

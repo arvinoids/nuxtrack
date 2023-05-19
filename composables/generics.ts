@@ -18,7 +18,7 @@ export function useGetBooleanFromLocalStorage(value:string|null){
     if (enabled.value === "false") {
       return {
         message: "Email notifications are currently disabled.",
-        status: "failed",
+        status: "warn",
       };
     }
     const emailurl = (

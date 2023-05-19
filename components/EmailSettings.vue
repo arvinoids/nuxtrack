@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col items-center gap-2">
     <h1 class="text-lg text-center">Email Settings</h1>
-    <div class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap">
+    <div
+      v-if="!loading"
+      class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap"
+    >
       <VForm action="submit" class="flex flex-col gap-4 w-[400px]">
         <p class="form-control flex-row justify-between">
           <label for="enable">Enable email notifications </label
@@ -36,20 +39,32 @@
         </div>
       </VForm>
     </div>
+    <div v-else>
+      <Spinner />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const loading = ref(true);
 const pb = useNuxtApp().$pb;
-const enabled = ref(
-  (await pb.collection("settings").getFirstListItem('field="emailnotification"')).value
-);
-const token = ref(
-  (await pb.collection("settings").getFirstListItem('field="emailtoken"')).value
-);
-const api = ref(
-  (await pb.collection("settings").getFirstListItem('field="emailservice"')).value
-);
+
+const enabled = ref("");
+const token = ref("");
+const api = ref("");
+
+onMounted(async () => {
+  enabled.value = (
+    await pb.collection("settings").getFirstListItem('field="emailnotification"')
+  ).value;
+  token.value = (
+    await pb.collection("settings").getFirstListItem('field="emailtoken"')
+  ).value;
+  api.value = (
+    await pb.collection("settings").getFirstListItem('field="emailservice"')
+  ).value;
+  loading.value = false;
+});
 
 async function updateEmailSettings() {
   try {

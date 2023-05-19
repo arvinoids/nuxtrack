@@ -30,9 +30,14 @@
               {{ user.statusmessage }}
             </td>
             <td>
+              <NuxtLink
+                :to="`/Admin/User/${user.username}/Edit`"
+                class="btn btn-sm btn-warning"
+                ><Icon name="mdi:account-edit-outline" size="1.2rem"
+              /></NuxtLink>
               <label :for="`delete-${user.id}`" class="btn btn-sm btn-warning"
-                >Delete</label
-              >
+                ><Icon name="mdi:account-remove-outline" size="1.2rem"
+              /></label>
               <DeleteUser :id="user.id" :username="user.username" />
             </td>
           </tr>
@@ -42,7 +47,7 @@
       <nuxt-link to="/Admin/AddUser" for="adduser" class="btn my-3">Add User</nuxt-link>
       <AddUser class="max-w-min" />
     </div>
-    <div v-else>Loading...</div>
+    <div v-else><Spinner /></div>
   </div>
 </template>
 

@@ -20,7 +20,7 @@
           @click="submitCase(caseId, taggedUser.id, group) ">Assign</a>
         <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') &&!forced)}"
           @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
-        <a href="#" class="btn btn-outline btn-error" @click="resetSelection(); cursor = 0">Cancel</a>
+        <a href="#" class="btn btn-outline btn-error" @click=" resetSelection(); cursor = 0; showCanceledToast();">Cancel</a>
       </div>
     </div>
   </div>
@@ -154,10 +154,13 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
 async function resetSelection() {
   if(cursor.value>0){
     await pb.collection('logs').create({ user: pb.authStore.model!.username, type: 'canceled assign', details: "Canceled assign case" })
-    useShowToast("Canceled assign after skips","warn")
   }
     emit('reset')
     caseId.value = "";
+}
+
+async function showCanceledToast() {
+  useShowToast("Canceled assign after skips","warn")
 }
 
 pb.collection('users').subscribe('*',async ()=>{

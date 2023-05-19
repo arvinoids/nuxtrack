@@ -1,32 +1,30 @@
 <template>
   <div class="flex flex-col items-center gap-2">
-    <h1 class="text-lg text-center">Add User</h1>
+    <h1 class="text-lg text-center">Editing user {{}}</h1>
     <div class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap">
       <VForm action="submit" class="flex flex-col gap-4 w-[300px]">
+        <div class="flex flex-col">
+          <label for="username" class="label">Username: </label>
+          <input
+            type="text"
+            class="input input-bordered input-sm"
+            name="username"
+            v-model="username"
+            disabled
+          />
+        </div>
         <div class="flex flex-col">
           <label for="name" class="label">Name: </label>
           <VField
             type="text"
             name="name"
             class="input input-bordered input-sm"
-            placeholder="Full Name"
             v-model="fullname"
             :rules="{ required: true, min: 3 }"
           />
           <VErrorMessage name="name" class="alert alert-error" />
         </div>
-        <div class="flex flex-col">
-          <label for="username" class="label">Username: </label>
-          <VField
-            type="text"
-            class="input input-bordered input-sm"
-            placeholder="username"
-            name="username"
-            v-model="username"
-            :rules="{ required: true }"
-          />
-          <VErrorMessage name="username" class="alert alert-error" />
-        </div>
+
         <div class="flex flex-col">
           <label for="email" class="label">Email: </label>
           <VField
@@ -39,28 +37,7 @@
           />
           <VErrorMessage name="email" class="alert alert-error" />
         </div>
-        <div class="flex flex-col">
-          <label for="password" class="label">Password: </label>
-          <VField
-            type="password"
-            class="input input-bordered input-sm"
-            placeholder="password"
-            v-model="password"
-            name="password"
-            :rules="{ required: true, min: 8 }"
-          />
-          <VErrorMessage name="password" class="alert alert-error" />
-          <label for="confirm" class="label">Confirm password: </label>
-          <VField
-            type="password"
-            class="input input-bordered input-sm"
-            placeholder="confirm"
-            v-model="passwordConfirm"
-            name="confirmation"
-            rules="confirmed:@password"
-          />
-          <VErrorMessage name="confirmation" class="alert alert-error" />
-        </div>
+
         <div class="flex flex-col form-control">
           <label for="group" class="label">Choose the group(s) for user:</label>
           <select
@@ -84,8 +61,8 @@
           </select>
         </div>
         <div class="flex justify-center">
-          <ValidatedButton @click.prevent="addUser" class="btn btn-primary w-min"
-            >Submit</ValidatedButton
+          <ValidatedButton @click.prevent="updateUser" class="btn btn-primary w-min"
+            >Update</ValidatedButton
           >
         </div>
       </VForm>
@@ -95,12 +72,12 @@
           <ul class="text-accent mt-2">
             <li>Username should match the user's corporate shortname.</li>
             <li>Email address should be the user's Lexmark email.</li>
-            <li>Password must be 8 characters or longer.</li>
             <li>
               Only users with <strong>admin</strong> or <strong>lead</strong> role can
               edit or delete cases and users.
             </li>
           </ul>
+          <p class="funt-semibold">To select multiple groups, hold down shift</p>
         </div>
         <div class="border alert alert-error items-end" v-if="message">
           <p>{{ message }}</p>
@@ -111,34 +88,26 @@
 </template>
 
 <script setup lang="ts">
-import { userEntry } from "custom-types";
-
+const username = useRoute().params.username;
 const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });
+const user = await pb.collection("users").getFirstListItem(`username="${username}"`);
 const message = ref("");
-let username: string;
-let email: string;
-let emailVisibility: boolean = true;
-let password: string;
-let passwordConfirm: string;
-let fullname: string;
-let memberOf: string[] = [];
-let role: "user" | "admin" = "user";
+let email = user.email;
+let fullname = user.fullname;
+let memberOf: string[] = user.memberOf;
+let role: "user" | "admin" | "lead" = user.role;
 
-async function addUser() {
-  const data: userEntry = {
-    username,
+async function updateUser() {
+  const data = {
     email,
-    emailVisibility,
-    password,
-    passwordConfirm,
     fullname,
     memberOf,
     role,
   };
-  const res = await useCreateUser(data);
+  const res = await useUpdateUser(user.id, data);
   useShowToast(res.message, res.status);
-  if (res.status === "success") navigateTo("/Admin/");
+  if (res.status === "success") navigateTo("/Admin/Users");
   else message.value = res.message;
 }
 </script>
