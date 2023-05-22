@@ -57,7 +57,7 @@
             <span
               class="badge badge-sm badge-outline cursor-pointer my-[1px]"
               :class="{ [`badge-${choice.color}`]: true }"
-              @click="changeStatus(choice.status as statuschoice, status.message); show = false"
+              @click="changeStatus(choice.status as statuschoice); show = false"
             >
               {{ choice.status }}</span
             >
@@ -97,7 +97,7 @@ const auth = useAuth();
 let choices = STATUS_CHOICES;
 if (user.role === "user") choices = STATUS_CHOICES_USER;
 
-async function changeStatus(newStatus: statuschoice, newMessage: string) {
+async function changeStatus(newStatus: statuschoice) {
   try {
     await useChangeUserStatus(user.id, newStatus, status.value.message);
     status.value.status = newStatus;
@@ -126,11 +126,16 @@ const badgeColor = computed(() => {
   return "gray-500";
 });
 
-function logout() {
+async function logout() {
+  const outStatus = user.role === "user" ? "Outside shift" : "Not available";
+  await changeStatus(outStatus);
+
   logActivity({
     user: useCurrentUser()!.username,
     type: "logged out",
+    details: outStatus,
   });
+
   pb.authStore.clear();
   navigateTo("/Login");
   auth.value.isAuthenticated = false;
@@ -144,12 +149,6 @@ onClickOutside(menu, (event) => {
 pb.collection("users").subscribe(user.id, async () => {
   status.value = await useGetUserStatus(user.id);
 });
-
-function userIsAdmin() {
-  if (useCurrentUser()!.role === "admin" || useCurrentUser()!.role === "lead")
-    return true;
-  else return false;
-}
 </script>
 
 <style scoped>
