@@ -23,10 +23,9 @@
         user.fullname
       }}</nuxt-link>
       <div
-        v-if="userIsAdmin"
-        class="badge badge-sm min-w-max"
-        :class="{ [`badge-${badgeColor}`]: true, 'cursor-pointer': userIsAdmin() }"
-        @click="if (userIsAdmin()) show = true;"
+        class="badge badge-sm min-w-max cursor-pointer"
+        :class="{ [`badge-${badgeColor}`]: true }"
+        @click="show = true"
       >
         {{ status.status }}
       </div>
@@ -52,6 +51,7 @@
             type="text"
             class="input-xs input-border bg-base-200 rounded mb-1"
             v-model="status.message"
+            placeholder="Enter status message here..."
           />
           <p v-for="choice in choices">
             <span
@@ -94,7 +94,8 @@ function getAvatarUrl() {
 
 const status = ref(await useGetUserStatus(props.id));
 const auth = useAuth();
-const choices = STATUS_CHOICES;
+let choices = STATUS_CHOICES;
+if (user.role === "user") choices = STATUS_CHOICES_USER;
 
 async function changeStatus(newStatus: statuschoice, newMessage: string) {
   try {

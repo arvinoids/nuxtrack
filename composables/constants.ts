@@ -5,3 +5,8 @@ export const STATUS_CHOICES = [
   { status: "On leave", color: "neutral" },
   { status: "Not available", color: "neutral" },
 ];
+
+export const STATUS_CHOICES_USER = [
+  { status: "Available",color: "secondary" },
+  { status: "Outside shift", color: "neutral" },
+];

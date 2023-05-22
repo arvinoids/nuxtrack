@@ -81,6 +81,7 @@
           <select class="select select-bordered select-sm" v-model="role">
             <option value="user">user</option>
             <option value="admin">admin</option>
+            <option value="lead">lead</option>
           </select>
         </div>
         <div class="flex justify-center">

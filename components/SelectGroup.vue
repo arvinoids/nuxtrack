@@ -12,15 +12,15 @@
       <div class="text-xs text-error pt-2">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
-        <a class="btn btn-outline btn-secondary" @click="skipCatch(taggedUser)">Catch Up Later</a>
+        <a class="btn btn-outline btn-secondary" :class="{ hidden: taggedUser.status !== 'Available' }" @click="skipCatch(taggedUser)">Catch Up Later</a>
         <div>
-          <a class="btn btn-outline btn-secondary" @click="skipOut(taggedUser.id, group)">Out of Office</a>
+          <a class="btn btn-outline btn-secondary" :class="{ hidden: taggedUser.status !== 'Available'}" @click="skipOut(taggedUser.id, group)">Out of Office</a>
         </div>
         <a href="#" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') || ((taggedUser.status !== 'Available') && !forced) }" 
           @click="submitCase(caseId, taggedUser.id, group) ">Assign</a>
         <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') &&!forced)}"
           @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
-        <a href="#" class="btn btn-outline btn-error" @click=" resetSelection(); cursor = 0; showCanceledToast();">Cancel</a>
+        <a href="#" class="btn btn-outline btn-error" @click=" resetSelection(); showCanceledToast();">Cancel</a>
       </div>
     </div>
   </div>
@@ -160,7 +160,9 @@ async function resetSelection() {
 }
 
 async function showCanceledToast() {
+  if(cursor.value > 0)
   useShowToast("Canceled assign after skips","warn")
+  cursor.value = 0
 }
 
 pb.collection('users').subscribe('*',async ()=>{
