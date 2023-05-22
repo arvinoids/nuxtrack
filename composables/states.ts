@@ -4,9 +4,6 @@ useState(() => ({
     role: null
  }))
 
-export const useDisabled = ref(true)
-
-
 export const useRefresher = ()=>
 useState(()=> ({
     count: 0

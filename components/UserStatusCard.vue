@@ -131,7 +131,7 @@ async function logout() {
   await changeStatus(outStatus);
 
   logActivity({
-    user: useCurrentUser()!.username,
+    user: user.username,
     type: "logged out",
     details: outStatus,
   });
