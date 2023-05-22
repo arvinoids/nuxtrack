@@ -84,7 +84,7 @@ const currentPage = ref(1);
 
 onMounted(async () => {
   let pageData = localStorage.getItem("tracker-currentpagelogs");
-  let page = pageData === "NaN" ? 1 : Number(pageData);
+  let page = pageData === "NaN" || pageData === "0" ? 1 : Number(pageData);
   currentPage.value = page;
 
   logs = await getLogs(page);
@@ -109,7 +109,7 @@ let page = props.pageNum === undefined ? 1 : props.pageNum;
 let logs = await getLogs(page);
 
 async function getPage(page: number | null) {
-  if (page === null) {
+  if (page === null || page === 0) {
     page = 1;
   }
   logs = await getLogs(page);
@@ -133,4 +133,5 @@ watch(currentPage, async (p = currentPage.value) => {
 
   updateTable.value++;
 });
+
 </script>
