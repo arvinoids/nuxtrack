@@ -26,4 +26,5 @@ export const useNotify = ()=> useState(()=> (false))
 export const useLoading = ()=> useState(()=>(true))
 export const useStatusChanged = ()=> useState(()=>(0))
 export const useCaseCountChanged = ()=> useState(()=>(0))
+export const useUserWhoChangedStatus =()=> useState(()=>(''))
  

@@ -99,6 +99,7 @@ if (user.role === "user") choices = STATUS_CHOICES_USER;
 
 async function changeStatus(newStatus: statuschoice) {
   try {
+    useUserWhoChangedStatus().value = user.username;
     await useChangeUserStatus(user.id, newStatus, status.value.message);
     status.value.status = newStatus;
     const logData: LogData = {
@@ -106,7 +107,8 @@ async function changeStatus(newStatus: statuschoice) {
       type: "changed status",
       details: newStatus + " - " + status.value.message,
     };
-    await logActivity(logData);
+    let log = await logActivity(logData);
+    useUserWhoChangedStatus().value = user.username;
   } catch (e) {
     console.log(e);
   }
@@ -128,7 +130,6 @@ const badgeColor = computed(() => {
 
 async function logout() {
   const outStatus = user.role === "user" ? "Outside shift" : "Not available";
-  await changeStatus(outStatus);
 
   logActivity({
     user: user.username,

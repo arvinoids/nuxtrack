@@ -1,5 +1,17 @@
 <template>
   <div class="flex flex-col items-center" :key="updateTable">
+    <div class="flex flex-row justify-start gap-2 items-center my-3">
+      <div class="tooltip tooltip-top tooltip-accent" data-tip="Refresh View">
+        <button class="btn" @click="updated++">
+          <Icon name="mdi:refresh" size="1.2rem" />
+        </button>
+      </div>
+      <div class="tooltip tooltip-top tooltip-accent" data-tip="Add User">
+        <nuxt-link to="/Admin/AddUser" for="adduser" class="btn">
+          <Icon name="mdi:account-plus-outline" size="1.2rem"
+        /></nuxt-link>
+      </div>
+    </div>
     <div v-if="!loading" class="flex flex-col items-center">
       <table class="table table-zebra table-compact shadow-md" :key="updateTable">
         <thead>
@@ -7,9 +19,7 @@
             <th class="rounded-none">Name</th>
             <th>Username</th>
             <th>Group</th>
-            <th>Created</th>
             <th>Status</th>
-            <th>Status Message</th>
             <th class="rounded-none">Actions</th>
           </tr>
         </thead>
@@ -22,13 +32,11 @@
                 <p>{{ group.description }}</p>
               </span>
             </td>
-            <td>{{ useFormatDate(new Date(user.created)) }}</td>
+
             <td>
               <AdminStatusSelect :user="user" />
             </td>
-            <td>
-              {{ user.statusmessage }}
-            </td>
+
             <td>
               <NuxtLink
                 :to="`/Admin/User/${user.username}/Edit`"
@@ -45,9 +53,6 @@
           </tr>
         </tbody>
       </table>
-
-      <nuxt-link to="/Admin/AddUser" for="adduser" class="btn my-3">Add User</nuxt-link>
-      <AddUser class="max-w-min" />
     </div>
     <div v-else><Spinner /></div>
   </div>
@@ -78,8 +83,10 @@ async function getUsers() {
 
 let updateTable = ref(0);
 watch(updated, async () => {
+  loading.value = true;
   users.value = await getUsers();
   updateTable.value++;
+  loading.value = false;
 });
 </script>
 
