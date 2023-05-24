@@ -584,7 +584,7 @@ export async function useDeleteGroupCases(group: string) {
  * Find the total cases, highest count and lowest count in the group
  * @param group - group id  
  * @param description - the description is passed so we don't need to query again */
-export async function useGetGroupStats(group: string, description: string) {
+export async function useGetGroupStats(group: string, description?: string) {
 
   const res = await pb.collection('counter').getList(1, 10000, { filter: `group="${group}"`, order: '+order' })
   // totalCases = sum of all 'count' in items
