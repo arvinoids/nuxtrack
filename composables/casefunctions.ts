@@ -598,7 +598,7 @@ export async function useGetGroupStats(group: string, description?: string) {
   // get lowest count
   const lowestCount = res.items.reduce((acc, item) => {
     return item.count < acc ? item.count : acc
-  }, 0)
+  }, 1)
   return {
     group,
     description,
