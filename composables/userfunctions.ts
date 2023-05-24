@@ -117,7 +117,6 @@ export async function useGetSortedUsers(group: string) {
     return (users as unknown) as expandedUsers;
 }
 
-
 async function userGoesOnLeave(user: string, group: string) {
     // if user is top of list, then just get top count upon return and assign as the count of the user
     // if user is not on top, get difference from top, store in db, then add difference to user's count upon return
@@ -127,7 +126,7 @@ async function userGoesOnLeave(user: string, group: string) {
 }
 
 async function userIsBackFromLeave(userId: string, group: string) {
-    const user = await pb.collection("leaves").getFirstListItem(`user="${userId}"`);
+    const userLeave = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${group}"`);
     const sortedUsers = await useGetSortedUsers(group);
     const lowest = await useGetGroupStats(group).then((res) => res.lowestCount);
     let difference: number;
@@ -135,14 +134,15 @@ async function userIsBackFromLeave(userId: string, group: string) {
         .collection("counter")
         .getFirstListItem(`user="${userId}"&&group="${group}"`)
         .then((res) => res.count);
-    if (user.position === 0) {
+    if (userLeave.position === 0) {
         difference = currentUserCount - lowest;
     } else {
-        const copiedUserCount = sortedUsers.items[user.position].count;
+        const copiedUserCount = sortedUsers.items[userLeave.position].count;
         difference = copiedUserCount - currentUserCount;
     }
     if (difference !== 0) {
         await useAddDummyCases(difference, userId, group, "Leave");
+        await pb.collection('leaves').delete(userLeave.id);
     }
 }
 
