@@ -74,8 +74,14 @@ const props = defineProps<{
 const choices = STATUS_CHOICES;
 const selected = ref(props.user.status);
 
-watch(selected, async () => {
-  await useChangeUserStatus(props.user.id, selected.value as statuschoice, "");
+watch(selected, async (newStatus, oldStatus) => {
+  await useChangeUserStatus(props.user.id, newStatus as statuschoice, "");
+  if (newStatus === "On leave") {
+    await useUserOnLeave(props.user.id);
+  }
+  if (oldStatus === "On leave") {
+    await useUserIsBackFromLeave(props.user.id);
+  }
   const message = `${props.user.username.toUpperCase()} status was changed to ${selected.value.toUpperCase()} by ${pb.authStore.model!.username.toUpperCase()}`;
   useShowToast(message, "success");
   const logData: LogData = {

@@ -150,6 +150,15 @@ onClickOutside(menu, (event) => {
 pb.collection("users").subscribe(user.id, async () => {
   status.value = await useGetUserStatus(user.id);
 });
+
+watch(status, async (oldStatus, newStatus) => {
+  if (newStatus.status === "On leave") {
+    await useUserOnLeave(user.id);
+  }
+  if (oldStatus.status === "On leave") {
+    await useUserIsBackFromLeave(user.id);
+  }
+});
 </script>
 
 <style scoped>
