@@ -1,3 +1,4 @@
+import { AdminCreateDummyCases } from './../.nuxt/components.d';
 import PocketBase, { ListResult } from "pocketbase";
 import { userEntry, userStatus, statuschoice } from "custom-types";
 import { expandedUsers } from "pocketbase-types";
@@ -121,37 +122,68 @@ async function userGoesOnLeave(user: string, group: string) {
     // if user is top of list, then just get top count upon return and assign as the count of the user
     // if user is not on top, get difference from top, store in db, then add difference to user's count upon return
     const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
-    const userPosition = sortedUsers.findIndex((item) => user === item.expand.user.id);
-    await storeUserCount(user, group, userPosition);
+    const userPosition = sortedUsers.findIndex((item) => user === item.user);
+    console.log('saving position', userPosition)
+    const difference = await savedDifference(user, group)
+    console.log('difference',difference)
+    await storeUserCount(user, group, userPosition, difference);
 }
 
 async function userIsBackFromLeave(userId: string, group: string) {
-    const userLeave = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${group}"`);
+    console.log('user si back from leave...')
+    await useRefreshGroupCounter(group);
+    const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${group}"`);
     const sortedUsers = await useGetSortedUsers(group);
-    const lowest = await useGetGroupStats(group).then((res) => res.lowestCount);
-    let difference: number;
-    const currentUserCount = await pb
-        .collection("counter")
-        .getFirstListItem(`user="${userId}"&&group="${group}"`)
-        .then((res) => res.count);
-    if (userLeave.position === 0) {
-        difference = currentUserCount - lowest;
-    } else {
-        const copiedUserCount = sortedUsers.items[userLeave.position].count;
-        difference = copiedUserCount - currentUserCount;
+    let casesToAdd:number
+    if(sortedUsers.items.length===2) {
+        if(userLeaveRecord.position===0) {
+            casesToAdd =  sortedUsers.items[1].count - sortedUsers.items[0].count - userLeaveRecord.difference
+        } else { 
+             casesToAdd = userLeaveRecord.difference - sortedUsers.items[1].count + sortedUsers.items[0].count
+            
+        }
     }
-    if (difference !== 0) await useAddDummyCases(difference, userId, group, "Leave")
-    await pb.collection('leaves').delete(userLeave.id);
+    else {  
+        casesToAdd = userLeaveRecord.difference - ((sortedUsers.items[userLeaveRecord.position].count) - sortedUsers.items[0].count)    }
+    await useAddDummyCases(casesToAdd, userId, group, "Leave") 
+    pb.collection('leaves').delete(userLeaveRecord.id);
 }
 
-async function storeUserCount(user: string, group: string, position: number) {
-    const count: number = await pb
-        .collection("counter")
-        .getFirstListItem(`user="${user}"&&group="${group}"`)
-        .then((res) => res.count);
+async function savedDifference(user:string,group:string)
+{
+    const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
+    const users = sortedUsers.length
+    const userPosition = sortedUsers.findIndex((item) => user === item.user);
+    let difference:number
+    if(users===2) difference = Math.abs(sortedUsers[0].count - sortedUsers[1].count)
+    else {
+        difference = sortedUsers[userPosition].count - sortedUsers[0].count        
+    }
+    return difference
+}
+
+
+async function restoreDifference(user:string, group:string,sortedUsers:expandedUsers) {
+    const users = sortedUsers.items.length
+    const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${user}"&&group="${group}"`);
+    let toAdd:number
+    if(users===2) {
+        if(userLeaveRecord.position===0) {
+            toAdd = sortedUsers.items[1].count + userLeaveRecord.difference
+        } else {  
+            toAdd = sortedUsers.items[0].count + userLeaveRecord.difference
+        }
+    } else { 
+        const lowest = sortedUsers.items[0].count
+        toAdd = userLeaveRecord.difference + lowest
+        }
+    return toAdd
+}
+
+async function storeUserCount(user: string, group: string, position: number,difference:number) {
     await pb.collection("leaves").create({
         user,
-        difference: count,
+        difference,
         group,
         position,
     });

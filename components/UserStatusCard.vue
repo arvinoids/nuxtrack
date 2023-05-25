@@ -156,6 +156,7 @@ watch(status, async (oldStatus, newStatus) => {
     await useUserOnLeave(user.id);
   }
   if (oldStatus.status === "On leave") {
+    console.log("execute userbackfromleave");
     await useUserIsBackFromLeave(user.id);
   }
 });

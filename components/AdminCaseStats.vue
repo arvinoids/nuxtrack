@@ -73,7 +73,7 @@
 import { LogData } from "custom-types";
 
 const selectedGroup = ref("");
-const selectedGroupDescription = ref("");
+const selectedGroupDescription: Ref<string | undefined> = ref("");
 const loading = ref(true);
 const groups = (await useGetAllGroups()).items;
 const casesChanged = useCaseCountChanged();
@@ -92,7 +92,7 @@ async function deleteGroupCases(group: string) {
 
 interface groupStat {
   group: string;
-  description: string;
+  description?: string;
   totalCases: number;
   highestCount: number;
   lowestCount: number;
@@ -116,7 +116,6 @@ async function refresh() {
   loading.value = true;
   await useRefreshAll();
   stats.value = await getGroupStats();
-  console.log(stats.value);
   loading.value = false;
 }
 

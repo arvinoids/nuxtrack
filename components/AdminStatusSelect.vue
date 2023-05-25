@@ -66,7 +66,6 @@
 import { statuschoice, LogData } from "custom-types";
 import { user } from "pocketbase-types";
 const pb = useNuxtApp().$pb;
-const changer = useUserWhoChangedStatus();
 
 const props = defineProps<{
   user: user;
@@ -92,8 +91,4 @@ watch(selected, async (newStatus, oldStatus) => {
 
   await logActivity(logData);
 });
-
-// pb.collection("users").subscribe(props.user.id, async () => {
-//   selected.value = (await pb.collection("users").getOne(props.user.id)).status;
-// });
 </script>

@@ -37,11 +37,8 @@ async function updateCounter(group: string, user: string) {
 }
 
 async function getCount(user: string, group: string) {
-  // const groupFilter = createFilter("group", group);
-  // const userFilter = createFilter("user", user);
   const res = await pb.collection("cases").getList(1, 10000, {
     filter: `group="${group}"&&user="${user}"`,
-    $autoCancel: false,
   });
   return res.totalItems;
 }
@@ -261,19 +258,27 @@ export async function useRefreshAll() {
   const rec = await pb.collection("groups").getList(1, 100);
   const groups = rec.items;
 
-  const groupsLength = groups.length;
-  for (let i = 0; i < groupsLength; i++) {
-    const group = groups[i];
+  // for (let i = 0; i < groupsLength; i++) {
+  //   const group = groups[i];
+  //   const userRec = await pb
+  //     .collection("users")
+  //     .getList(1, 100, { filter: `memberOf~"${group.id}"` });
+  //   const users = userRec.items;
+  //   const usersLength = users.length;
+  //   for (let j = 0; j < usersLength; j++) {
+  //     const user = users[j];
+  //     await updateCounter(group.id, user.id);
+  //   }
+  // }
+  groups.forEach( async (group) => {
     const userRec = await pb
       .collection("users")
       .getList(1, 100, { filter: `memberOf~"${group.id}"` });
     const users = userRec.items;
-    const usersLength = users.length;
-    for (let j = 0; j < usersLength; j++) {
-      const user = users[j];
+    users.forEach(async (user) => {
       await updateCounter(group.id, user.id);
-    }
-  }
+    });
+  });  
 }
 
 export async function useGetGroupName(group: string) {
@@ -283,6 +288,13 @@ export async function useGetGroupName(group: string) {
   } catch (e) {
     console.log(e);
   }
+}
+
+export async function useRefreshGroupCounter(group:string) {
+  const users = await pb.collection('users').getList(1,100,{filter:`memberOf~"${group}"`}).then(res=>res.items)
+    users.forEach((user) => {
+      updateCounter(group, user.id);
+    });
 }
 
 export async function useSearchCase(id: string) {
@@ -464,7 +476,6 @@ export async function useMakeCounter(group: string, users: ListResult) {
       group,
       count,
     };
-    console.log("counter data", data);
     const oldCounter = await pb
       .collection("counter")
       .getList(1, 1, { filter: `user="${user.id}"&&group="${group}"` });
@@ -473,7 +484,6 @@ export async function useMakeCounter(group: string, users: ListResult) {
     }
     // create new counter
     const res = await pb.collection("counter").create(data);
-    console.log("create result", res);
   });
 }
 
@@ -598,7 +608,7 @@ export async function useGetGroupStats(group: string, description?: string) {
   // get lowest count
   const lowestCount = res.items.reduce((acc, item) => {
     return item.count < acc ? item.count : acc
-  }, 1)
+  }, 100000)
   return {
     group,
     description,

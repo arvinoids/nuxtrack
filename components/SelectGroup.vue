@@ -12,10 +12,10 @@
       <div class="text-xs text-error pt-2">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
-        <a class="btn btn-outline btn-secondary" :class="{ hidden: taggedUser.status !== 'Available' }" @click="skipCatch(taggedUser)">Catch Up Later</a>
-        <div>
-          <a class="btn btn-outline btn-secondary" :class="{ hidden: taggedUser.status !== 'Available'}" @click="skipOut(taggedUser.id, group)">Out of Office</a>
-        </div>
+        <a class="btn btn-outline btn-secondary"  @click="skipCatch(taggedUser)">Skip</a>
+        <!-- <div>
+          <a class="btn btn-outline btn-secondary"  @click="skipOut(taggedUser.id, group)">Out of Office</a>
+        </div> -->
         <a href="#" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') || ((taggedUser.status !== 'Available') && !forced) }" 
           @click="submitCase(caseId, taggedUser.id, group) ">Assign</a>
         <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') &&!forced)}"
