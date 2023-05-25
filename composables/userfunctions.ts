@@ -140,10 +140,8 @@ async function userIsBackFromLeave(userId: string, group: string) {
         const copiedUserCount = sortedUsers.items[userLeave.position].count;
         difference = copiedUserCount - currentUserCount;
     }
-    if (difference !== 0) {
-        await useAddDummyCases(difference, userId, group, "Leave");
-        await pb.collection('leaves').delete(userLeave.id);
-    }
+    if (difference !== 0) await useAddDummyCases(difference, userId, group, "Leave")
+    await pb.collection('leaves').delete(userLeave.id);
 }
 
 async function storeUserCount(user: string, group: string, position: number) {
