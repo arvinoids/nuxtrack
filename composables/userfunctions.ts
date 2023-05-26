@@ -123,14 +123,11 @@ async function userGoesOnLeave(user: string, group: string) {
     // if user is not on top, get difference from top, store in db, then add difference to user's count upon return
     const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
     const userPosition = sortedUsers.findIndex((item) => user === item.user);
-    console.log('saving position', userPosition)
     const difference = await savedDifference(user, group)
-    console.log('difference',difference)
     await storeUserCount(user, group, userPosition, difference);
 }
 
 async function userIsBackFromLeave(userId: string, group: string) {
-    console.log('user si back from leave...')
     await useRefreshGroupCounter(group);
     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${group}"`);
     const sortedUsers = await useGetSortedUsers(group);
