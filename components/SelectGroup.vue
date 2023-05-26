@@ -65,21 +65,8 @@ function moveCursor() {
   } else cursor.value++;
 }
 
-async function skipOut(user: string, group: string) {
-  const res = await useSkipOut(user, group);
-  useShowToast(res.message, res.status);
-  emit("skip");
-  moveCursor();
-  const logData: LogData = {
-    user: loggedInUser.value,
-    type: "skipped user",
-    details: res.message,
-  };
-  logActivity(logData);
-}
-
 async function skipCatch(user: user) {
-  const message = `${user.fullname} was skipped to catch up later.`;
+  const message = `${user.fullname} was skipped.`;
   // useShowToast(message, "success");
   emit("skip");
   moveCursor();
