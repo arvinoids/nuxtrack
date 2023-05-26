@@ -46,6 +46,9 @@ const message = ref("");
 const disableEscalate = ref(false);
 const caseIsBlank = ref(false)
 const forced = ref(false)
+const currentUser = pb.authStore.model!.fullname
+const groupName = await useGetGroupName(props.group)
+
 
 let userlist=ref(await useGetSortedUsers(props.group))
 
@@ -80,7 +83,6 @@ async function skipCatch(user: user) {
 
 async function submitCase(caseId: string, id: string, group: string) {
   const res = await useSubmitCase(caseId, id, group);
-  const currentUser = pb.authStore.model!.fullname
   const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);
   await resetSelection();
@@ -90,7 +92,7 @@ async function submitCase(caseId: string, id: string, group: string) {
     const email = {
       to: user.email,
       subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${caseId} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
+      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
     }
     const emailres: result = (await useSendEmail(email)) as result
     useShowToast(emailres.message, emailres.status)
@@ -106,8 +108,19 @@ async function submitCase(caseId: string, id: string, group: string) {
 async function escalateCase(caseId: string, id: string, group: string) {
   const res = await useEscalateCase(caseId, id, group);
   useShowToast(res.message, res.status);
-  resetSelection();
+  const currentTime = useFormatDate(new Date(Date.now()));
+  await resetSelection();
   useDataUpdated().value++;
+  if (res.status === 'success') {
+    const user = (await pb.collection('users').getOne(id))
+    const email = {
+      to: user.email,
+      subject: "New case assigned to you",
+      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
+    }
+    const emailres: result = (await useSendEmail(email)) as result
+    useShowToast(emailres.message, emailres.status)
+  }
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
