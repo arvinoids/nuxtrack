@@ -20,12 +20,16 @@
       <form v-else class="flex flex-col gap-3 px-20 h-[8rem]">
         <input
           type="email"
-          class="input input-sm input-bordered text-center"
+          class="input input-sm input-bordered text-center peer"
           placeholder="email@lexmark.com"
           v-model="email"
           required
         />
-        <button class="btn btn-accent button-sm" @click.prevent="reset">
+        <button
+          class="btn btn-accent button-sm btn-dis peer-invalid:btn-disabled"
+          :class="{ 'btn-disabled': email === '' }"
+          @click.prevent="reset"
+        >
           Send Password Reset Email
         </button>
         <nuxt-link to="/Login" class="text-sm text-center">Back to Login</nuxt-link>
