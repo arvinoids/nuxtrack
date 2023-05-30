@@ -29,6 +29,9 @@
 
       <div class="flex flex-col items-center h-4/5">
         <button class="btn-hover color-1 formlabel">Log In</button>
+        <nuxt-link to="/ResetPassword" class="text text-sm text-accent"
+          >Forgot password?</nuxt-link
+        >
         <div v-if="message" class="">
           <div class="border p-3 border-base-300">
             <p class="text-error text-center text-sm">{{ message }}</p>
