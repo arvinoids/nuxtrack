@@ -1,10 +1,11 @@
 <template>
   <div class="flex flex-col items-center">
-    <div class="self-center mt-3">
+    <div class="self-center mt-3 flex flex-col items-center">
       <p class="text-lg text-secondary mx-10">
         Hello, <span class="font-semibold">{{ currentUser }}</span
         >. To assign or escalate a case, please select a group below.
       </p>
+      <div><AssignToSelf>Assign case to myself</AssignToSelf></div>
     </div>
     <div v-if="!loading">
       <div ref="dashboard" class="flex flex-row flex-wrap justify-center">
