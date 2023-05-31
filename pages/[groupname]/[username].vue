@@ -3,7 +3,10 @@
     <div>
       <UserCard :user="user" />
     </div>
-    <PaginatedCases :userId="user.id" :group="group.id" />
+    <div class="flex flex-col gap-2 mx-2">
+      <div><AssignCase :user="user" :group="group.id" /></div>
+      <PaginatedCases :userId="user.id" :group="group.id" />
+    </div>
   </div>
 </template>
 

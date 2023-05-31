@@ -358,6 +358,7 @@ export async function useEscalateCase(
     result.status = "success";
     useUpdateGroup(group)
   } catch (e) {
+    console.log(e)
     result.message = "Failed to escalate.";
     result.status = "failed";
   }
