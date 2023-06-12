@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <label for="assignToSelf" class="btn mt-2 btn-outline rounded btn-accent"
+  <span>
+    <label for="assignToSelf" class="cursor-pointer hover:font-bold text-accent"
       ><slot
     /></label>
     <input type="checkbox" id="assignToSelf" class="modal-toggle" />
@@ -48,7 +48,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </span>
 </template>
 
 <script setup lang="ts">

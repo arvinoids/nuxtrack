@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col text-center m-3 w-[250px] shadow-lg border bg-base-100">
+  <div class="flex flex-col text-center m-1 w-[250px] shadow-lg border bg-base-100">
     <div class="bg-secondary">
       <div class="flex items-center justify-between">
         <h2
@@ -11,7 +11,7 @@
         </h2>
         <div
           class="tooltip tooltip-bottom tooltip-accent"
-          data-tip="Click this if you checked for new cases and there are none."
+          data-tip="Click this if you checked for new cases."
         >
           <button
             class="btn btn-ghost btn-circle btn-sm mr-1"
