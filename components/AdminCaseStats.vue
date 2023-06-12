@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center items-center gap-2 w-auto">
     <p class="text-sm font-bold self-start">Case Stats</p>
-    <div v-if="!loading" class="h-[320px] w-[450px]">
+    <div v-if="!loading" class="h-[360px] w-[450px]">
       <table class="border table table-compact table-zebra rounded-none">
         <thead>
           <th class="rounded-none">Group</th>
@@ -34,7 +34,7 @@
 
     <div
       v-else
-      class="border h-[320px] w-[450px] flex flex-col justify-center items-center"
+      class="border h-[360px] w-[450px] flex flex-col justify-center items-center"
     >
       <Spinner />
     </div>

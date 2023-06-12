@@ -29,7 +29,7 @@
               class="absolute mt-1 max-h-60 w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 sm:text-sm z-10"
             >
               <HeadlessListboxOption
-                v-for="user in users.items"
+                v-for="user in validUsers"
                 v-slot="{ active, selected }"
                 :key="user.id"
                 :value="user"
@@ -126,10 +126,19 @@ import { LogData } from "custom-types";
 const casesChanged = useCaseCountChanged();
 const users: ListResult = await useGetAllUsers();
 const tickets = ref(1);
-const selectedUser = ref(users.items[0]);
+const validUsers = getValidUsers();
+const selectedUser = ref(validUsers[0]);
 const availableGroups = computed(() => {
   return selectedUser.value.expand.memberOf;
 });
+
+// show only users with elements inside memberOf[]
+function getValidUsers() {
+  const filtered = users.items.filter((item) => {
+    return !(item.memberOf == ![]);
+  });
+  return filtered;
+}
 
 const firstGroup = ref(selectedUser.value.expand.memberOf[0]);
 

@@ -67,8 +67,6 @@ const caseIsEscalated = ref(false);
 const caseIsBlank = ref(false);
 const disableEscalate = ref(false);
 
-console.log(groups);
-
 async function doAssign() {
   useAssignCase(caseId.value, user.id, selectedGroupId.value);
 }
