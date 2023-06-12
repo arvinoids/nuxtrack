@@ -30,19 +30,19 @@
         </div>
 
         <div class="modal-action">
-          <a
-            href="#"
+          <label
+            for="assignToSelf"
             class="btn btn-primary"
             :class="{ hidden: caseExists || caseId === '' }"
             @click="submitCase(caseId, user.id, selectedGroupId)"
-            >Assign</a
+            >Assign</label
           >
-          <a
-            href="#"
+          <label
+            for="assignToSelf"
             class="btn btn-warning btn-primary"
             :class="{ hidden: !caseExists || disableEscalate }"
             @click="escalateCase(caseId, user.id, selectedGroupId)"
-            >Escalate</a
+            >Escalate</label
           >
           <label for="assignToSelf" class="btn btn-outline btn-warning">Cancel</label>
         </div>
