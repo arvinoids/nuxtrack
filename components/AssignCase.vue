@@ -19,10 +19,10 @@
                 <div class="text-xs text-error pt-2">{{ message }}</div>
                 </p>
                 <div class="modal-action justify-center">
-                    <a href="#" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') }"
-                        @click="submitCase(caseId, user.id, group)">Assign</a>
-                    <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) }"
-                        @click="escalateCase(caseId, user.id, group)">Escalate</a>
+                    <label for="assignCase" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') }"
+                        @click="submitCase(caseId, user.id, group)">Assign</label>
+                    <label for="assignCase" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) }"
+                        @click="escalateCase(caseId, user.id, group)">Escalate</label>
                     <label for="assignCase" class="btn btn-accent">Cancel</label>
                 </div>
             </div>
