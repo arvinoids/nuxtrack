@@ -73,13 +73,11 @@ onMounted(async () => {
 });
 
 async function getUsers() {
-  const res = await pb
-    .collection("users")
-    .getFullList(1000, {
-      sort: "+fullname",
-      expand: "memberOf",
-      fields: "username,memberOf,status",
-    });
+  const res = await pb.collection("users").getFullList(1000, {
+    sort: "+fullname",
+    expand: "memberOf",
+    fields: "id,fullname, username,expand.memberOf,status",
+  });
   return res;
 }
 
