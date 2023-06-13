@@ -44,7 +44,7 @@ const props = defineProps<{
   username: string;
 }>();
 
-const usersData = await pb.collection("users").getList();
+const usersData = await pb.collection("users").getList(1, 1000, { sort: "+fullname" });
 const newUser = ref("Select a user below:");
 const users = usersData.items;
 
