@@ -5,7 +5,13 @@
       class="flex items-center btn btn-ghost btn-square p-2"
       ref="menubutton"
       @click.stop="show = !show"
+      v-if="!show"
     >
+      <button class="text-gray-200 hover:text-gray-50">
+        <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />
+      </button>
+    </div>
+    <div class="flex items-center btn btn-ghost btn-square p-2" ref="menubutton" v-else>
       <button class="text-gray-200 hover:text-gray-50">
         <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />
       </button>
@@ -58,12 +64,16 @@ const loggedInUser = useLoggedInUsername();
 const userRole = ref(pb.authStore.model!.role);
 const userId = ref(pb.authStore.model!.id);
 const show = ref(false);
-// const newEvent = useNotify();
 
 if (await pb.authStore.isValid) {
   auth.value.isAuthenticated = true;
   loggedInUser.value = pb.authStore.model!.username;
 }
+
+const menu = ref(null);
+onClickOutside(menu, () => {
+  show.value = false;
+});
 </script>
 
 <style scoped>
