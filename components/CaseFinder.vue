@@ -16,9 +16,9 @@
         <label for="caseId"
           ><input
             class="input my-3 bg-neutral text-center w-[19rem]"
-            type="text"
+            type="search"
             v-model="caseId"
-            placeholder="Enter CAS here"
+            placeholder="CAS-XXXXXXX-XXXXXX"
           />
         </label>
 
