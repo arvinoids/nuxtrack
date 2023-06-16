@@ -72,7 +72,7 @@ async function doAssign() {
 }
 
 async function submitCase(caseId: string, userId: string, group: string) {
-  const groupName = useGetGroupName(group);
+  const groupName = await useGetGroupName(group);
   const res = await useSubmitCase(caseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);

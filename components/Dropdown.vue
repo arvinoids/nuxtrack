@@ -65,7 +65,7 @@ const userRole = ref(pb.authStore.model!.role);
 const userId = ref(pb.authStore.model!.id);
 const show = ref(false);
 
-if (await pb.authStore.isValid) {
+if (pb.authStore.isValid) {
   auth.value.isAuthenticated = true;
   loggedInUser.value = pb.authStore.model!.username;
 }

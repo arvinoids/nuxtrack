@@ -10,7 +10,8 @@
           v-if="avatarUrl"
           :src="avatarUrl"
           alt=""
-          class="h-10 w-10 flex-none rounded-full"
+          class="h-10 w-10 flex-none rounded-full border-2"
+          :class="{ [`border-${badgeColor}`]: true }"
         />
         <Icon
           v-else
@@ -75,8 +76,8 @@
 </template>
 
 <script setup lang="ts">
-const cnf = useRuntimeConfig().public;
 import { statuschoice, LogData } from "custom-types";
+import { Record } from "pocketbase";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{
   id: string;
@@ -88,8 +89,11 @@ const avatarUrl = getAvatarUrl();
 function getAvatarUrl() {
   if (pb.authStore.model?.avatar === "") {
     return null;
-  } else
-    return `${cnf.pocketBaseURL}/api/files/_pb_users_auth_/${user.id}/${user.avatar}`;
+  } else {
+    const user = pb.authStore.model as Record;
+    const url = pb.files.getUrl(user, user!.avatar, { thumb: "100x100" });
+    return url;
+  }
 }
 
 const status = ref(await useGetUserStatus(props.id));
