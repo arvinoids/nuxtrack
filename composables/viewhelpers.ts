@@ -7,18 +7,28 @@ export function useShowToast(message: string, status: string) {
       hideProgressBar: true,
       toastStyle: {
         fontFamily: "Inter",
+        borderRadius:'0px',
       }
 
     })
   else if (status == "failed")
     toast.error(message, {
       position: toast.POSITION.BOTTOM_CENTER,
-      hideProgressBar: true,
+      autoClose:5000,
+      toastStyle: {
+        fontFamily: "Inter",
+        borderRadius:'0px',
+      }
     })
 
   else toast.warning(message, {
     position: toast.POSITION.BOTTOM_CENTER,
+    autoClose:5000,
     hideProgressBar: true,
+    toastStyle: {
+      fontFamily: "Inter",
+      borderRadius:'0px',
+    }
   })
 }
 
