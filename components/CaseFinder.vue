@@ -71,7 +71,7 @@ let caseData = ref();
 
 watch(caseId, async (caseId) => {
   loading.value = true;
-  caseData.value = await useFindCase(caseId);
+  caseData.value = await useFindCase(caseId.trim().toUpperCase());
   if (caseData.value.data !== null) {
      caseFound.value = true;
   }
