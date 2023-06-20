@@ -1,4 +1,3 @@
-import { AdminCreateDummyCases } from './../.nuxt/components.d';
 import PocketBase, { ListResult } from "pocketbase";
 import { userEntry, userStatus, statuschoice } from "custom-types";
 import { expandedUsers } from "pocketbase-types";
@@ -195,7 +194,14 @@ export async function useUserOnLeave(id: string) {
 
 export async function useUserIsBackFromLeave(id: string) {
     const groups = await useGetUserGroups(id);
-    groups.forEach(async (group: string) => {
+    try {
+        groups.forEach(async (group: string) => {
         await userIsBackFromLeave(id, group);
     });
+    return { status:'success', message:'updated user case count after leave'}
+    } catch (e:any) { return { 
+        status: 'failed',
+        message: e.message
+    } }
+    
 }

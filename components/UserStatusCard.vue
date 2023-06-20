@@ -163,7 +163,12 @@ watch(status, async (oldStatus, newStatus) => {
   }
   if (oldStatus.status === "On leave") {
     console.log("execute userbackfromleave");
-    await useUserIsBackFromLeave(user.id);
+    const res = await useUserIsBackFromLeave(user.id);
+    logActivity({
+      user: user.username,
+      type: "changed status",
+      details: res.status + ":" + res.message,
+    });
   }
 });
 </script>
