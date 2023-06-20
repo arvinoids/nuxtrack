@@ -203,5 +203,4 @@ export async function useUserIsBackFromLeave(id: string) {
         status: 'failed',
         message: e.message
     } }
-    
 }
