@@ -13,14 +13,14 @@
     <label for="finder" class="modal cursor-pointer">
       <label class="modal-box relative w-[22rem] flex flex-col gap-2" for="">
         <h3 class="text-lg font-bold">Find a case</h3>
-        <label for="caseId"
-          ><input
-            class="input my-3 bg-neutral text-center w-[19rem]"
+        <label for="finder" class="btn w-min self-center absolute right-3 top-3 btn-ghost hover:btn-error">✖</label>
+        <input
+            class="input mt-3 bg-neutral text-center w-[19rem]"
             type="search"
             v-model="caseId"
             placeholder="CAS-XXXXXXX-XXXXXX"
-          />
-        </label>
+            id="caseInput"
+          /><label for="caseInput" class='label'><span class="label-text-alt text-warning">Please note that search is case-sensitve and must be 18 characters or longer.</span></label>
 
         <div v-if="caseFound">
           <div class="text-sm">
@@ -50,12 +50,11 @@
           </div>
         </div>
         <div v-else>
-          <p class="text-accent text-center" v-if="caseId">
+          <p class="text-accent text-center" v-if="caseId.length>=18">
           <div v-if="loading">Looking for case...</div>
           <div v-else>Case not found</div>
           </p>
         </div>
-        <label for="finder" class="btn btn-sm w-min self-center text-sm">Close</label>
       </label>
     </label>
   </div>
@@ -74,7 +73,7 @@ watch(caseId, async (caseId) => {
   if(caseId.length>=18) {
       caseData.value = await useFindCase(caseId.trim());
   }
-  if (caseData.value.data !== null) {
+  if (caseData.value.data !== null&&caseId.length>=18) {
      caseFound.value = true;
   }
   else caseFound.value = false;
