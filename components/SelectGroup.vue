@@ -5,20 +5,24 @@
         Assign case to
         <span class="text-accent">{{ taggedUser.fullname }}</span>
       </h3>
-      <p class="text-sm">Status: <span class="font-semibold" :class="{ [`text-${getColor(taggedUser.status)}`]: true }">{{ taggedUser.status }}</span></p>
+      <p class="text-sm">Status: <span class="font-semibold" :class="{ [`text-${getColor(taggedUser.status)}`]: true }">{{
+        taggedUser.status }}</span></p>
       <p class="py-4">
         <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]" v-model="caseId" />
-        <div class="flex flex-row justify-center items-center" v-if="taggedUser.status!=='Available'"><input type="checkbox" v-model="forced" /><label class="text-xs mx-2">Force assign</label></div>
+      <div class="flex flex-row justify-center items-center" v-if="taggedUser.status !== 'Available'"><input type="checkbox"
+          v-model="forced" /><label class="text-xs mx-2">Force assign</label></div>
       <div class="text-xs text-error pt-2">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
-        <a class="btn btn-outline btn-secondary"  @click="skipCatch(taggedUser)">Skip</a>
+        <a class="btn btn-outline btn-secondary" @click="skipCatch(taggedUser)">Skip</a>
         <!-- <div>
           <a class="btn btn-outline btn-secondary"  @click="skipOut(taggedUser.id, group)">Out of Office</a>
         </div> -->
-        <a href="#" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') || ((taggedUser.status !== 'Available') && !forced) }" 
-          @click="submitCase(caseId, taggedUser.id, group) ">Assign</a>
-        <a href="#" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') &&!forced)}"
+        <a href="#" class="btn btn-primary"
+          :class="{ hidden: (caseExists || caseId === '') || ((taggedUser.status !== 'Available') && !forced) }"
+          @click="submitCase(caseId, taggedUser.id, group)">Assign</a>
+        <a href="#" class="btn btn-warning btn-primary" v-if="groupName!=='l1_na'"
+          :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
         <a href="#" class="btn btn-outline btn-error" @click=" resetSelection(); showCanceledToast();">Cancel</a>
       </div>
@@ -47,18 +51,18 @@ const disableEscalate = ref(false);
 const caseIsBlank = ref(false)
 const forced = ref(false)
 const currentUser = pb.authStore.model!.fullname
-const groupName = await useGetGroupName(props.group)
+const groupName:string = await useGetGroupName(props.group)
 
 
-let userlist=ref(await useGetSortedUsers(props.group))
+let userlist = ref(await useGetSortedUsers(props.group))
 
-pb.collection('users').subscribe('*',async ()=>{
+pb.collection('users').subscribe('*', async () => {
   userlist.value = await useGetSortedUsers(props.group)
 })
 
 //const taggedUser = ref(userlist.value.items[cursor.value].expand.user as user);
 
-const taggedUser = computed(()=>{
+const taggedUser = computed(() => {
   return userlist.value.items[cursor.value].expand.user
 })
 
@@ -130,14 +134,15 @@ async function escalateCase(caseId: string, id: string, group: string) {
 }
 
 watch(caseId, async (caseId) => {
-  caseExists.value = await useCaseExists(caseId.trim());
-  caseIsEscalated.value = await useCaseIsEscalated(caseId.trim());
-  if (caseId.trim().includes("escalated")) {
+  caseId=caseId.trim()
+  caseExists.value = await useCaseExists(caseId);
+  caseIsEscalated.value = await useCaseIsEscalated(caseId);
+  if (caseId.includes("escalated")) {
     message.value = "Remove -escalated operator.";
   } else {
     message.value = errorMessage(caseExists.value, caseIsEscalated.value, caseId);
   }
-  if (caseId.trim() === '') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
+  if (caseId === '') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
 });
 
 function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
@@ -145,27 +150,29 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
     disableEscalate.value = true;
     return "Already escalated. Please check case number.";
   }
-  if (caseExists && !caseIsEscalated)
-    return "This case is in the database. Escalate to continue.";
+  if (caseExists && !caseIsEscalated) {
+    if (groupName === 'l1_na') { return "This case is in the database. Please select an L3 group to escalate." }
+    else return "This case is in the database. Escalate to proceed."
+  };
   if (!caseExists) return "Assign case to proceed.";
   else return "";
 }
 
 async function resetSelection() {
-  if(cursor.value>0){
+  if (cursor.value > 0) {
     await pb.collection('logs').create({ user: pb.authStore.model!.username, type: 'canceled assign', details: "Canceled assign case" })
   }
-    emit('reset')
-    caseId.value = "";
+  emit('reset')
+  caseId.value = "";
 }
 
 async function showCanceledToast() {
-  if(cursor.value > 0)
-  useShowToast("Canceled assign after skips","warn")
+  if (cursor.value > 0)
+    useShowToast("Canceled assign after skips", "warn")
   cursor.value = 0
 }
 
-pb.collection('users').subscribe('*',async ()=>{
+pb.collection('users').subscribe('*', async () => {
   userlist.value = await useGetSortedUsers(props.group)
 })
 
