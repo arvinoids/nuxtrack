@@ -2,11 +2,11 @@
   <div>
     <div :key="updateTable" class="flex flex-col gap-3">
       <div
-        class="overflow-x-auto shadow-lg flex flex-col w-[1080px]"
+        class="overflow-x-auto shadow-md flex flex-col w-[1080px] h-[600px]"
         v-if="logs!.totalItems !== 0"
       >
         <table class="table table-compact" v-if="!loading">
-          <thead>
+          <thead class="sticky top-0 z-20">
             <tr>
               <th class="rounded-none">User</th>
               <th>Transaction</th>
@@ -129,9 +129,7 @@ watch(itemsPerPage, async () => {
 
 watch(currentPage, async (p = currentPage.value) => {
   getPage(p);
-  logs = await getLogs(itemsPerPage.value);
-
+  logs = await getLogs(p);
   updateTable.value++;
 });
-
 </script>

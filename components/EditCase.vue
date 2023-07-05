@@ -15,9 +15,13 @@
           <label class="label">
             <span class="label-text">Owner</span>
           </label>
-          <select class="select select-bordered" v-model="newUser">
-            <option v-for="user in users" :key="user.id" :value="user.id">
-              {{ user.fullname }}
+          <select class="select select-bordered w-[30ch]" v-model="newUser">
+            <option
+              v-for="user in users"
+              :key="user.expand.user.id"
+              :value="user.expand.user.id"
+            >
+              {{ user.expand.user.fullname }}
             </option>
           </select>
         </div>
@@ -58,25 +62,33 @@ const props = defineProps<{
   product: string;
 }>();
 
-const userRec = await pb.collection("users").getList(1, 50, {
-  filter: `memberOf~"${props.product}"`,
-});
-const users = userRec.items;
+let newUser = ref(props.owner);
+let newCase: string = props.caseId;
+let newGroup = ref(props.product);
+
+async function getUsers(group: string) {
+  const res = (await useGetSortedUsers(group)).items;
+  return res;
+}
+
+const users = ref(await getUsers(props.product));
 
 const productSets = await pb.collection("groups").getList(1, 100);
-const groups = productSets.items;
+const groups = ref(productSets.items);
 
-let newUser: string = props.owner;
-let newCase: string = props.caseId;
-let newGroup: string = props.product;
+watch(newGroup, async () => {
+  users.value = await getUsers(newGroup.value);
+  newUser.value = users.value[0].expand.user.id;
+});
 
 const message = ref("");
 const updated = useDataUpdated();
+
 async function doUpdate() {
   const res = await useUpdateCase(
     props.id,
-    newUser,
-    newGroup,
+    newUser.value,
+    newGroup.value,
     newCase,
     pb.authStore.model!.username
   );

@@ -1,11 +1,11 @@
 <template>
   <div :key="updateTable" class="flex flex-col gap-3">
     <div
-      class="overflow-x-auto shadow-lg flex flex-col w-[1080px]"
+      class="overflow-x-auto shadow-lg flex flex-col w-[1080px] h-[600px]"
       v-if="cases.totalItems !== 0"
     >
       <table class="table table-compact" v-if="!loading">
-        <thead>
+        <thead class="sticky top-0 z-20">
           <tr>
             <th class="rounded-none">Owner</th>
             <th>Case ID</th>
@@ -53,14 +53,36 @@
         <option>20</option>
         <option>100</option>
       </select>
-      <div class="btn-group justify-center">
+
+      <div class="btn-group">
         <button
           class="btn"
-          v-for="page in cases.totalPages"
-          :class="{ 'btn-active btn-disabled': page === cases.page }"
-          @click="getPage(page)"
+          :class="{ 'btn-disabled': currentPage === 1 }"
+          @click="currentPage = 1"
         >
-          {{ page }}
+          ‹
+        </button>
+        <button
+          class="btn"
+          :class="{ 'btn-disabled': currentPage === 1 }"
+          @click="currentPage--"
+        >
+          «
+        </button>
+        <button class="btn">Page {{ currentPage }} of {{ cases?.totalPages }}</button>
+        <button
+          class="btn"
+          :class="{ 'btn-disabled': currentPage === cases?.totalPages }"
+          @click="currentPage++"
+        >
+          »
+        </button>
+        <button
+          class="btn"
+          :class="{ 'btn-disabled': currentPage === 1 }"
+          @click="currentPage = cases!.totalPages"
+        >
+          ›
         </button>
       </div>
     </div>
@@ -84,7 +106,7 @@ const updated = useDataUpdated();
 const loading = ref(true);
 const updateTable = ref(0);
 
-const currentPage = ref(props.pageNum);
+const currentPage = ref(props.pageNum ?? 1);
 const itemsPerPage = ref(props.perPage);
 if (props.perPage === undefined) itemsPerPage.value = 10;
 
@@ -121,9 +143,25 @@ async function getPage(page: number) {
   updateTable.value++;
 }
 
+// watch(itemsPerPage, async () => {
+//   getPage(1);
+//   cases = await getCases(1);
+//   updateTable.value++;
+// });
+
+// new watchers
 watch(itemsPerPage, async () => {
   getPage(1);
+  currentPage.value = 1;
+  loading.value = true;
   cases = await getCases(1);
+  loading.value = false;
+  updateTable.value++;
+});
+
+watch(currentPage, async (p = currentPage.value) => {
+  getPage(p);
+  cases = await getCases(p);
   updateTable.value++;
 });
 </script>
