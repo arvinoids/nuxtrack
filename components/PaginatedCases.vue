@@ -1,10 +1,10 @@
 <template>
   <div :key="updateTable" class="flex flex-col gap-3">
     <div
-      class="overflow-x-auto shadow-lg flex flex-col w-[1080px] h-[600px]"
+      class="overflow-x-auto flex flex-col w-[1080px] h-[600px]"
       v-if="cases.totalItems !== 0"
     >
-      <table class="table table-compact" v-if="!loading">
+      <table class="table table-compact shadow-md" v-if="!loading">
         <thead class="sticky top-0 z-20">
           <tr>
             <th class="rounded-none">Owner</th>
