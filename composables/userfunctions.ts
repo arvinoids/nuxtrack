@@ -1,14 +1,18 @@
-import PocketBase, { ListResult } from "pocketbase";
+import  { ListResult } from "pocketbase";
 import { userEntry, userStatus, statuschoice } from "custom-types";
 import { expandedUsers } from "pocketbase-types";
-const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
-pb.autoCancellation(false);
+// const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
+//pb.autoCancellation(false);
 
 export function useCurrentUser() {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     return pb.authStore.model
 }
 
 export async function useDeleteUser(id: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const result = { message: "", status: "success" };
 
     try {
@@ -26,6 +30,8 @@ export async function useDeleteUser(id: string) {
 }
 
 export async function useCreateUser(userData: userEntry) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const result = { status: "failed", message: "" };
     try {
         const res = await pb.collection("users").create(userData);
@@ -47,6 +53,8 @@ export async function useUpdateUser(id: string, userData: {
     memberOf?: string[],
     role?: "user" | "admin" | "lead",
 }) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const result = { status: "failed", message: "" };
     try {
         await pb.collection("users").update(id, userData);
@@ -61,6 +69,8 @@ export async function useUpdateUser(id: string, userData: {
 }
 
 export async function useGetUsers(group?: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     let users: ListResult;
     if (group === null) {
         users = await pb.collection("users").getList();
@@ -72,16 +82,22 @@ export async function useGetUsers(group?: string) {
 }
 
 export async function useGetUserGroups(id: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const res = await pb.collection("users").getOne(id);
     return res.memberOf;
 }
 
 export async function useGetUsernameFromId(id: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const res = await pb.collection("users").getOne(id);
     return res.username;
 }
 
 export async function useGetUserStatus(id: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const status: userStatus = {
         status: 'Unknown',
         message: ''
@@ -97,6 +113,8 @@ export async function useGetUserStatus(id: string) {
 }
 
 export async function useChangeUserStatus(id: string, newStatus: statuschoice, newMessage: string | null) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     try {
         const record = await pb.collection('users').update(id, { 'status': newStatus, 'statusmessage': newMessage })
     } catch (e) {
@@ -105,12 +123,16 @@ export async function useChangeUserStatus(id: string, newStatus: statuschoice, n
 }
 
 export async function useGetAllUsers() {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     let users: ListResult;
     users = await pb.collection("users").getList(1, 1000, { expand: 'memberOf', sort: 'fullname' })
     return users
 }
 /** Get users of a group sorted by count ascending */
 export async function useGetSortedUsers(group: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const users = await pb
         .collection("counter")
         .getList(1, 1000, { filter: `group="${group}"`, sort: "+count", expand: "user" });
@@ -120,6 +142,8 @@ export async function useGetSortedUsers(group: string) {
 async function userGoesOnLeave(user: string, group: string) {
     // if user is top of list, then just get top count upon return and assign as the count of the user
     // if user is not on top, get difference from top, store in db, then add difference to user's count upon return
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
     const userPosition = sortedUsers.findIndex((item) => user === item.user);
     const difference = await savedDifference(user, group)
@@ -127,6 +151,8 @@ async function userGoesOnLeave(user: string, group: string) {
 }
 
 async function userIsBackFromLeave(userId: string, group: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     await useRefreshGroupCounter(group);
     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${group}"`);
     const sortedUsers = await useGetSortedUsers(group);
@@ -145,8 +171,9 @@ async function userIsBackFromLeave(userId: string, group: string) {
     pb.collection('leaves').delete(userLeaveRecord.id);
 }
 
-async function savedDifference(user:string,group:string)
-{
+async function savedDifference(user:string,group:string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
     const users = sortedUsers.length
     const userPosition = sortedUsers.findIndex((item) => user === item.user);
@@ -160,6 +187,8 @@ async function savedDifference(user:string,group:string)
 
 
 async function restoreDifference(user:string, group:string,sortedUsers:expandedUsers) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     const users = sortedUsers.items.length
     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${user}"&&group="${group}"`);
     let toAdd:number
@@ -177,6 +206,8 @@ async function restoreDifference(user:string, group:string,sortedUsers:expandedU
 }
 
 async function storeUserCount(user: string, group: string, position: number,difference:number) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     await pb.collection("leaves").create({
         user,
         difference,

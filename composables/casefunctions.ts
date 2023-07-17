@@ -1,9 +1,4 @@
-import PocketBase, { ListResult, Record } from "pocketbase";
-
-// //const cnf = useRuntimeConfig().public;
-const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
-// const pb = useNuxtApp().$pb
-pb.autoCancellation(false);
+import { ListResult, Record } from "pocketbase";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -13,6 +8,8 @@ pb.autoCancellation(false);
 //We need a way to refresh the counter every time changes are made.
 
 async function updateCounter(group: string, user: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   let newCount = await getCount(user, group);
   // console.log("new count: ", newCount);
   let data = {
@@ -37,6 +34,8 @@ async function updateCounter(group: string, user: string) {
 }
 
 async function getCount(user: string, group: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = await pb.collection("cases").getList(1, 10000, {
     filter: `group="${group}"&&user="${user}"`,
   });
@@ -48,6 +47,8 @@ export async function useAssignCase(
   user: string,
   group: string
 ) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const data = {
     user: user,
     group: group,
@@ -75,6 +76,8 @@ export async function useAssignCase(
 
 //case checking if it exists
 export async function caseExists(caseId: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const caseFilter = 'case="' + caseId + '"';
   try {
     const record = await pb.collection("cases").getFirstListItem(caseFilter);
@@ -86,6 +89,8 @@ export async function caseExists(caseId: string) {
 }
 
 export async function useSkipOut(userId: string, groupId: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const data = {
     user: userId,
     group: groupId,
@@ -108,6 +113,8 @@ export async function useSkipOut(userId: string, groupId: string) {
 }
 
 export async function getUserCases(userId?: string, group?: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   // console.log("getting cases for user ", userId);
   let cases;
   if (!userId) {
@@ -138,6 +145,8 @@ export async function useGetFilteredCases(
   pageNumber?: number,
   perPage?: number
 ) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const sorting = "-created";
   if (pageNumber === undefined) pageNumber = 1;
   if (perPage === undefined) perPage = 10;
@@ -179,6 +188,8 @@ export async function useGetFilteredLogs(
   pageNumber?: number,
   perPage?: number
 ) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const sorting = "-created";
   if (pageNumber === undefined) pageNumber = 1;
   if (perPage === undefined) perPage = 10;
@@ -206,6 +217,8 @@ export async function useUpdateCase(
   caseId: string,
   assignedBy: string
 ) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const data = {
     user: user,
     group: group,
@@ -227,6 +240,8 @@ export async function useUpdateCase(
 }
 
 export async function useDeleteCase(id: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const result = { message: "", status: "success" };
   try {
     const caseRecord = await pb.collection("cases").getOne(id);
@@ -254,6 +269,8 @@ export async function useSubmitCase(
 }
 
 export async function useRefreshAll() {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   //get groups
   const rec = await pb.collection("groups").getList(1, 100);
   const groups = rec.items;
@@ -282,6 +299,8 @@ export async function useRefreshAll() {
 }
 
 export async function useGetGroupName(group: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   try {
     const res = await pb.collection("groups").getOne(group);
     return res.name;
@@ -291,6 +310,8 @@ export async function useGetGroupName(group: string) {
 }
 
 export async function useRefreshGroupCounter(group:string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const users = await pb.collection('users').getList(1,100,{filter:`memberOf~"${group}"`}).then(res=>res.items)
     users.forEach((user) => {
       updateCounter(group, user.id);
@@ -298,6 +319,8 @@ export async function useRefreshGroupCounter(group:string) {
 }
 
 export async function useSearchCase(id: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   id = id.trim();
   let result = { message: "", status: "failed" };
   let data: Record | undefined;
@@ -314,6 +337,8 @@ export async function useSearchCase(id: string) {
 }
 
 export async function useCaseExists(id: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   try {
     let res = await pb.collection("cases").getFirstListItem(`case="${id}"`);
     return true;
@@ -323,6 +348,8 @@ export async function useCaseExists(id: string) {
 }
 
 export async function useCaseIsEscalated(id: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   try {
     let res = await pb
       .collection("cases")
@@ -338,6 +365,8 @@ export async function useEscalateCase(
   user: string,
   group: string
 ) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   let caseRec = await getCase(caseId.trim());
   await renameOldCase(caseRec);
 
@@ -366,11 +395,15 @@ export async function useEscalateCase(
 }
 
 async function getCase(id: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const rec = await pb.collection("cases").getFirstListItem(`case="${id}"`);
   return rec;
 }
 
 async function renameOldCase(rec: Record) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   let newCaseId = rec.case + "-escalated";
   rec.case = newCaseId;
   const newData = {
@@ -387,6 +420,8 @@ async function renameOldCase(rec: Record) {
  * Reassigns cases before deleting the user.
  */
 export async function useReassignCases(oldUser: string, newUser: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = { message: "Reassign failed", status: "failed" };
   const userCases = await pb
     .collection("cases")
@@ -416,6 +451,8 @@ export async function useReassignCases(oldUser: string, newUser: string) {
 }
 
 async function removeCounters(userId: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   // remove items with matching user id
   const res = { message: "Unable to remove counters", status: " failed" };
   const countersData = await pb
@@ -433,6 +470,8 @@ async function removeCounters(userId: string) {
 }
 
 async function removeLists(userId: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = { message: "Unable to remove from lists", status: " failed" };
   const listsData = await pb
     .collection("currentlist")
@@ -449,6 +488,8 @@ async function removeLists(userId: string) {
 }
 
 export async function useRemoveUserFromGroups(id: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = { message: "Remove failed", status: "failed" };
   // const user = await pb.collection('users').getOne(id)
   try {
@@ -466,6 +507,8 @@ export async function useRemoveUserFromGroups(id: string) {
 
 
 export async function useMakeCounter(group: string, users: ListResult) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   users.items.forEach(async (user) => {
     const count = (
       await pb
@@ -489,6 +532,8 @@ export async function useMakeCounter(group: string, users: ListResult) {
 }
 
 export async function useUpdateCounter(group: string, users: ListResult) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   users.items.forEach(async (user) => {
     const oldCounter = await pb
       .collection("counter")
@@ -506,6 +551,8 @@ export async function useUpdateCounter(group: string, users: ListResult) {
 }
 
 async function countCases(user: string, group: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = await pb
     .collection("cases")
     .getList(1, 10000, { filter: `user="${user}"&&group="${group}"` });
@@ -517,6 +564,8 @@ async function countCases(user: string, group: string) {
 // }
 
 export async function useFindCase(id: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = {
     message: "",
     status: "",
@@ -553,6 +602,8 @@ function createDummyCases(quantity: number, prefix: string) {
 }
 
 export async function useAddDummyCases(quantity: number, user: string, group: string, prefix: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const cases = createDummyCases(quantity, prefix)
   cases.forEach(async (caseId) => {
     let data = {
@@ -571,11 +622,15 @@ export async function useAddDummyCases(quantity: number, user: string, group: st
 }
 
 export async function useGetAllGroups() {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = await pb.collection('groups').getList()
   return res
 }
 
 export async function useDeleteGroupCases(group: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const result = { message: '', status: 'failed' }
   try {
     const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${group}"` })
@@ -596,6 +651,8 @@ export async function useDeleteGroupCases(group: string) {
  * @param group - group id  
  * @param description - the description is passed so we don't need to query again */
 export async function useGetGroupStats(group: string, description?: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
 
   const res = await pb.collection('counter').getList(1, 10000, { filter: `group="${group}"`, order: '+order' })
   // totalCases = sum of all 'count' in items
@@ -620,6 +677,8 @@ export async function useGetGroupStats(group: string, description?: string) {
 }
 
 export async function useUpdateGroup(group: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
   const res = { message: '', status: 'failed' }
   let timestamp = Date.now();
   let currentTime = new Date(timestamp).toISOString();

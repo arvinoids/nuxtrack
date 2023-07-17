@@ -8,6 +8,9 @@
       />
       <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
         <NuxtLink to="/">Rotation Tracker</NuxtLink>
+        <DevOnly
+          ><span class="text-red-600 px-10 bg-base-200">DEVELOPMENT MODE</span></DevOnly
+        >
       </h1>
     </div>
     <div class="navbar-center"></div>

@@ -1,8 +1,6 @@
-import PocketBase from 'pocketbase';
 import { emailContent,LogData } from "custom-types";
 
-const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
-//const pb = await useNuxtApp().$pb
+//const 
 
 export function useGetBooleanFromLocalStorage(value:string|null){
     let result:boolean;
@@ -12,6 +10,7 @@ export function useGetBooleanFromLocalStorage(value:string|null){
   }
   
   export async function useSendEmail(email: emailContent) {
+    const pb = useNuxtApp().$pb
     const enabled = await pb
       .collection("settings")
       .getFirstListItem(`field="emailnotification"`);
@@ -38,8 +37,9 @@ export function useGetBooleanFromLocalStorage(value:string|null){
   }
 
   export async function logActivity(data: LogData) {
+    const pb = useNuxtApp().$pb
     try {
-      const res = pb.collection("logs").create(data);
+      pb.collection("logs").create(data);
     } catch (e: any) {
       console.log(e.message);
     }
