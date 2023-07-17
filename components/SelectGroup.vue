@@ -57,6 +57,9 @@ const groupName:string = await useGetGroupName(props.group)
 let userlist = ref(await useGetSortedUsers(props.group))
 
 //const taggedUser = ref(userlist.value.items[cursor.value].expand.user as user);
+pb.collection('users').subscribe('*', async () => {
+  userlist.value = await useGetSortedUsers(props.group)
+})
 
 const taggedUser = computed(() => {
   return userlist.value.items[cursor.value].expand.user
@@ -167,6 +170,10 @@ async function showCanceledToast() {
     useShowToast("Canceled assign after skips", "warn")
   cursor.value = 0
 }
+
+pb.collection('users').subscribe('*', async () => {
+  userlist.value = await useGetSortedUsers(props.group)
+})
 
 </script>
 
