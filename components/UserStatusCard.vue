@@ -72,6 +72,11 @@
         Log Out
       </div>
     </div>
+    <div :v-if="false" name="for tailwind to prevent treeshake of these classes">
+      <span class="bg-secondary badge-secondary border-secondary"></span>
+      <span class="bg-error badge-error border-error"></span>
+      <span class="bg-neutral badge-neutral border-neutral"></span>
+    </div>
   </div>
 </template>
 
@@ -129,7 +134,7 @@ const badgeColor = computed(() => {
     }
   }
   // If the status is not found, return the default color.
-  return "gray-500";
+  return "neutral";
 });
 
 async function logout() {
