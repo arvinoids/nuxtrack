@@ -53,13 +53,9 @@ const forced = ref(false)
 const currentUser = pb.authStore.model!.fullname
 const groupName:string = await useGetGroupName(props.group)
 
-
 let userlist = ref(await useGetSortedUsers(props.group))
 
 //const taggedUser = ref(userlist.value.items[cursor.value].expand.user as user);
-pb.collection('users').subscribe('*', async () => {
-  userlist.value = await useGetSortedUsers(props.group)
-})
 
 const taggedUser = computed(() => {
   return userlist.value.items[cursor.value].expand.user
@@ -144,6 +140,10 @@ watch(caseId, async (caseId) => {
   if (caseId === '') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
 });
 
+pb.collection('users').subscribe('*', async () => {
+  userlist.value = await useGetSortedUsers(props.group)
+})
+
 function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
   if (caseExists && caseIsEscalated) {
     disableEscalate.value = true;
@@ -170,11 +170,6 @@ async function showCanceledToast() {
     useShowToast("Canceled assign after skips", "warn")
   cursor.value = 0
 }
-
-pb.collection('users').subscribe('*', async () => {
-  userlist.value = await useGetSortedUsers(props.group)
-})
-
 </script>
 
 <style></style>
