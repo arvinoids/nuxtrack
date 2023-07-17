@@ -56,10 +56,6 @@ const groupName:string = await useGetGroupName(props.group)
 
 let userlist = ref(await useGetSortedUsers(props.group))
 
-pb.collection('users').subscribe('*', async () => {
-  userlist.value = await useGetSortedUsers(props.group)
-})
-
 //const taggedUser = ref(userlist.value.items[cursor.value].expand.user as user);
 
 const taggedUser = computed(() => {
@@ -85,14 +81,14 @@ async function skipCatch(user: user) {
   logActivity(logData);
 }
 
-async function submitCase(caseId: string, id: string, group: string) {
-  const res = await useSubmitCase(caseId, id, group);
+async function submitCase(caseId: string, userId: string, group: string) {
+  const res = await useSubmitCase(caseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);
   await resetSelection();
   useDataUpdated().value++;
   if (res.status === 'success') {
-    const user = (await pb.collection('users').getOne(id))
+    const user = (await pb.collection('users').getOne(userId))
     const email = {
       to: user.email,
       subject: "New case assigned to you",
@@ -104,7 +100,7 @@ async function submitCase(caseId: string, id: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(id)),
+    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
   };
   logActivity(logData);
 }
@@ -171,10 +167,6 @@ async function showCanceledToast() {
     useShowToast("Canceled assign after skips", "warn")
   cursor.value = 0
 }
-
-pb.collection('users').subscribe('*', async () => {
-  userlist.value = await useGetSortedUsers(props.group)
-})
 
 </script>
 
