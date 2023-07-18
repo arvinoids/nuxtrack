@@ -15,9 +15,6 @@
       </p>
       <div class="modal-action justify-center">
         <a class="btn btn-outline btn-secondary" @click="skipCatch(taggedUser)">Skip</a>
-        <!-- <div>
-          <a class="btn btn-outline btn-secondary"  @click="skipOut(taggedUser.id, group)">Out of Office</a>
-        </div> -->
         <a href="#" class="btn btn-primary"
           :class="{ hidden: (caseExists || caseId === '') || ((taggedUser.status !== 'Available') && !forced) }"
           @click="submitCase(caseId, taggedUser.id, group)">Assign</a>

@@ -7,7 +7,7 @@
         class="h-[25px] md:ml-[5rem] mr-5"
       />
       <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
-        <NuxtLink to="/">Rotation Tracker</NuxtLink>
+        <NuxtLink to="/">{{ APP_NAME }}</NuxtLink>
         <DevOnly
           ><span class="text-red-600 px-10 bg-base-200">DEVELOPMENT MODE</span></DevOnly
         >

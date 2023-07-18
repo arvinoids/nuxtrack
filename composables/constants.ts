@@ -10,3 +10,5 @@ export const STATUS_CHOICES_USER = [
   { status: "Available",color: "secondary" },
   { status: "Outside shift", color: "neutral" },
 ];
+
+export const APP_NAME = "Rotation Tracker"

@@ -5,6 +5,7 @@
       <slot />
     </div>
     <Footer />
+    <Updater />
   </div>
 </template>
 <style>
