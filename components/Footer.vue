@@ -2,9 +2,7 @@
   <div>
     <p class="text-center text-sm pt-5">
       &copy; 2023
-      <a href="https://solutionsteam.lrdc.lexmark.com/"
-        >&copy; Lexmark Solutions Support</a
-      >
+      <a href="https://solutionsteam.lrdc.lexmark.com/">Lexmark Solutions Support</a>
     </p>
     <p class="text-xs text-center text-base-200 italic">Rotation Tracker v{{ value }}</p>
   </div>
