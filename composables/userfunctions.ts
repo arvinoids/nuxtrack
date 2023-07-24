@@ -235,3 +235,15 @@ export async function useUserIsBackFromLeave(id: string) {
         message: e.message
     } }
 }
+
+export async function useGetUserById(id:string) {
+    const pb = useNuxtApp().$pb
+    const user = await pb.collection("users").getOne(id);
+    return user
+}
+
+export async function useGetUserByUsername(username:string) {
+    const pb = useNuxtApp().$pb
+    const user = await pb.collection("users").getFirstListItem(`username="${username}"`);
+    return user
+}

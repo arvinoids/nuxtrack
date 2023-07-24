@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { LogData } from "custom-types";
+import { LogData, emailContent } from "custom-types";
 const loggedInUser = useLoggedInUsername();
 
 const props = defineProps<{
@@ -39,6 +39,14 @@ async function deleteCase(id: string) {
     type: "deleted case",
     details: res.message,
   };
+  const owner = await useGetUserById(props.caseOwner);
+  const email: emailContent = {
+    to: owner.email,
+    subject: "Case has been unassigned",
+    body: `Hello ${owner.fullname}, \n\nThe case ${props.caseId} has been removed from your assignment.\n\nThanks,\nRotation Tracker`,
+  };
+  const emailres = await useSendEmail(email);
+  useShowToast(emailres.message, emailres.status);
   logActivity(logData);
 }
 </script>
