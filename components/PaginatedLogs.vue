@@ -93,7 +93,7 @@ onMounted(async () => {
 
 // const currentPage = ref(props.pageNum);
 const itemsPerPage = ref(props.perPage);
-if (props.perPage === undefined) itemsPerPage.value = 10;
+if (props.perPage === undefined) itemsPerPage.value = 15;
 
 async function getLogs(page: number | null | undefined) {
   if (page === null || page === undefined || page === 0) page = 1;
