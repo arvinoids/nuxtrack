@@ -1,7 +1,7 @@
 <template>
   <div class="container min-w-max">
     <div class="flex flex-col items-center">
-      <h5 class="text-xl text-secondary mb-2 font-semibold">
+      <h5 class="text-xl text-secondary mb-4 font-semibold">
         {{ group.description }}
       </h5>
       <div class="flex flex-row">

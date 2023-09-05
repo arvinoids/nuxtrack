@@ -1,10 +1,10 @@
 <template>
   <div :key="updateTable" class="flex flex-col gap-3">
     <div
-      class="overflow-x-auto flex flex-col w-[1080px] h-[600px]"
+      class="overflow-x-auto flex flex-col w-[1080px] h-[525px] shadow-md"
       v-if="cases.totalItems !== 0"
     >
-      <table class="table table-compact shadow-md" v-if="!loading">
+      <table class="table table-compact" v-if="!loading">
         <thead class="sticky top-0 z-20">
           <tr>
             <th class="rounded-none">Owner</th>
@@ -44,7 +44,7 @@
           </tr>
         </tbody>
       </table>
-      <div class="text-center" v-else>Loading...</div>
+      <div class="text-center m-auto" v-else><Spinner /></div>
     </div>
     <div class="flex flex-row gap-10">
       <select class="select select-bordered w-full max-w-xs" v-model="itemsPerPage">

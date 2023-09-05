@@ -3,12 +3,17 @@
     <h1 class="text-lg text-center">Email Settings</h1>
     <div
       v-if="!loading"
-      class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap"
+      class="flex flex-row border m-2 p-10 shadow-md w-full gap-10 flex-wrap"
     >
       <VForm action="submit" class="flex flex-col gap-4 w-[400px]">
         <p class="form-control flex-row justify-between">
           <label for="enable">Enable email notifications </label
-          ><input name="notifications" type="checkbox" v-model="enabled" />
+          ><input
+            name="notifications"
+            type="checkbox"
+            v-model="enabled"
+            class="checkbox checkbox-sm checkbox-secondary focus:border-2"
+          />
         </p>
         <div class="flex flex-row gap-3 justify-between items-center">
           <label for="token" class="">Email Token</label>
@@ -34,7 +39,10 @@
           />
           <VErrorMessage name="name" class="alert alert-error" />
         </div>
-        <div class="btn w-min self-center" @click.prevent="updateEmailSettings()">
+        <div
+          class="btn w-min self-center bg-neutral-500 text-neutral"
+          @click.prevent="updateEmailSettings()"
+        >
           Save
         </div>
       </VForm>
