@@ -2,7 +2,7 @@
   <div>
     <div :key="updateTable" class="flex flex-col gap-3">
       <div
-        class="overflow-x-auto shadow-md flex flex-col w-[1080px] h-[500px]"
+        class="overflow-x-auto shadow-md flex flex-col w-[1080px] h-[590px]"
         v-if="logs!.totalItems !== 0"
       >
         <table class="table table-compact" v-if="!loading">
