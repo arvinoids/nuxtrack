@@ -168,7 +168,8 @@ async function userIsBackFromLeave(userId: string, group: string) {
     else {  
         casesToAdd = userLeaveRecord.difference - ((sortedUsers.items[userLeaveRecord.position].count) - sortedUsers.items[0].count)    }
     await useAddDummyCases(casesToAdd, userId, group, "Leave") 
-    pb.collection('leaves').delete(userLeaveRecord.id);
+    pb.collection('leaves').update(userLeaveRecord.id, { active: false })
+    await useRefreshGroupCounter(group);
 }
 
 async function savedDifference(user:string,group:string) {
@@ -213,6 +214,7 @@ async function storeUserCount(user: string, group: string, position: number,diff
         difference,
         group,
         position,
+        active:true
     });
 }
 

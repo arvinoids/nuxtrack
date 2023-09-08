@@ -27,6 +27,14 @@
         class="badge badge-sm min-w-max cursor-pointer"
         :class="{ [`badge-${badgeColor}`]: true }"
         @click="show = true"
+        v-if="!isAdminUsersPage"
+      >
+        {{ status.status }}
+      </div>
+      <div
+        v-else
+        class="badge badge-sm min-w-max cursor-pointer"
+        :class="{ [`badge-${badgeColor}`]: true }"
       >
         {{ status.status }}
       </div>
@@ -162,20 +170,30 @@ pb.collection("users").subscribe(user.id, async () => {
   status.value = await useGetUserStatus(user.id);
 });
 
-watch(status, async (oldStatus, newStatus) => {
-  if (newStatus.status === "On leave") {
-    await useUserOnLeave(user.id);
-  }
-  if (oldStatus.status === "On leave") {
-    console.log("execute userbackfromleave");
-    const res = await useUserIsBackFromLeave(user.id);
-    logActivity({
-      user: user.username,
-      type: "changed status",
-      details: res.status + ":" + res.message,
-    });
-  }
+const router = useRouter();
+const currentPath = ref(router.currentRoute);
+const isAdminUsersPage = ref(currentPath.value.fullPath === "/Admin/Users");
+watchEffect(() => {
+  isAdminUsersPage.value = currentPath.value.fullPath === "/Admin/Users";
 });
+
+if (!isAdminUsersPage.value) {
+  watch(status, async (newStatus, oldStatus) => {
+    if (newStatus.status === "On leave") {
+      await useUserOnLeave(user.id);
+      console.log("executed useronleave");
+    }
+    if (oldStatus.status === "On leave") {
+      console.log("execute userbackfromleave");
+      const res = await useUserIsBackFromLeave(user.id);
+      logActivity({
+        user: user.username,
+        type: "changed status",
+        details: res.status + ":" + res.message,
+      });
+    }
+  });
+}
 </script>
 
 <style scoped>

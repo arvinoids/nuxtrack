@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-    <div v-if="loading" class="m-3"><Spinner /></div>
+    <div v-if="loading" class="m-10"><Spinner /></div>
 
     <div v-else>
       <div v-if="users.totalItems > 0" :key="updateCard">

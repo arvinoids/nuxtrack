@@ -23,7 +23,7 @@
             </tr>
           </tbody>
         </table>
-        <div class="text-center" v-else>Loading...</div>
+        <div class="text-center mx-auto my-auto" v-else><Spinner /></div>
       </div>
       <div class="flex flex-row gap-10">
         <select class="select select-bordered w-full max-w-xs" v-model="itemsPerPage">
