@@ -135,7 +135,7 @@ export async function useGetSortedUsers(group: string) {
     pb.autoCancellation(false);
     const users = await pb
         .collection("counter")
-        .getList(1, 1000, { filter: `group="${group}"`, sort: "+count", expand: "user" });
+        .getList(1, 50, { filter: `group="${group}"`, sort: "+count", expand: "user" });
     return (users as unknown) as expandedUsers;
 }
 

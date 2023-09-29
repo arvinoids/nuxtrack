@@ -56,7 +56,7 @@
         </div>
         <div class="my-3">
           <p class="text-xs">Last updated</p>
-          <p class="text-sm font-semibold text-warning">
+          <p class="text-xs text-warning">
             {{ lastUpdated }}
           </p>
         </div>
