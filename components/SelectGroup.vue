@@ -28,8 +28,8 @@
 </template>
 
 <script setup lang="ts">
-import { expandedUsers, user } from "pocketbase-types";
-import { LogData, result } from "custom-types";
+import type { expandedUsers, user } from "pocketbase-types";
+import type { LogData, result } from "custom-types";
 const pb = useNuxtApp().$pb
 
 const props = defineProps<{

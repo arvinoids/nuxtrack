@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { LogData } from "custom-types";
+import type { LogData } from "custom-types";
 const loggedInUser = useLoggedInUsername();
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);

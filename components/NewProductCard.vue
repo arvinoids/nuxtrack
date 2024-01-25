@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { LogData } from "custom-types";
+import type { LogData } from "custom-types";
 import { ListResult } from "pocketbase";
 
 const pb = useNuxtApp().$pb;

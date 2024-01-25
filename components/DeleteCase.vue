@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { LogData, emailContent } from "custom-types";
+import type { LogData, emailContent } from "custom-types";
 const loggedInUser = useLoggedInUsername();
 
 const props = defineProps<{

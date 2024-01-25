@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { statuschoice, LogData } from "custom-types";
+import type { statuschoice, LogData } from "custom-types";
 import { Record } from "pocketbase";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{

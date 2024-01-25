@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { expandedCaseRecordList } from "pocketbase-types";
+import type { expandedCaseRecordList } from "pocketbase-types";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{
   userId?: string;

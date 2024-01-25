@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { LogData } from 'custom-types';
+import type { LogData } from 'custom-types';
 import { Record } from 'pocketbase';
 const pb = useNuxtApp().$pb
 const props = defineProps<{

@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { Record } from "pocketbase";
-import { LogData } from "custom-types";
+import type { LogData } from "custom-types";
 const pb = useNuxtApp().$pb;
 const caseId = ref("");
 const message = ref("");

@@ -63,8 +63,8 @@
 </template>
 
 <script setup lang="ts">
-import { statuschoice, LogData } from "custom-types";
-import { user } from "pocketbase-types";
+import type { statuschoice, LogData } from "custom-types";
+import type { user } from "pocketbase-types";
 const pb = useNuxtApp().$pb;
 
 const props = defineProps<{
