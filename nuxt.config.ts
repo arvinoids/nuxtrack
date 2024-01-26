@@ -23,9 +23,9 @@ export default defineNuxtConfig({
   },
 
   app: {
-    baseURL: '/Tracker',
+    baseURL: '/SWTracker',
     head: {
-      title: "Solutions Team Rotation Tracker",    },
+      title: "Software Team Rotation Tracker",    },
     pageTransition: { name: "page", mode: "out-in" },
   },
   modules: ["@nuxtjs/color-mode",'nuxt-icon','@formkit/auto-animate','@vueuse/nuxt','nuxt-headlessui'],
@@ -33,11 +33,5 @@ export default defineNuxtConfig({
     preference: "light",
     dataValue: "theme",
     classSuffix: "",
-  },
-  router: {
-    options: {
-      sensitive:true,
-      strict:true
-    }
   }
 });
