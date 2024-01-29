@@ -33,11 +33,5 @@ export default defineNuxtConfig({
     preference: "light",
     dataValue: "theme",
     classSuffix: "",
-  },
-  router: {
-    options: {
-      sensitive:true,
-      strict:true
-    }
   }
 });
