@@ -3,9 +3,12 @@
     <div class="self-center mt-3 flex flex-col items-center">
       <p class="text-lg text-secondary mx-10">
         Hello, <span class="font-semibold">{{ currentUser }}</span
-        >. To assign or escalate a case, please select a group below, or
+        >. To assign or escalate a case, please select a group below.
 
-        <span><AssignToSelf class="mx-1">Assign case to yourself</AssignToSelf>.</span>
+        <span v-if="pb.authStore.model.memberOf.length !== 0"
+          >You may also
+          <AssignToSelf class="mx-1">Assign case to yourself</AssignToSelf>.</span
+        >
       </p>
     </div>
     <div v-if="!loading">
@@ -31,7 +34,7 @@ let currentUser;
 onMounted(async () => {
   groups = (await pb.collection("groups").getList(1, 100, { sort: "+order" })).items;
   currentUser = await pb.authStore.model.fullname;
-
+  console.log(pb.authStore.model);
   loading.value = false;
 });
 </script>
