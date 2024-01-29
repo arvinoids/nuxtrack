@@ -62,8 +62,8 @@
           </select>
         </div>
         <div class="flex justify-center">
-          <ValidatedButton @click.prevent="updateUser" class="btn btn-primary w-min"
-            >Update</ValidatedButton
+          <button @click.prevent="updateUser" class="btn btn-primary w-min"
+            >Update</button
           >
         </div>
       </VForm>
