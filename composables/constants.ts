@@ -11,4 +11,4 @@ export const STATUS_CHOICES_USER = [
   { status: "Outside shift", color: "neutral" },
 ];
 
-export const APP_NAME = "Rotation Tracker"
+export const APP_NAME = "Software Team Rotation Tracker"
