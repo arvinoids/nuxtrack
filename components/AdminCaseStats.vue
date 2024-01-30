@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { LogData } from "custom-types";
+import type { LogData } from "custom-types";
 
 const selectedGroup = ref("");
 const selectedGroupDescription: Ref<string | undefined> = ref("");
