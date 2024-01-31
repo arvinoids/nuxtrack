@@ -20,7 +20,7 @@
 </style>
 
 <script setup>
-const bodyStyle = `background-image: url('TeamPicHD.jpg'); 
+const bodyStyle = `background-image: url('/TeamPicHD.jpg'); 
   background-repeat: no-repeat; 
   background-attachment: fixed; 
   background-size: cover; 
