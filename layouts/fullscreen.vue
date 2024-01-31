@@ -26,7 +26,8 @@ const bodyStyle = `background-image: url('TeamPicHD.jpg');
   background-size: cover; 
   background-position: auto; 
   background-position-x: center; 
-  background-position-y: center`;
+  background-position-y: center;
+  background-color: #8A8A8A`;
 
 useHead({
   bodyAttrs: {
