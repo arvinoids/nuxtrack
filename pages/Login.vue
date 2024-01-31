@@ -3,7 +3,7 @@
     <form @submit.prevent="login()">
       <div class="flex flex-row justify-center">
         <h3 class="justify-center">
-          <a href="https://www.lexmark.com" target="_blank">
+          <a href="https://solutionsteam.lrdc.lexmark.com">
             <img src="/lxk-logo-2x.svg" alt="Lexmark" class="w-[300px]" />
           </a>
         </h3>
