@@ -20,14 +20,14 @@
 </style>
 
 <script setup>
-const bodyStyle = `background-image: url('/TeamPicHD.jpg'); 
+const bodyStyle = `background-image: url('TeamPicHD.jpg'); 
   background-repeat: no-repeat; 
   background-attachment: fixed; 
   background-size: cover; 
   background-position: auto; 
   background-position-x: center; 
-  background-position-y: center`;
-
+  background-position-y: center;
+  background-color:#8a8a8a;`;
 useHead({
   bodyAttrs: {
     style: bodyStyle,
