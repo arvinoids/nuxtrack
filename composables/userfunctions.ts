@@ -1,6 +1,6 @@
 import  { ListResult } from "pocketbase";
-import { userEntry, userStatus, statuschoice } from "custom-types";
-import { expandedUsers } from "pocketbase-types";
+import type { userEntry, userStatus, statuschoice } from "custom-types";
+import type { expandedUsers } from "pocketbase-types";
 // const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
 //pb.autoCancellation(false);
 
@@ -129,10 +129,13 @@ export async function useGetAllUsers() {
     users = await pb.collection("users").getList(1, 1000, { expand: 'memberOf', sort: 'fullname' })
     return users
 }
+
 /** Get users of a group sorted by count ascending */
 export async function useGetSortedUsers(group: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
+    // first check if user list is still the same
+    await cleanUpCounter(group);
     const users = await pb
         .collection("counter")
         .getList(1, 50, { filter: `group="${group}"`, sort: "+count", expand: "user" });
@@ -249,3 +252,22 @@ export async function useGetUserByUsername(username:string) {
     const user = await pb.collection("users").getFirstListItem(`username="${username}"`);
     return user
 }
+
+/** Cleans up the counter so that users who are no longer in the group are deleted. */
+async function cleanUpCounter(group: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);   
+    const groupUsers = await pb.collection("users").getList(1,100,{filter:`memberOf~"${group}"`}).then((res)=>res.items)
+    const users = groupUsers.map((user)=>user.id)
+    const groupCounterUsers = await pb.collection("counter").getList(1,1000,{filter:`group="${group}"`});
+
+    // use forEach to check if user is in counter, if not, delete from counter
+    groupCounterUsers.items.forEach(async (user) => {
+        if(!users.includes(user.user)) {
+            const rec = await pb.collection('counter').getFirstListItem(`user="${user.user}"&&group="${group}"`)
+            await pb.collection("counter").delete(rec.id)
+        }
+    })
+}
+
+// user="8izk3mwibw3g2xp" &&  group="hzx2wvxbydofpi0"

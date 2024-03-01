@@ -65,7 +65,7 @@
         <p>No users in this group.</p>
       </div>
     </div>
-    <div class="flex flex-col flex-grow mt-3" :key="dataUpdated">
+    <div class="flex flex-col flex-grow mt-3" :key="dataUpdated.value">
       <div class="flex justify-center mt-auto gap-2">
         <a :href="anchor"><button class="btn w-24 self-center mb-3">Select</button></a>
       </div>
