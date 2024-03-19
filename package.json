@@ -31,6 +31,7 @@
     "vee-validate": "^4.8.3",
     "vue": "^3.4.8",
     "vue3-toastify": "^0.1.0",
+    "vuedraggable": "^4.1.0",
     "yup": "^1.0.2"
   }
 }
