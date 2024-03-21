@@ -7,27 +7,27 @@ export function useShowToast(message: string, status: string) {
       hideProgressBar: true,
       toastStyle: {
         fontFamily: "Inter",
-        borderRadius:'0px',
+        borderRadius: '0px',
       }
 
     })
   else if (status == "failed")
     toast.error(message, {
       position: toast.POSITION.BOTTOM_CENTER,
-      autoClose:5000,
+      autoClose: 5000,
       toastStyle: {
         fontFamily: "Inter",
-        borderRadius:'0px',
+        borderRadius: '0px',
       }
     })
 
   else toast.warning(message, {
     position: toast.POSITION.BOTTOM_CENTER,
-    autoClose:5000,
+    autoClose: 5000,
     hideProgressBar: true,
     toastStyle: {
       fontFamily: "Inter",
-      borderRadius:'0px',
+      borderRadius: '0px',
     }
   })
 }
@@ -44,8 +44,8 @@ export function useFormatDate(date: Date) {
   return formatted
 }
 
-export function getColor(status:string){
-  const choices  =STATUS_CHOICES
+export function getColor(status: string) {
+  const choices = STATUS_CHOICES
   for (const choice of choices) {
     if (choice.status === status) {
       return choice.color;
@@ -54,5 +54,16 @@ export function getColor(status:string){
   return "gray-500";
 }
 
+// for mini toast
+import { useNotifications } from "./states";
+const notifications = useNotifications()
 
+export function miniToast(status:'success'|'failed'|'warning',message:string) {
+  notifications.value = [{status,message}, ...notifications.value]
+  setTimeout(removeToast, 3000)
+}
+
+export function removeToast() {
+  notifications.value = [...notifications.value.slice(0, notifications.value.length - 1)]
+}
 

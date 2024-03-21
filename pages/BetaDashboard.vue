@@ -1,0 +1,7 @@
+<template>
+  <QuickDashboard />
+</template>
+
+<script setup lang="ts"></script>
+
+<style></style>

@@ -11,7 +11,7 @@
 
     <!-- Dialog -->
     <label for="finder" class="modal cursor-pointer">
-      <label class="modal-box relative w-[22rem] flex flex-col gap-2" for="">
+      <label class="modal-box relative w-[22rem] flex flex-col gap-2">
         <h3 class="text-lg font-bold">Find a case</h3>
         <label for="finder" class="btn w-min self-center absolute right-3 top-3 btn-ghost hover:btn-error">✖</label>
         <input

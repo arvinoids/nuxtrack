@@ -1,4 +1,4 @@
-import { emailContent,LogData } from "custom-types";
+import type { emailContent,LogData } from "custom-types";
 
 //const 
 
@@ -17,7 +17,7 @@ export function useGetBooleanFromLocalStorage(value:string|null){
     if (enabled.value === "false") {
       return {
         message: "Email notifications are currently disabled.",
-        status: "warn",
+        status: "warning",
       };
     }
     const emailurl = (

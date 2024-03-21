@@ -1,4 +1,6 @@
+import type { notification } from "custom-types";
 import { ListResult, Record } from "pocketbase";
+import type { user } from "pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -46,7 +48,7 @@ export async function useAssignCase(
   caseId: string,
   user: string,
   group: string
-) {
+):Promise<notification>{
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const data = {
@@ -56,7 +58,7 @@ export async function useAssignCase(
     assignedBy: pb.authStore.model!.username,
   };
 
-  const result = { message: "", status: "" };
+  const result: notification = { message: "", status: "failed" };
   if (caseId === "")
     return { message: "Case ID cannot be blank", status: "failed" };
   if (await caseExists(caseId)) {
@@ -262,7 +264,7 @@ export async function useSubmitCase(
   user: string,
   group: string
 ) {
-  const res = await useAssignCase(caseId, user, group);
+  const res: notification = await useAssignCase(caseId, user, group);
   const result = { message: res.message, status: res.status };
   useUpdateGroup(group)
   return result;
@@ -287,7 +289,7 @@ export async function useRefreshAll() {
   //     await updateCounter(group.id, user.id);
   //   }
   // }
-  groups.forEach( async (group) => {
+  groups.forEach(async (group) => {
     const userRec = await pb
       .collection("users")
       .getList(1, 100, { filter: `memberOf~"${group.id}"` });
@@ -295,7 +297,7 @@ export async function useRefreshAll() {
     users.forEach(async (user) => {
       await updateCounter(group.id, user.id);
     });
-  });  
+  });
 }
 
 export async function useGetGroupName(group: string) {
@@ -309,13 +311,13 @@ export async function useGetGroupName(group: string) {
   }
 }
 
-export async function useRefreshGroupCounter(group:string) {
+export async function useRefreshGroupCounter(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const users = await pb.collection('users').getList(1,100,{filter:`memberOf~"${group}"`}).then(res=>res.items)
-    users.forEach((user) => {
-      updateCounter(group, user.id);
-    });
+  const users = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${group}"` }).then(res => res.items)
+  users.forEach((user) => {
+    updateCounter(group, user.id);
+  });
 }
 
 export async function useSearchCase(id: string) {
@@ -377,7 +379,7 @@ export async function useEscalateCase(
     assignedBy: pb.authStore.model!.username,
   };
 
-  const result = { message: "", status: "" };
+  const result: notification = { message: "", status: "failed" };
   try {
     await pb.collection("cases").create(data);
     await updateCounter(group, user);
@@ -531,6 +533,31 @@ export async function useMakeCounter(group: string, users: ListResult) {
   });
 }
 
+export async function useNewMakeCounter(group: string, users: user[]) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+  users.forEach(async (user) => {
+    const count = (
+      await pb
+        .collection("cases")
+        .getList(1, 10000, { filter: `user="${user.id}"&&group="${group}"`, fields: '' })
+    ).totalItems;
+    let data = {
+      user: user.id,
+      group: group,
+      count,
+    };
+    const oldCounter = await pb
+      .collection("counter")
+      .getList(1, 1, { filter: `user="${user.id}"&&group="${group}"`, fields: '' });
+    if (oldCounter.totalItems === 1) {
+      await pb.collection("counter").delete(oldCounter.items[0].id);
+    }
+    // create new counter
+    const res = await pb.collection("counter").create(data);
+  });
+}
+
 export async function useUpdateCounter(group: string, users: ListResult) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
@@ -549,6 +576,26 @@ export async function useUpdateCounter(group: string, users: ListResult) {
     } catch (e: any) { console.log(e.message) }
   });
 }
+
+export async function useNewUpdateCounter(group: string, users: user[]) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+  users.forEach(async (user) => {
+    const oldCounter = await pb
+      .collection("counter")
+      .getFirstListItem(`user="${user.id}" && group="${group}"`, { fields: '' });
+    let newCount = await countCases(user.id, group);
+    let data = {
+      user: user.id,
+      group: group,
+      count: newCount,
+    };
+    try {
+      const res = await pb.collection("counter").update(oldCounter.id, data);
+    } catch (e: any) { console.log(e.message) }
+  });
+}
+
 
 async function countCases(user: string, group: string) {
   const pb = useNuxtApp().$pb
@@ -627,7 +674,9 @@ export async function useGetAllGroups() {
   const res = await pb.collection('groups').getList()
   return res
 }
-
+/** Deletes all cases in selected group
+ * @param group - the group Id
+ */
 export async function useDeleteGroupCases(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
@@ -679,7 +728,7 @@ export async function useGetGroupStats(group: string, description?: string) {
 export async function useUpdateGroup(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const res = { message: '', status: 'failed' }
+  const res: notification = { message: '', status: 'failed' }
   let timestamp = Date.now();
   let currentTime = new Date(timestamp).toISOString();
   try {
@@ -692,3 +741,4 @@ export async function useUpdateGroup(group: string) {
   }
   return res
 }
+
