@@ -1,12 +1,13 @@
+
 declare module 'pocketbase-types' {
-    interface user {
+    type user = {
         "collectionId": string,
         "collectionName": string,
         "created": Date,
         "emailVisibility": boolean,
         "fullname": string,
         "id": string,
-        "memberOf": [],
+        "memberOf": string[],
         "role": string,
         "updated": Date,
         "username": string,
@@ -15,7 +16,7 @@ declare module 'pocketbase-types' {
         "statusmessage": string,
     }
 
-    interface group {
+    type group = {
         "collectionId": string,
         "collectionName": string,
         "created": Date,
@@ -26,7 +27,7 @@ declare module 'pocketbase-types' {
         "updated": Date
     }
 
-    interface expanded {
+    type expanded = {
         "collectionId": string,
         "collectionName": string,
         "count": number,
@@ -43,14 +44,14 @@ declare module 'pocketbase-types' {
         "statusmessage": string,
     }
 
-    interface expandedUsers {
+    type expandedUsers = {
         "page": number,
         "perPage": number,
         "totalItems": number,
         "totalPages": number,
         "items": expanded[]
     }
-    interface expandedCase {
+    type expandedCase = {
         "assignedBy": string,
         "case": string,
         "collectionId": string,
@@ -66,13 +67,26 @@ declare module 'pocketbase-types' {
         "user": string
     }
 
-    interface expandedCaseRecordList {
+    type expandedCaseRecordList = {
         "page": number,
         "perPage": number,
         "totalItems": number,
         "totalPages": number,
         "items": expandedCase[]
     }
+
+    type counter = {
+        "id": string,
+        "user": string,
+        "group": string,
+        "count":number
+    }
+
+    type expandedCounter = counter& {
+        "expand":{
+            "user":user
+        }
+     }
 }
 
 declare module 'custom-types' {
@@ -111,5 +125,10 @@ declare module 'custom-types' {
     interface userStatus {
         status:statuschoice,
         message:string
+    }
+
+    type notification = {
+        status:'success'|'failed'|'warning',
+        message:string,
     }
 }

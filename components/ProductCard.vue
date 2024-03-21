@@ -25,19 +25,18 @@
     <div v-if="loading" class="m-10"><Spinner /></div>
 
     <div v-else>
-      <div v-if="users.totalItems > 0" :key="updateCard">
-        <div v-for="(user, id) in users.items" :key="user.id" class="my-[0.1rem]">
+      <div v-if="displayUsers.length > 0" :key="updateCard">
+        <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
-            class="tooltip tooltip-right"
+            class="tooltip tooltip-top"
             :data-tip="
               user.expand.user.username.toUpperCase() +
-              ' has ' +
+              ' is ' +
+              user.expand.user.status +
+              ' - ' +
               user.count +
-              ' case(s) in ' +
-              group.description +
-              '\nStatus: ' +
-              user.expand.user.status
+              ' case(s)'
             "
           >
             <Icon
@@ -65,58 +64,71 @@
         <p>No users in this group.</p>
       </div>
     </div>
-    <div class="flex flex-col flex-grow mt-3" :key="dataUpdated.value">
+    <div class="flex flex-col flex-grow mt-3" :key="dataUpdated">
       <div class="flex justify-center mt-auto gap-2">
-        <a :href="anchor"><button class="btn w-24 self-center mb-3">Select</button></a>
+        <a :href="anchor"
+          ><button v-if="users.length" class="btn w-24 self-center mb-3">
+            Select
+          </button></a
+        >
       </div>
-      <SelectGroup
-        :group="group.id"
-        :users="users"
-        @skip="nextUser"
-        @reset="resetSelection"
-      />
+      <div v-if="users.length">
+        <NewSelectGroup
+          :group="group.id"
+          :users="users"
+          @skip="nextUser"
+          @reset="resetSelection"
+        />
+      </div>
     </div>
     <div class="bg-gray-100 pt-[7px]"></div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useNewMakeCounter, useNewUpdateCounter } from "~/composables/casefunctions";
 import type { LogData } from "custom-types";
-import { ListResult,Record } from "pocketbase";
+import { useCounters } from "~/composables/states";
+import type { expandedCounter, group, user } from "pocketbase-types";
+import { miniToast } from "../composables/viewhelpers";
+import type { notification } from "custom-types";
 
-const pb = useNuxtApp().$pb;
-pb.autoCancellation(false);
-const props = defineProps<{ groupData: Record }>();
-const anchor: string = "#" + props.groupData.id + "select";
-const updateCard = ref(0);
+const props = defineProps<{
+  users: user[];
+  group: group;
+  counters: expandedCounter[] | undefined;
+}>();
+
+const loading = ref(false);
 const selectedUser = ref(0);
-const loading = ref(true);
-const dataUpdated = useDataUpdated();
+const dataUpdated = ref(0);
+const updateCard = ref(0);
+const lastUpdated = ref(useFormatDate(new Date(props.group.updated)));
+const anchor: string = "#" + props.group.id + "select";
+const allCounters = useCounters();
 
-// query for groups and users
-let group = props.groupData
-const groupUsers = await pb
-  .collection("users")
-  .getList(1, 100, { filter: `memberOf~"${group.id}"` });
+let users: expandedCounter[] = allCounters.value.filter(
+  (user) => user.group === props.group.id
+);
 
-const lastUpdated = ref(useFormatDate(new Date(group.updated)));
-
-// generate counters and replace old ones.
-if (await counterIsEmpty(group.id, groupUsers)) {
-  await useMakeCounter(group.id, groupUsers);
-} else await useUpdateCounter(group.id, groupUsers);
-
-async function counterIsEmpty(group: string, users: ListResult) {
-  const counters = await pb
-    .collection("counter")
-    .getList(1, 1000, { filter: `group="${group}"` });
-  if (counters.totalItems === users.totalItems) return false;
-  else return true;
-}
+const displayUsers = ref(users);
+const pb = useNuxtApp().$pb;
+pb.collection("counter").subscribe("*", async () => {
+  const res = await pb.collection("counter").getList(1, 30, {
+    filter: `group="${props.group.id}"`,
+    expand: "user,group",
+    sort: "+count",
+  });
+  displayUsers.value = (res.items as unknown) as expandedCounter[];
+});
+//console.log(props.counters.length);
+if (props.counters?.length === 0) {
+  await useNewMakeCounter(props.group.id, props.users);
+} // else await useNewUpdateCounter(props.group.id, props.users);
 
 function nextUser() {
   const cursor = selectedUser.value;
-  if (cursor === users.value.totalItems - 1) {
+  if (cursor === props.users.length - 1) {
     selectedUser.value = 0;
   } else selectedUser.value++;
 }
@@ -124,30 +136,6 @@ function nextUser() {
 function resetSelection() {
   selectedUser.value = 0;
 }
-
-let users = ref(await useGetSortedUsers(group.id));
-
-onMounted(async () => {
-  users.value = await useGetSortedUsers(group.id);
-  loading.value = false;
-});
-
-// subscribe to changes in the counter
-pb.collection("counter").subscribe("*", async function (e) {
-  users.value = await useGetSortedUsers(group.id);
-  updateCard.value++;
-});
-
-pb.collection("users").subscribe("*", async function (e) {
-  users.value = await useGetSortedUsers(group.id);
-  updateCard.value++;
-});
-
-pb.collection("groups").subscribe(group.id, async () => {
-  group = await pb.collection("groups").getOne(group.id);
-  lastUpdated.value = useFormatDate(new Date(group.updated));
-});
-
 
 async function updatedCase(group: string) {
   let result = { status: "failed", message: "" };
@@ -157,16 +145,12 @@ async function updatedCase(group: string) {
     details: `in ${await useGetGroupName(group)}`,
   };
   try {
-    const res = await useUpdateGroup(group);
-    result.status = res.status;
-    result.message = res.message;
+    const res: notification = await useUpdateGroup(group);
     await logActivity(logData);
-    useShowToast(result.message, result.status);
+    miniToast(res.status, result.message);
     updateCard.value++;
   } catch (e: any) {
     console.log(e.message);
   }
 }
 </script>
-
-<style scoped></style>
