@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div v-else class="h-[60px] flex flex-col items-center">
+    <div v-else class="h-[120px] flex flex-col justify-center p-5 items-center gap-2">
       <div>Data loading, please wait...</div>
       <div><Spinner /></div>
     </div>
