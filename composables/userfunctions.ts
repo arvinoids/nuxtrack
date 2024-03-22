@@ -91,7 +91,7 @@ export async function useGetUserGroups(id: string) {
 export async function useGetUsernameFromId(id: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    const res = await pb.collection("users").getOne(id);
+    const res = await pb.collection("users").getOne(id,{fields:'username'});
     return res.username;
 }
 

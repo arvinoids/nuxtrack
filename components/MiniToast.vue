@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="fixed mb-5 bottom-0 right-0 left-0 flex flex-col justify-center items-center"
-  >
+  <div class="fixed mb-5 bottom-0 right-10 left-0 flex flex-col justify-center items-end">
     <TransitionGroup
       ><div
         v-for="notification in useNotifications().value"
