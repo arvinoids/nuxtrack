@@ -773,22 +773,18 @@ export async function useUpdateGroup(group: string) {
  *   // counters have been updated
  * } */
 export async function useForceUpdateCounters(groupId: string) {
-  console.log('updating group count')
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   // get the list of users in that group
-  console.log('getting users')
   const users = await pb.collection('users').getList(1, 10000, { filter: `memberOf~"${groupId}"`, fields: 'id' })
   for (let user of users.items) {
     // count the number of cases for that user in this group
     const cases = await pb.collection('cases').getList(1, 10000, { filter: `user="${user.id}" && group="${groupId}"`, fields: '' })
-    console.log(`${user.id} has ${cases.totalItems}`)
     const data = {
       user: user.id,
       group: groupId,
       count: cases.totalItems,
     }
-    console.log('user data:', data)
     // update old counter for this user in this group if it exists, otherwise create it
     try {
       const oldCounter = await pb.collection('counter').getFirstListItem(`user="${user.id}"&&group="${groupId}"`, { fields: '' })
