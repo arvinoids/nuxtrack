@@ -9,16 +9,21 @@
             group.description
           }}</NuxtLink>
         </h2>
-        <div
-          class="tooltip tooltip-bottom tooltip-accent"
-          data-tip="Click this if you checked for new cases."
-        >
-          <button
-            class="btn btn-ghost btn-circle btn-sm mr-1"
-            @click="updatedCase(group.id)"
-          >
-            <Icon name="mdi:alarm-check" size="1.2rem" class="text-neutral-100" />
+        <div class="flex items-center">
+          <button class="btn btn-sm btn-ghost btn-circle" @click="updateCounter()">
+            <Icon name="ic:twotone-refresh" size="1.2rem" class="text-slate-50" />
           </button>
+          <div
+            class="tooltip tooltip-bottom tooltip-accent"
+            data-tip="Click this if you checked for new cases."
+          >
+            <button
+              class="btn btn-ghost btn-circle btn-sm mr-1"
+              @click="updatedCase(group.id)"
+            >
+              <Icon name="mdi:alarm-check" size="1.2rem" class="text-neutral-100" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -86,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { useNewMakeCounter, useNewUpdateCounter } from "~/composables/casefunctions";
+import { useNewMakeCounter } from "~/composables/casefunctions";
 import type { LogData } from "custom-types";
 import { useCounters } from "~/composables/states";
 import type { expandedCounter, group, user } from "pocketbase-types";
@@ -152,5 +157,11 @@ async function updatedCase(group: string) {
   } catch (e: any) {
     console.log(e.message);
   }
+}
+
+async function updateCounter() {
+  loading.value = true;
+  await useForceUpdateCounters(props.group.id);
+  loading.value = false;
 }
 </script>

@@ -61,7 +61,10 @@
             <option value="lead">lead</option>
           </select>
         </div>
-        <div class="flex justify-center">
+        <div class="flex justify-center gap-3">
+          <button @click.prevent="$router.back()" class="btn btn-warning w-min">
+            Discard Changes
+          </button>
           <button @click.prevent="updateUser" class="btn btn-primary w-min">
             Update
           </button>
@@ -94,6 +97,7 @@ const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });
 const user = await pb.collection("users").getFirstListItem(`username="${username}"`);
 const message = ref("");
+let oldGroups = user.memberOf;
 let email = user.email;
 let fullname = user.fullname;
 let memberOf: string[] = user.memberOf;
@@ -107,6 +111,14 @@ async function updateUser() {
     role,
   };
   const res = await useUpdateUser(user.id, data);
+
+  // refresh the oldGroups and memberOf groups counters
+  const uniqueGroupIds = [...new Set([...oldGroups, ...memberOf])];
+
+  for (let groupId of uniqueGroupIds) {
+    useForceUpdateCounters(groupId);
+  }
+
   useShowToast(res.message, res.status);
   if (res.status === "success") navigateTo("/Admin/Users");
   else message.value = res.message;

@@ -48,7 +48,7 @@ export async function useAssignCase(
   caseId: string,
   user: string,
   group: string
-):Promise<notification>{
+): Promise<notification> {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const data = {
@@ -511,6 +511,7 @@ export async function useRemoveUserFromGroups(id: string) {
 export async function useMakeCounter(group: string, users: ListResult) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
+
   users.items.forEach(async (user) => {
     const count = (
       await pb
@@ -522,17 +523,24 @@ export async function useMakeCounter(group: string, users: ListResult) {
       group,
       count,
     };
+
+    // look for old entry if it exists
     const oldCounter = await pb
       .collection("counter")
       .getList(1, 1, { filter: `user="${user.id}"&&group="${group}"` });
     if (oldCounter.totalItems === 1) {
       await pb.collection("counter").delete(oldCounter.items[0].id);
+    } else {
+      oldCounter.items.forEach(async (item) => {
+        await pb.collection("counter").delete(item.id);
+      })
     }
     // create new counter
     const res = await pb.collection("counter").create(data);
   });
 }
 
+/** Revised make counter function. */
 export async function useNewMakeCounter(group: string, users: user[]) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
@@ -547,14 +555,20 @@ export async function useNewMakeCounter(group: string, users: user[]) {
       group: group,
       count,
     };
+    // get old counter entry
     const oldCounter = await pb
       .collection("counter")
       .getList(1, 1, { filter: `user="${user.id}"&&group="${group}"`, fields: '' });
     if (oldCounter.totalItems === 1) {
-      await pb.collection("counter").delete(oldCounter.items[0].id);
-    }
-    // create new counter
-    const res = await pb.collection("counter").create(data);
+      // update old counter
+      await pb.collection("counter").update(oldCounter.items[0].id, data);
+    } else if (oldCounter.totalItems > 0) {
+      // delete old counters then create new counter
+      oldCounter.items.forEach(async (item) => {
+        await pb.collection("counter").delete(item.id);
+      })
+      await pb.collection("counter").create(data);
+    } else await pb.collection("counter").create(data);
   });
 }
 
@@ -596,13 +610,17 @@ export async function useNewUpdateCounter(group: string, users: user[]) {
   });
 }
 
-
+/** Counts the number of cases for a user in a group
+ * @params user - the id of the user
+ * @params group - the id of the group
+ * @returns the number of cases for the user in the group.
+ */
 async function countCases(user: string, group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res = await pb
     .collection("cases")
-    .getList(1, 10000, { filter: `user="${user}"&&group="${group}"` });
+    .getList(1, 10000, { filter: `user="${user}"&&group="${group}"`, fields: '' });
   return res.totalItems;
 }
 
@@ -742,3 +760,42 @@ export async function useUpdateGroup(group: string) {
   return res
 }
 
+//**Force-update the counters for all users in a group
+/**
+ * @param groupId - the group id
+ * @returns a promise that resolves when the counters have been updated
+ * @description this function updates the counters for all users in a group.
+ * It first gets the list of users in that group, then for each user, it counts the number of cases in that group.
+ * It then generates the data for the counter entry, and updates the counter entry if it already exists, or creates a new counter entry if it doesn't exist.
+ * The function returns a promise that resolves when the counters have been updated.
+ * @example
+ * useForceUpdateCounters('group-id').then(() => {
+ *   // counters have been updated
+ * } */
+export async function useForceUpdateCounters(groupId: string) {
+  console.log('updating group count')
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+  // get the list of users in that group
+  console.log('getting users')
+  const users = await pb.collection('users').getList(1, 10000, { filter: `memberOf~"${groupId}"`, fields: 'id' })
+  for (let user of users.items) {
+    // count the number of cases for that user in this group
+    const cases = await pb.collection('cases').getList(1, 10000, { filter: `user="${user.id}" && group="${groupId}"`, fields: '' })
+    console.log(`${user.id} has ${cases.totalItems}`)
+    const data = {
+      user: user.id,
+      group: groupId,
+      count: cases.totalItems,
+    }
+    console.log('user data:', data)
+    // update old counter for this user in this group if it exists, otherwise create it
+    try {
+      const oldCounter = await pb.collection('counter').getFirstListItem(`user="${user.id}"&&group="${groupId}"`, { fields: '' })
+      await pb.collection('counter').update(oldCounter.id, data)
+    } catch (e) {
+      await pb.collection('counter').create(data)
+    }
+
+  }
+}
