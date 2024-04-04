@@ -261,13 +261,13 @@ async function cleanUpCounter(group: string) {
     const users = groupUsers.map((user)=>user.id)
     const groupCounterUsers = await pb.collection("counter").getList(1,1000,{filter:`group="${group}"`});
 
-    // use forEach to check if user is in counter, if not, delete from counter
-    groupCounterUsers.items.forEach(async (user) => {
-        if(!users.includes(user.user)) {
-            const rec = await pb.collection('counter').getFirstListItem(`user="${user.user}"&&group="${group}"`)
-            await pb.collection("counter").delete(rec.id)
+    // use for each user of groupCounterUsers to check if user is in counter, if not, delete from counter
+    for (let user of groupCounterUsers.items) {
+        if (!users.includes(user.user)) {
+            const counter = await pb.collection('counter').getFirstListItem(`user="${user.user}"&&group="${group}"`)
+            await pb.collection("counter").delete(counter.id);
         }
-    })
+    }
 }
 
 // user="8izk3mwibw3g2xp" &&  group="hzx2wvxbydofpi0"
