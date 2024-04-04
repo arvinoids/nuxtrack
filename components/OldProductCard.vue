@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import type { LogData } from "custom-types";
-import { ListResult,Record } from "pocketbase";
+import { ListResult, Record } from "pocketbase";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -94,7 +94,7 @@ const loading = ref(true);
 const dataUpdated = useDataUpdated();
 
 // query for groups and users
-let group = props.groupData
+let group = props.groupData;
 const groupUsers = await pb
   .collection("users")
   .getList(1, 100, { filter: `memberOf~"${group.id}"` });
@@ -102,11 +102,11 @@ const groupUsers = await pb
 const lastUpdated = ref(useFormatDate(new Date(group.updated)));
 
 // generate counters and replace old ones.
-if (await counterIsEmpty(group.id, groupUsers)) {
+if (await counterIsIncomplete(group.id, groupUsers)) {
   await useMakeCounter(group.id, groupUsers);
 } else await useUpdateCounter(group.id, groupUsers);
 
-async function counterIsEmpty(group: string, users: ListResult) {
+async function counterIsIncomplete(group: string, users: ListResult) {
   const counters = await pb
     .collection("counter")
     .getList(1, 1000, { filter: `group="${group}"` });
@@ -147,7 +147,6 @@ pb.collection("groups").subscribe(group.id, async () => {
   group = await pb.collection("groups").getOne(group.id);
   lastUpdated.value = useFormatDate(new Date(group.updated));
 });
-
 
 async function updatedCase(group: string) {
   let result = { status: "failed", message: "" };

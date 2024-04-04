@@ -102,8 +102,8 @@ async function submitCase(caseId: string, userId: string, group: string) {
   };
   // first get the id of the counter for this group and user
   const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}"`)
-  //then increment counter
-  await pb.collection('counter').update(counter.id,{count:counter.count+1})
+  // then increment counter
+  // await pb.collection('counter').update(counter.id,{count:counter.count+1})
   logActivity(logData);
 }
 
@@ -128,9 +128,9 @@ async function escalateCase(caseId: string, userId: string, group: string) {
     type: "assigned case",
     details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
   };
-  const counter = await pb.collection('counter').getFirstListItem(`user="${userId}&group="${group}`)
+  const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}`)
   //then increment counter
-  await pb.collection('counter').update(counter.id,{count:counter.count+1})
+  // await pb.collection('counter').update(counter.id,{count:counter.count+1})
   logActivity(logData);
 }
 

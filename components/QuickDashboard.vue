@@ -63,6 +63,15 @@ function getGroupCounters(groupId: string) {
       ? allCounters.value.filter((counter) => counter.group === groupId)
       : undefined;
 }
+
+pb.collection("users").subscribe("*", async () => {
+  loading.value = true;
+  users = await pb.collection("users").getFullList();
+  allCounters.value = await pb
+    .collection("counter")
+    .getFullList({ sort: "+count", expand: "user" });
+  loading.value = false;
+});
 </script>
 
 <style></style>
