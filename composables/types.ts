@@ -87,6 +87,12 @@ declare module 'pocketbase-types' {
             "user":user
         }
      }
+
+     type userSequence = {
+        "id": string,
+        "group": string,
+        "user_sequence": JSON
+     }
 }
 
 declare module 'custom-types' {

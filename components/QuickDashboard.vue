@@ -15,10 +15,10 @@
       <div ref="dashboard" class="flex flex-row flex-wrap justify-center">
         <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
           <transition>
-            <ProductCard
+            <GroupCard
               :group="group"
               :users="getGroupUsers(group.id)"
-              :counters="getGroupCounters(group.id)"
+              :usersequence="getGroupUserSequence(group.id)"
               class="flex-grow"
             />
           </transition>
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { useCounters } from "~/composables/states";
-import type { group, user } from "pocketbase-types";
+import type { group, user, userSequence } from "pocketbase-types";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -43,33 +43,26 @@ const loading = ref(true);
 const allCounters = useCounters();
 let groups: group[];
 let users: user[];
+let userSequence: userSequence[];
 
 onMounted(async () => {
   groups = await pb.collection("groups").getFullList({ sort: "+order" });
-  users = await pb.collection("users").getFullList();
-  allCounters.value = await pb
-    .collection("counter")
-    .getFullList({ sort: "+count", expand: "user" });
+  users = await pb.collection("users").getFullList({ sort: "+username" });
+  userSequence = await pb.collection("usersequence").getFullList();
   loading.value = false;
 });
+
+function getGroupUserSequence(groupId: string) {
+  return userSequence.find((item) => item.group === groupId);
+}
 
 function getGroupUsers(groupId: string) {
   return users.filter((user) => user.memberOf.includes(groupId));
 }
 
-function getGroupCounters(groupId: string) {
-  if (allCounters.value)
-    return allCounters.value.length > 0
-      ? allCounters.value.filter((counter) => counter.group === groupId)
-      : undefined;
-}
-
 pb.collection("users").subscribe("*", async () => {
   loading.value = true;
   users = await pb.collection("users").getFullList();
-  allCounters.value = await pb
-    .collection("counter")
-    .getFullList({ sort: "+count", expand: "user" });
   loading.value = false;
 });
 </script>
