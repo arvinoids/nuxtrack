@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { userEntry } from "custom-types";
+import type { userEntry } from "custom-types";
 
 const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });

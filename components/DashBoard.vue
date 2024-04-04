@@ -15,7 +15,7 @@
       <div ref="dashboard" class="flex flex-row flex-wrap justify-center">
         <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
           <transition>
-            <NewProductCard :group="group.id" class="flex-grow" />
+            <NewProductCard :group-data="group" class="flex-grow" />
           </transition>
         </div>
       </div>

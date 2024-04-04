@@ -1,4 +1,4 @@
-import PocketBase from 'pocketbase'
+import PocketBase, { LocalAuthStore } from 'pocketbase'
 
 export default defineNuxtPlugin(nuxtApp => {
     const cnf = useRuntimeConfig().public

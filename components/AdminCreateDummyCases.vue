@@ -121,7 +121,7 @@
 
 <script setup lang="ts">
 import { ListResult } from "pocketbase";
-import { LogData } from "custom-types";
+import type { LogData } from "custom-types";
 
 const casesChanged = useCaseCountChanged();
 const users: ListResult = await useGetAllUsers();

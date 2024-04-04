@@ -24,6 +24,7 @@
         <Dropdown />
       </div>
     </div>
+    <MiniToast />
   </div>
 </template>
 
