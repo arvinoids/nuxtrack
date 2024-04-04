@@ -790,8 +790,7 @@ export async function useForceUpdateCounters(groupId: string) {
       const oldCounter = await pb.collection('counter').getFirstListItem(`user="${user.id}"&&group="${groupId}"`, { fields: '' })
       await pb.collection('counter').update(oldCounter.id, data)
     } catch (e) {
-      await pb.collection('counter').create(data)
+      // if (users.totalItems>0) await pb.collection('counter').create(data)
     }
-
   }
 }
