@@ -15,14 +15,14 @@
         />
       </p>
 
-      <!-- <div
+      <div
         class="flex flex-row justify-center items-center"
         v-if="firstUser.status !== 'Available'"
       >
         <input type="checkbox" v-model="forced" /><label class="text-xs mx-2"
           >Force assign</label
         >
-      </div> -->
+      </div>
       <div class="text-xs text-error pt-2">{{ message }}</div>
 
       <div class="modal-action justify-center">
@@ -37,7 +37,8 @@
             hidden:
               caseExists ||
               caseId === '' ||
-              (firstUser.status !== 'Available' && !forced),
+              (firstUser.status !== 'Available' && !forced) ||
+              invalidFormat === true,
           }"
           @click="submitCase(caseId, firstUser.id, group)"
           >Assign</a
@@ -97,6 +98,7 @@ const caseIsBlank = ref(false);
 const forced = ref(false);
 const currentUser = pb.authStore.model!.fullname;
 const groupName: string = await useGetGroupName(props.group);
+const invalidFormat = ref(false);
 
 function nextUser(users: user[]) {
   let firstUser = users.shift();
@@ -165,6 +167,8 @@ watch(caseId, async (caseId) => {
   caseId = caseId.trim();
   caseExists.value = await useCaseExists(caseId);
   caseIsEscalated.value = await useCaseIsEscalated(caseId);
+  const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
+
   if (caseId.includes("escalated")) {
     message.value = "Remove -escalated operator.";
   } else {
@@ -173,6 +177,10 @@ watch(caseId, async (caseId) => {
   if (caseId === "") {
     message.value = "Please enter a value.";
     caseIsBlank.value = true;
+  }
+  if (!pattern.test(caseId)) {
+    message.value = "Incorrect case format.";
+    invalidFormat.value = true;
   }
 });
 
@@ -186,8 +194,10 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
       return "This case is in the database. Please select an L3 group to escalate.";
     } else return "This case is in the database. Escalate to proceed.";
   }
-  if (!caseExists) return "Assign case to proceed.";
-  else return "";
+  if (!caseExists) {
+    invalidFormat.value = false;
+    return "Assign case to proceed.";
+  } else return "";
 }
 
 async function resetSelection() {
