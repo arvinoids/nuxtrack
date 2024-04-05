@@ -33,14 +33,13 @@
 </template>
 
 <script setup lang="ts">
-import { useCounters } from "~/composables/states";
 import type { group, user, userSequence } from "pocketbase-types";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
 const currentUser = useCurrentUser();
 const loading = ref(true);
-const allCounters = useCounters();
+// const allCounters = useCounters();
 let groups: group[];
 let users: user[];
 let userSequence: userSequence[];
@@ -66,5 +65,3 @@ pb.collection("users").subscribe("*", async () => {
   loading.value = false;
 });
 </script>
-
-<style></style>

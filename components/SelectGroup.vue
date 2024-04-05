@@ -37,6 +37,8 @@ const props = defineProps<{
   users: expandedUsers;
 }>();
 
+console.log('anchor: ',`${props.group}select`)
+
 const emit = defineEmits(["skip", "reset"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref(useCaseId().value);
