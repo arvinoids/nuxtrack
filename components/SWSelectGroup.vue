@@ -15,13 +15,18 @@
         />
       </p>
 
-      <div
-        class="flex flex-row justify-center items-center"
-        v-if="firstUser.status !== 'Available'"
-      >
-        <input type="checkbox" v-model="forced" /><label class="text-xs mx-2"
-          >Force assign</label
+      <div v-if="firstUser">
+        <div class="text-xs text-neutral-500 capitalize">
+          {{ firstUser.status }}
+        </div>
+        <div
+          class="flex flex-row justify-center items-center"
+          v-if="firstUser.status !== 'Available'"
         >
+          <input type="checkbox" v-model="forced" /><label class="text-xs mx-2"
+            >Force assign</label
+          >
+        </div>
       </div>
       <div class="text-xs text-error pt-2">{{ message }}</div>
 
@@ -56,15 +61,7 @@
           @click="escalateCase(caseId, firstUser.id, group)"
           >Escalate</a
         >
-        <a
-          href="#"
-          class="btn btn-outline btn-error"
-          @click="
-            resetSelection();
-            showCanceledToast();
-          "
-          >Cancel</a
-        >
+        <a href="#" class="btn btn-outline btn-error" @click="resetSelection()">Cancel</a>
       </div>
     </div>
   </div>
@@ -86,7 +83,7 @@ const firstUser = computed(() => {
   return userlist.value[0];
 });
 
-const emit = defineEmits(["shift", "reset"]);
+const emit = defineEmits(["shift", "reset", "update"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
@@ -104,12 +101,19 @@ function nextUser(users: user[]) {
   let firstUser = users.shift();
   users.push(firstUser!);
   emit("shift", users);
+  cursor.value++;
 }
 
 function previousUser(users: user[]) {
   let lastUser = users.pop();
   users.unshift(lastUser!);
+  logActivity({
+    user: loggedInUser.value,
+    type: "skipped user",
+    details: `${lastUser!.username} was moved to top.`,
+  });
   emit("shift", users);
+  cursor.value--;
 }
 
 async function submitCase(caseId: string, userId: string, group: string) {
@@ -120,6 +124,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
   useDataUpdated().value++;
   if (res.status === "success") {
     const user = await pb.collection("users").getOne(userId);
+    emit("update");
     const email = {
       to: user.email,
       subject: "New case assigned to you",
@@ -133,6 +138,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
     type: "assigned case",
     details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
   };
+
   logActivity(logData);
 }
 
@@ -140,10 +146,12 @@ async function escalateCase(caseId: string, userId: string, group: string) {
   const res = await useEscalateCase(caseId, userId, group);
   miniToast(res.status, res.message);
   const currentTime = useFormatDate(new Date(Date.now()));
-  await resetSelection();
+  // await resetSelection();
+
   useDataUpdated().value++;
   if (res.status === "success") {
     const user = await pb.collection("users").getOne(userId);
+    emit("update");
     const email = {
       to: user.email,
       subject: "New case assigned to you",
@@ -201,20 +209,13 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
 }
 
 async function resetSelection() {
-  if (cursor.value > 0) {
-    await pb.collection("logs").create({
-      user: pb.authStore.model!.username,
-      type: "canceled assign",
-      details: "Canceled assign case",
-    });
-  }
+  await pb.collection("logs").create({
+    user: pb.authStore.model!.username,
+    type: "canceled assign",
+    details: "Canceled assign case",
+  });
   emit("reset");
   caseId.value = "";
-}
-
-async function showCanceledToast() {
-  if (cursor.value > 0) miniToast("warning", "Canceled assign after skips");
-  cursor.value = 0;
 }
 </script>
 

@@ -1,6 +1,6 @@
-import  { ListResult } from "pocketbase";
+import { ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice } from "custom-types";
-import type { expandedUsers } from "pocketbase-types";
+import type { expandedUsers,user } from "pocketbase-types";
 // const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
 //pb.autoCancellation(false);
 
@@ -91,7 +91,7 @@ export async function useGetUserGroups(id: string) {
 export async function useGetUsernameFromId(id: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    const res = await pb.collection("users").getOne(id,{fields:'username'});
+    const res = await pb.collection("users").getOne(id, { fields: 'username' });
     return res.username;
 }
 
@@ -159,57 +159,58 @@ async function userIsBackFromLeave(userId: string, group: string) {
     await useRefreshGroupCounter(group);
     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${group}"`);
     const sortedUsers = await useGetSortedUsers(group);
-    let casesToAdd:number
-    if(sortedUsers.items.length===2) {
-        if(userLeaveRecord.position===0) {
-            casesToAdd =  sortedUsers.items[1].count - sortedUsers.items[0].count - userLeaveRecord.difference
-        } else { 
-             casesToAdd = userLeaveRecord.difference - sortedUsers.items[1].count + sortedUsers.items[0].count
-            
+    let casesToAdd: number
+    if (sortedUsers.items.length === 2) {
+        if (userLeaveRecord.position === 0) {
+            casesToAdd = sortedUsers.items[1].count - sortedUsers.items[0].count - userLeaveRecord.difference
+        } else {
+            casesToAdd = userLeaveRecord.difference - sortedUsers.items[1].count + sortedUsers.items[0].count
+
         }
     }
-    else {  
-        casesToAdd = userLeaveRecord.difference - ((sortedUsers.items[userLeaveRecord.position].count) - sortedUsers.items[0].count)    }
-    await useAddDummyCases(casesToAdd, userId, group, "Leave") 
+    else {
+        casesToAdd = userLeaveRecord.difference - ((sortedUsers.items[userLeaveRecord.position].count) - sortedUsers.items[0].count)
+    }
+    await useAddDummyCases(casesToAdd, userId, group, "Leave")
     pb.collection('leaves').update(userLeaveRecord.id, { active: false })
     await useRefreshGroupCounter(group);
 }
 
-async function savedDifference(user:string,group:string) {
+async function savedDifference(user: string, group: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
     const users = sortedUsers.length
     const userPosition = sortedUsers.findIndex((item) => user === item.user);
-    let difference:number
-    if(users===2) difference = Math.abs(sortedUsers[0].count - sortedUsers[1].count)
+    let difference: number
+    if (users === 2) difference = Math.abs(sortedUsers[0].count - sortedUsers[1].count)
     else {
-        difference = sortedUsers[userPosition].count - sortedUsers[0].count        
+        difference = sortedUsers[userPosition].count - sortedUsers[0].count
     }
     return difference
 }
 
 
-async function restoreDifference(user:string, group:string,sortedUsers:expandedUsers) {
+async function restoreDifference(user: string, group: string, sortedUsers: expandedUsers) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const users = sortedUsers.items.length
     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${user}"&&group="${group}"`);
-    let toAdd:number
-    if(users===2) {
-        if(userLeaveRecord.position===0) {
+    let toAdd: number
+    if (users === 2) {
+        if (userLeaveRecord.position === 0) {
             toAdd = sortedUsers.items[1].count + userLeaveRecord.difference
-        } else {  
+        } else {
             toAdd = sortedUsers.items[0].count + userLeaveRecord.difference
         }
-    } else { 
+    } else {
         const lowest = sortedUsers.items[0].count
         toAdd = userLeaveRecord.difference + lowest
-        }
+    }
     return toAdd
 }
 
-async function storeUserCount(user: string, group: string, position: number,difference:number) {
+async function storeUserCount(user: string, group: string, position: number, difference: number) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     await pb.collection("leaves").create({
@@ -217,7 +218,7 @@ async function storeUserCount(user: string, group: string, position: number,diff
         difference,
         group,
         position,
-        active:true
+        active: true
     });
 }
 
@@ -232,22 +233,24 @@ export async function useUserIsBackFromLeave(id: string) {
     const groups = await useGetUserGroups(id);
     try {
         groups.forEach(async (group: string) => {
-        await userIsBackFromLeave(id, group);
-    });
-    return { status:'success', message:'updated user case count after leave'}
-    } catch (e:any) { return { 
-        status: 'failed',
-        message: e.message
-    } }
+            await userIsBackFromLeave(id, group);
+        });
+        return { status: 'success', message: 'updated user case count after leave' }
+    } catch (e: any) {
+        return {
+            status: 'failed',
+            message: e.message
+        }
+    }
 }
 
-export async function useGetUserById(id:string) {
+export async function useGetUserById(id: string) {
     const pb = useNuxtApp().$pb
     const user = await pb.collection("users").getOne(id);
     return user
 }
 
-export async function useGetUserByUsername(username:string) {
+export async function useGetUserByUsername(username: string) {
     const pb = useNuxtApp().$pb
     const user = await pb.collection("users").getFirstListItem(`username="${username}"`);
     return user
@@ -256,10 +259,10 @@ export async function useGetUserByUsername(username:string) {
 /** Cleans up the counter so that users who are no longer in the group are deleted. */
 async function cleanUpCounter(group: string) {
     const pb = useNuxtApp().$pb
-    pb.autoCancellation(false);   
-    const groupUsers = await pb.collection("users").getList(1,100,{filter:`memberOf~"${group}"`}).then((res)=>res.items)
-    const users = groupUsers.map((user)=>user.id)
-    const groupCounterUsers = await pb.collection("counter").getList(1,1000,{filter:`group="${group}"`});
+    pb.autoCancellation(false);
+    const groupUsers = await pb.collection("users").getList(1, 100, { filter: `memberOf~"${group}"` }).then((res) => res.items)
+    const users = groupUsers.map((user) => user.id)
+    const groupCounterUsers = await pb.collection("counter").getList(1, 1000, { filter: `group="${group}"` });
 
     // use for each user of groupCounterUsers to check if user is in counter, if not, delete from counter
     for (let user of groupCounterUsers.items) {
@@ -270,4 +273,36 @@ async function cleanUpCounter(group: string) {
     }
 }
 
-// user="8izk3mwibw3g2xp" &&  group="hzx2wvxbydofpi0"
+export async function getOrderedUsers(groupId: string) {
+    const pb = useNuxtApp().$pb;
+    let groupUsers = await pb.collection("users").getList(1, 100, { filter: `memberOf~"${groupId}"` }).then((res) => res.items)
+    let storedSequence;
+    let orderedUsers;
+    let usersData:user[]=[];
+    try {
+        storedSequence = await pb
+            .collection("usersequence")
+            .getFirstListItem(`group="${groupId}"`);
+        orderedUsers = storedSequence.user_order;
+    } catch {
+        const usersequence = groupUsers.map((item) => item.id);
+        const res = await pb
+            .collection("usersequence")
+            .create({ group: groupId, user_order: usersequence });
+        orderedUsers = res.user_order;
+    }
+
+    for (let user of orderedUsers) {
+        let userInfo = groupUsers.find((item) => item.id === user) as unknown as user;
+        usersData.push(userInfo);
+    }
+    return usersData
+}
+
+export function getOrderedUserIds(users:user[]){
+    let userIds:string[]=[];
+    for(let user of users){
+        userIds.push(user.id);
+    }
+    return userIds;
+}

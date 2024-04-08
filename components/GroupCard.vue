@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="flex flex-col text-center m-1 w-[250px] shadow-lg border bg-base-100"
-  >
+  <div class="flex flex-col text-center m-1 w-[250px] shadow-lg border bg-base-100">
     <div class="bg-secondary">
       <div class="flex items-center justify-between">
         <h2
@@ -23,17 +21,11 @@
 
     <div v-else>
       <div v-if="displayUsers.length > 0" :key="updateCard">
-        <div
-          v-for="(user, id) in displayUsers"
-          :key="user.id"
-          class="my-[0.1rem]"
-        >
+        <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.username}`"
             class="tooltip tooltip-top"
-            :data-tip="
-              user.username.toUpperCase() + ' is ' + user.status + ' - '
-            "
+            :data-tip="user.username.toUpperCase() + ' is ' + user.status + ' - '"
           >
             <Icon
               name="ic:sharp-circle"
@@ -57,15 +49,15 @@
     <div class="flex flex-col flex-grow mt-3" :key="dataUpdated">
       <div class="flex justify-center mt-auto gap-2">
         <a :href="anchor"
-          ><button v-if="true" class="btn w-24 self-center mb-3">
-            Select
-          </button></a
+          ><button v-if="true" class="btn w-24 self-center mb-3">Select</button></a
         >
       </div>
       <SWSelectGroup
         :group="group.id"
         :users="displayUsers"
-        @shift="(users:user[])=> displayUsers = users"
+        @shift="updateDisplayUsers"
+        @reset="resetOrder"
+        @update="updateOrder"
       />
     </div>
     <div class="bg-gray-100 pt-[7px]"></div>
@@ -86,8 +78,10 @@ const orderedUsers = ref();
 const groupUsers = ref(props.users);
 const displayUsers = ref<user[]>([]);
 const anchor: string = "#" + props.group.id + "select";
-let updateCard = ref(0);
-let dataUpdated = ref(0);
+const updateCard = ref(0);
+const dataUpdated = ref(0);
+const sequenceId = ref("");
+const initialOrder = ref();
 
 onMounted(async () => {
   try {
@@ -95,23 +89,49 @@ onMounted(async () => {
       .collection("usersequence")
       .getFirstListItem(`group="${props.group.id}"`);
     orderedUsers.value = res.user_order;
+    sequenceId.value = res.id;
   } catch {
     const usersequence = groupUsers.value.map((item) => item.id);
     const res = await pb
       .collection("usersequence")
       .create({ group: props.group.id, user_order: usersequence });
     orderedUsers.value = res.user_order;
+    sequenceId.value = res.id;
   }
 
   for (let user of orderedUsers.value) {
     let userInfo = props.users.find((item) => item.id === user);
     displayUsers.value.push(userInfo!);
   }
-
+  initialOrder.value = [...displayUsers.value];
   loading.value = false;
 });
 
-function updateDisplayUsers(users: user[]) {
+async function updateDisplayUsers(users: user[]) {
   displayUsers.value = users;
+  // await pb.collection("usersequence").update(sequenceId.value, {
+  //   user_order: getOrderedUserIds(displayUsers.value),
+  // });
 }
+
+const currentOrder = computed(() => {
+  return [...displayUsers.value];
+});
+async function updateOrder() {
+  let firstUser = currentOrder.value.shift();
+  currentOrder.value.push(firstUser!);
+  await pb.collection("usersequence").update(sequenceId.value, {
+    user_order: getOrderedUserIds(currentOrder.value),
+  });
+}
+
+function resetOrder() {
+  displayUsers.value = [...initialOrder.value];
+}
+
+// realtime updates to sequence
+pb.collection("usersequence").subscribe("*", async () => {
+  const res = await getOrderedUsers(props.group.id);
+  if (displayUsers.value !== res) displayUsers.value = res;
+});
 </script>

@@ -1,24 +1,18 @@
 <template>
-  <ul>
-    <li v-for="user in users.items" class="text-accent">
-      <NuxtLink :to="`/${groupName}/${user.username}`"
-        ><div>{{ user.fullname }}</div>
-      </NuxtLink>
-    </li>
-  </ul>
+  <UserOrder :groupId="group" :users="users" />
 </template>
 
 <script setup lang="ts">
-import { ListResult } from "pocketbase";
+import type { user } from "pocketbase-types";
 
 const props = defineProps<{
   group: string;
-  users: ListResult;
+  users: user[];
 }>();
 
-const groupName = await useGetGroupName(props.group);
+//user data is already in sequence
 
-let users = await useGetUsers(props.group);
+const groupName = await useGetGroupName(props.group);
 </script>
 
 <style></style>
