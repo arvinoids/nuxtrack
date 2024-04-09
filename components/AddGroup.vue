@@ -58,10 +58,10 @@ async function addGroup() {
   console.log(data);
   try {
     await pb.collection("groups").create(data);
-    useShowToast(`Group '${groupData.value.description}' has been created`, "success");
+    miniToast("success", `Group '${groupData.value.description}' has been created`);
     return true;
   } catch (e: any) {
-    useShowToast(e.message, "failed");
+    miniToast("failed", e.message);
     return false;
   }
 }

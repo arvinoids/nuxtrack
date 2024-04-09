@@ -33,7 +33,7 @@ const update = useDataUpdated();
 async function deleteCase(id: string) {
   const res = await useDeleteCase(id);
   update.value++;
-  useShowToast(res.message + " has been deleted.", res.status);
+  miniToast(res.status, res.message + " has been deleted.");
   const logData: LogData = {
     user: loggedInUser.value,
     type: "deleted case",
@@ -46,7 +46,7 @@ async function deleteCase(id: string) {
     body: `Hello ${owner.fullname}, \n\nThe case ${props.caseId} has been removed from your assignment.\n\nThanks,\nRotation Tracker`,
   };
   const emailres = await useSendEmail(email);
-  useShowToast(emailres.message, emailres.status);
+  miniToast(emailres.status, emailres.message);
   logActivity(logData);
 }
 </script>

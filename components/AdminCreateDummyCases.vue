@@ -121,7 +121,7 @@
 
 <script setup lang="ts">
 import { ListResult } from "pocketbase";
-import type { LogData } from "custom-types";
+import type { LogData, notification } from "custom-types";
 
 const casesChanged = useCaseCountChanged();
 const users: ListResult = await useGetAllUsers();
@@ -149,7 +149,7 @@ watch(selectedUser, () => {
 });
 
 async function AddDummyCases() {
-  const result = { status: "failed", message: "" };
+  const result: notification = { status: "failed", message: "" };
   try {
     const res = await useAddDummyCases(
       tickets.value,
@@ -163,7 +163,7 @@ async function AddDummyCases() {
     console.log(e);
     result.message = e.message;
   }
-  useShowToast(result.message, result.status);
+  miniToast(result.status, result.message);
   const data: LogData = {
     user: useCurrentUser()!.username,
     type: "assigned case",

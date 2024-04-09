@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import type { LogData } from "custom-types";
+import type { LogData, statuschoice } from "custom-types";
 
 const selectedGroup = ref("");
 const selectedGroupDescription: Ref<string | undefined> = ref("");
@@ -77,7 +77,7 @@ const casesChanged = useCaseCountChanged();
 
 async function deleteGroupCases(group: string) {
   const res = await useDeleteGroupCases(group);
-  useShowToast(res.message, res.status);
+  miniToast(res.status, res.message);
   const logData: LogData = {
     user: useCurrentUser()!.username,
     type: "deleted case",

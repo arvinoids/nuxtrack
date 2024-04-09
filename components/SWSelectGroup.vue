@@ -67,13 +67,13 @@ const props = defineProps<{
 }>();
 
 let userlist = ref(props.users);
-const originalList = [...props.users];
 const firstUser = computed(() => {
-  return userlist.value[0];
+  return props.users[0];
 });
 
-watch(firstUser, () => {
-  console.log(firstUser.value);
+watch(userlist, () => {
+  console.log(userlist.value);
+  console.log(firstUser.value.username);
 });
 
 const emit = defineEmits(["shift", "reset", "update"]);
@@ -131,30 +131,24 @@ watch([caseId, forced], async () => {
   } else {
     hideSubmit.value = false;
   }
-  console.log(
-    caseIsBlank.value,
-    invalidFormat.value,
-    firstUser.value.status !== "Available" && !forced.value
-  );
 });
 
 async function resetSelection() {
-  userlist.value = [...originalList];
+  emit("reset");
+  userlist.value = props.users;
+  caseId.value = "";
   await pb.collection("logs").create({
     user: pb.authStore.model!.username,
     type: "canceled assign",
     details: "Canceled assign case",
   });
-  emit("reset");
-  caseId.value = "";
-  cursor.value = 0;
 }
 
 async function submitCase(caseId: string, userId: string, group: string) {
   const res: notification = await useSubmitCase(caseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
   miniToast(res.status, res.message);
-  await resetSelection();
+  // await resetSelection();
   useDataUpdated().value++;
   if (res.status === "success") {
     const user = await pb.collection("users").getOne(userId);

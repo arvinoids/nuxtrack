@@ -244,7 +244,7 @@ export async function useUpdateCase(
 export async function useDeleteCase(id: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const result = { message: "", status: "success" };
+  const result:{message:string,status:'success'|'failed'|'warning'} = { message: "", status: "success" };
   try {
     const caseRecord = await pb.collection("cases").getOne(id);
     const caseId = caseRecord.case;
@@ -684,7 +684,7 @@ export async function useAddDummyCases(quantity: number, user: string, group: st
       console.log(e);
     }
   });
-  return { status: 'success', message: `${quantity} Cases created` }
+  return { status: 'success', message: `${quantity} Cases created` } as notification
 }
 
 export async function useGetAllGroups() {
@@ -699,7 +699,7 @@ export async function useGetAllGroups() {
 export async function useDeleteGroupCases(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const result = { message: '', status: 'failed' }
+  const result:notification = { message: '', status: 'failed' }
   try {
     const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${group}"` })
     res.items.forEach(async (item) => {

@@ -75,7 +75,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
   const groupName = await useGetGroupName(group);
   const res = await useSubmitCase(caseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
-  useShowToast(res.message, res.status);
+  miniToast(res.status, res.message);
   useDataUpdated().value++;
   if (res.status === "success") {
     const user = await pb.collection("users").getOne(userId);
@@ -89,7 +89,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
       } on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres = await useSendEmail(email);
-    useShowToast(emailres.message, emailres.status);
+    miniToast(emailres.status, emailres.message);
   }
   const logData: LogData = {
     user: currentUser!.username,
@@ -102,7 +102,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
 async function escalateCase(caseId: string, id: string, group: string) {
   const groupName = useGetGroupName(group);
   const res = await useEscalateCase(caseId, id, group);
-  useShowToast(res.message, res.status);
+  miniToast(res.status, res.message);
   const currentTime = useFormatDate(new Date(Date.now()));
   useDataUpdated().value++;
   if (res.status === "success") {
@@ -113,7 +113,7 @@ async function escalateCase(caseId: string, id: string, group: string) {
       body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres = await useSendEmail(email);
-    useShowToast(emailres.message, emailres.status);
+    miniToast(emailres.status, emailres.message);
   }
   const logData: LogData = {
     user: currentUser!.username,

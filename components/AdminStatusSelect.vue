@@ -82,7 +82,7 @@ watch(selected, async (newStatus, oldStatus) => {
     await useUserIsBackFromLeave(props.user.id);
   }
   const message = `${props.user.username.toUpperCase()} status was changed to ${selected.value.toUpperCase()} by ${pb.authStore.model!.username.toUpperCase()}`;
-  useShowToast(message, "success");
+  miniToast("success", message);
   const logData: LogData = {
     user: pb.authStore.model!.username,
     type: "changed status",
