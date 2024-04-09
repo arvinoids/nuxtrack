@@ -117,9 +117,11 @@ async function updateDisplayUsers(users: user[]) {
 const currentOrder = computed(() => {
   return [...displayUsers.value];
 });
+
 async function updateOrder() {
   let firstUser = currentOrder.value.shift();
   currentOrder.value.push(firstUser!);
+  initialOrder.value = [...currentOrder.value];
   await pb.collection("usersequence").update(sequenceId.value, {
     user_order: getOrderedUserIds(currentOrder.value),
   });
