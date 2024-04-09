@@ -15,10 +15,12 @@
         />
       </p>
 
-      <div v-if="firstUser">
-        <div class="text-xs text-neutral-500 capitalize">
+      <div v-if="firstUser" class="text-xs">
+        User is
+        <span class="text-xs text-neutral-500 capitalize">
           {{ firstUser.status }}
-        </div>
+        </span>
+
         <div
           class="flex flex-row justify-center items-center"
           v-if="firstUser.status !== 'Available'"
@@ -39,27 +41,10 @@
           href="#"
           class="btn btn-primary"
           :class="{
-            hidden:
-              caseExists ||
-              caseId === '' ||
-              (firstUser.status !== 'Available' && !forced) ||
-              invalidFormat === true,
+            hidden: hideSubmit,
           }"
           @click="submitCase(caseId, firstUser.id, group)"
           >Assign</a
-        >
-        <a
-          href="#"
-          class="btn btn-warning btn-primary"
-          v-if="groupName !== 'l1_na'"
-          :class="{
-            hidden:
-              !caseExists ||
-              disableEscalate ||
-              (firstUser.status !== 'Available' && !forced),
-          }"
-          @click="escalateCase(caseId, firstUser.id, group)"
-          >Escalate</a
         >
         <a href="#" class="btn btn-outline btn-error" @click="resetSelection()">Cancel</a>
       </div>
@@ -87,15 +72,11 @@ const emit = defineEmits(["shift", "reset", "update"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
-const caseExists = ref(false);
-const caseIsEscalated = ref(false);
+// const caseExists = ref(false);
 const message = ref("");
-const disableEscalate = ref(false);
-const caseIsBlank = ref(false);
 const forced = ref(false);
 const currentUser = pb.authStore.model!.fullname;
 const groupName: string = await useGetGroupName(props.group);
-const invalidFormat = ref(false);
 
 function nextUser(users: user[]) {
   let firstUser = users.shift();
@@ -115,6 +96,16 @@ function previousUser(users: user[]) {
   emit("shift", users);
   cursor.value--;
 }
+
+const hideSubmit = ref(true);
+const invalidFormat = computed(() => {
+  const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
+  return !pattern.test(caseId.value);
+});
+
+const caseIsBlank = computed(() => {
+  return caseId.value === "";
+});
 
 async function submitCase(caseId: string, userId: string, group: string) {
   const res: notification = await useSubmitCase(caseId, userId, group);
@@ -142,71 +133,15 @@ async function submitCase(caseId: string, userId: string, group: string) {
   logActivity(logData);
 }
 
-async function escalateCase(caseId: string, userId: string, group: string) {
-  const res = await useEscalateCase(caseId, userId, group);
-  miniToast(res.status, res.message);
-  const currentTime = useFormatDate(new Date(Date.now()));
-  // await resetSelection();
-
-  useDataUpdated().value++;
-  if (res.status === "success") {
-    const user = await pb.collection("users").getOne(userId);
-    emit("update");
-    const email = {
-      to: user.email,
-      subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
-    };
-    const emailres: notification = (await useSendEmail(email)) as notification;
-    miniToast(emailres.status, emailres.message);
-  }
-  const logData: LogData = {
-    user: loggedInUser.value,
-    type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
-  };
-  const counter = await pb
-    .collection("counter")
-    .getFirstListItem(`user="${userId}"&&group="${group}`);
-  logActivity(logData);
-}
-
 watch(caseId, async (caseId) => {
-  caseId = caseId.trim();
-  caseExists.value = await useCaseExists(caseId);
-  caseIsEscalated.value = await useCaseIsEscalated(caseId);
-  const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
-
-  if (caseId.includes("escalated")) {
-    message.value = "Remove -escalated operator.";
-  } else {
-    message.value = errorMessage(caseExists.value, caseIsEscalated.value, caseId);
-  }
-  if (caseId === "") {
-    message.value = "Please enter a value.";
-    caseIsBlank.value = true;
-  }
-  if (!pattern.test(caseId)) {
-    message.value = "Incorrect case format.";
-    invalidFormat.value = true;
-  }
+  if (caseIsBlank.value) {
+    message.value = "Please enter a case ID.";
+  } else if (invalidFormat.value) {
+    message.value = "Incorrect case ID format. Please recheck.";
+  } else if (await useCaseExists(caseId)) {
+    message.value = "This case is already assigned. Please use search.";
+  } else message.value = "";
 });
-
-function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
-  if (caseExists && caseIsEscalated) {
-    disableEscalate.value = true;
-    return "Already escalated. Please check case number.";
-  }
-  if (caseExists && !caseIsEscalated) {
-    if (groupName === "l1_na") {
-      return "This case is in the database. Please select an L3 group to escalate.";
-    } else return "This case is in the database. Escalate to proceed.";
-  }
-  if (!caseExists) {
-    invalidFormat.value = false;
-    return "Assign case to proceed.";
-  } else return "";
-}
 
 async function resetSelection() {
   await pb.collection("logs").create({

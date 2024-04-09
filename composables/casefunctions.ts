@@ -340,6 +340,7 @@ export async function useSearchCase(id: string) {
 
 export async function useCaseExists(id: string) {
   const pb = useNuxtApp().$pb
+  id.trim()
   pb.autoCancellation(false);
   try {
     let res = await pb.collection("cases").getFirstListItem(`case="${id}"`);
