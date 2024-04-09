@@ -33,7 +33,10 @@
       <div class="text-xs text-error pt-2">{{ message }}</div>
 
       <div class="modal-action justify-center">
-        <a class="btn btn-outline btn-warning" @click="previousUser(userlist)"
+        <a
+          v-if="cursor !== 0"
+          class="btn btn-outline btn-warning"
+          @click="previousUser(userlist)"
           >Previous</a
         >
         <a class="btn btn-outline btn-secondary" @click="nextUser(userlist)">Skip</a>
@@ -41,6 +44,7 @@
           href="#"
           class="btn btn-primary"
           :class="{
+            hidden: !forced,
             hidden: hideSubmit,
           }"
           @click="submitCase(caseId, firstUser.id, group)"
@@ -64,15 +68,15 @@ const props = defineProps<{
 }>();
 
 let userlist = ref(props.users);
+const originalList = [...props.users];
 const firstUser = computed(() => {
   return userlist.value[0];
 });
 
 const emit = defineEmits(["shift", "reset", "update"]);
 const loggedInUser = useLoggedInUsername();
-let caseId = ref(useCaseId().value);
+let caseId = ref("");
 let cursor = ref(0);
-// const caseExists = ref(false);
 const message = ref("");
 const forced = ref(false);
 const currentUser = pb.authStore.model!.fullname;
@@ -97,15 +101,51 @@ function previousUser(users: user[]) {
   cursor.value--;
 }
 
-const hideSubmit = ref(true);
 const invalidFormat = computed(() => {
   const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
-  return !pattern.test(caseId.value);
+  return !pattern.test(caseId.value.trim());
 });
 
 const caseIsBlank = computed(() => {
   return caseId.value === "";
 });
+
+const hideSubmit = ref(true);
+
+watch([caseId, forced], async () => {
+  message.value = "";
+  if (caseIsBlank.value) {
+    message.value = "Please enter a case ID.";
+    hideSubmit.value = true;
+  } else if (invalidFormat.value) {
+    message.value = "Incorrect case ID format. Please recheck.";
+    hideSubmit.value = true;
+  } else if (await useCaseExists(caseId.value)) {
+    message.value = "This case is already assigned. Please use search.";
+    hideSubmit.value = true;
+  } else if (firstUser.value.status !== "Available" && !forced.value) {
+    hideSubmit.value = true;
+  } else {
+    hideSubmit.value = false;
+  }
+  console.log(
+    caseIsBlank.value,
+    invalidFormat.value,
+    firstUser.value.status !== "Available" && !forced.value
+  );
+});
+
+async function resetSelection() {
+  userlist.value = [...originalList];
+  await pb.collection("logs").create({
+    user: pb.authStore.model!.username,
+    type: "canceled assign",
+    details: "Canceled assign case",
+  });
+  emit("reset");
+  caseId.value = "";
+  cursor.value = 0;
+}
 
 async function submitCase(caseId: string, userId: string, group: string) {
   const res: notification = await useSubmitCase(caseId, userId, group);
@@ -131,26 +171,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
   };
 
   logActivity(logData);
-}
-
-watch(caseId, async (caseId) => {
-  if (caseIsBlank.value) {
-    message.value = "Please enter a case ID.";
-  } else if (invalidFormat.value) {
-    message.value = "Incorrect case ID format. Please recheck.";
-  } else if (await useCaseExists(caseId)) {
-    message.value = "This case is already assigned. Please use search.";
-  } else message.value = "";
-});
-
-async function resetSelection() {
-  await pb.collection("logs").create({
-    user: pb.authStore.model!.username,
-    type: "canceled assign",
-    details: "Canceled assign case",
-  });
-  emit("reset");
-  caseId.value = "";
 }
 </script>
 
