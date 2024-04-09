@@ -44,7 +44,6 @@
           href="#"
           class="btn btn-primary"
           :class="{
-            hidden: !forced,
             hidden: hideSubmit,
           }"
           @click="submitCase(caseId, firstUser.id, group)"
