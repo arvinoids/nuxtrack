@@ -3,7 +3,7 @@
     <div class="self-center mt-3 flex flex-col items-center">
       <p class="text-lg text-secondary mx-10">
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
-        >. To assign or escalate a case, please select a group below.
+        >. To assign a case, please select a group below.
 
         <span v-if="currentUser ? currentUser.memberOf.length !== 0 : false"
           >You may also

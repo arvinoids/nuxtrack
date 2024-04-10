@@ -37,13 +37,6 @@
             @click="submitCase(caseId, user.id, selectedGroupId)"
             >Assign</label
           >
-          <label
-            for="assignToSelf"
-            class="btn btn-warning btn-primary"
-            :class="{ hidden: !caseExists || disableEscalate }"
-            @click="escalateCase(caseId, user.id, selectedGroupId)"
-            >Escalate</label
-          >
           <label for="assignToSelf" class="btn btn-outline btn-warning">Cancel</label>
         </div>
       </div>

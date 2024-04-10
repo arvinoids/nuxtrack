@@ -21,8 +21,6 @@
                 <div class="modal-action justify-center">
                     <label for="assignCase" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') }"
                         @click="submitCase(caseId, user.id, group)">Assign</label>
-                    <label for="assignCase" class="btn btn-warning btn-primary" :class="{ hidden: (!caseExists || disableEscalate) }"
-                        @click="escalateCase(caseId, user.id, group)">Escalate</label>
                     <label for="assignCase" class="btn btn-accent">Cancel</label>
                 </div>
             </div>
@@ -72,28 +70,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
     logActivity(logData);
 }
 /** Escalates the case: renames the old case to [case]-escalated */
-async function escalateCase(caseId: string, userId: string, group: string) {
-    const res = await useEscalateCase(caseId, userId, group);
-    miniToast(res.status, res.message);
-    const currentTime = useFormatDate(new Date(Date.now()));
-    useDataUpdated().value++;
-    if (res.status === 'success') {
-        const user = (await pb.collection('users').getOne(userId,{fields: 'fullname,email'}))
-        const email = {
-            to: user.email,
-            subject: "New case assigned to you",
-            body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
-        }
-        const emailres = (await useSendEmail(email))
-        miniToast(emailres.status, emailres.message)
-    }
-    const logData: LogData = {
-        user: currentUser!.username,
-        type: "assigned case",
-        details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
-    };
-    logActivity(logData);
-}
 
 watch(caseId, async (caseId) => {
     caseExists.value = await useCaseExists(caseId.trim());

@@ -45,7 +45,7 @@
               {{ caseData.data.assignedBy.toUpperCase() }}
             </p>
             <div class="border p-3 text-sm my-3">
-              To escalate the case, close this window and select a group in the homepage.
+              To assign the case, close this window and select a group in the homepage.
             </div>
           </div>
         </div>

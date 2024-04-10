@@ -156,7 +156,7 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
     return "Already escalated. Please check case number.";
   }
   if (caseExists && !caseIsEscalated) {
-    if (groupName === 'l1_na') { return "This case is in the database. Please select an L3 group to escalate." }
+    if (groupName === 'l1_na') { return "This case is in the database. Please select an L3 group to assign." }
     else return "This case is in the database. Escalate to proceed."
   };
   if (!caseExists) return "Assign case to proceed.";
