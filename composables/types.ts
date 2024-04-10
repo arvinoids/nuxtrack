@@ -101,9 +101,9 @@ declare module 'custom-types' {
         message:string,
         status:"success"|"failed"
     }
-    interface LogData {
+    type LogData = {
         user: string,
-        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out",
+        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out"|"directly assigned",
         details?: string
     }
 

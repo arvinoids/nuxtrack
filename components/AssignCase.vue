@@ -38,13 +38,20 @@ const props = defineProps<{
 }>()
 
 const caseExists = ref(false);
-const caseIsEscalated = ref(false);
 const disableEscalate = ref(false);
-const caseIsBlank = ref(false)
+
+const invalidFormat = computed(() => {
+  const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
+  return !pattern.test(caseId.value.trim());
+});
+
+const caseIsBlank = computed(() => {
+  return caseId.value === "";
+});
 
 const groupName = await useGetGroupName(props.group)
-let caseId = ref('')
-let message = ref('')
+const caseId = ref('')
+const message = ref('')
 const currentUser = useCurrentUser()
 
 async function submitCase(caseId: string, userId: string, group: string) {
@@ -56,15 +63,15 @@ async function submitCase(caseId: string, userId: string, group: string) {
         const user = (await pb.collection('users').getOne(userId, { fields: 'fullname,email'}))
         const email = {
             to: user.email,
-            subject: "New case assigned to you",
-            body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser!.fullname} on ${currentTime}.\n\nRotation Tracker`
+            subject: "New case directly assigned to you",
+            body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been directly assigned to you by ${currentUser!.fullname} on ${currentTime}.\n\nRotation Tracker`
         }
         const emailres = (await useSendEmail(email))
         miniToast(emailres.status, emailres.message)
     }
     const logData: LogData = {
         user: currentUser!.username,
-        type: "assigned case",
+        type: "directly assigned",
         details: `${caseId} to ` + (await useGetUsernameFromId(userId)),
     };
     logActivity(logData);
@@ -72,28 +79,20 @@ async function submitCase(caseId: string, userId: string, group: string) {
 /** Escalates the case: renames the old case to [case]-escalated */
 
 watch(caseId, async (caseId) => {
-    caseExists.value = await useCaseExists(caseId.trim());
-    caseIsEscalated.value = await useCaseIsEscalated(caseId.trim());
-    if (caseId.trim().includes("escalated")) {
-        message.value = "Remove -escalated operator.";
-    } else {
-        message.value = errorMessage(caseExists.value, caseIsEscalated.value, caseId);
+    caseExists.value = await useCaseExists(caseId);
+    disableEscalate.value = false
+    message.value = 'Assign case to proceed.'
+    if(caseIsBlank.value) {
+        disableEscalate.value = true
+        message.value = "Please enter a case ID."
+    } else if(invalidFormat.value) {
+        disableEscalate.value = true
+        message.value = "Incorrect case ID format. Please recheck."
+    } else if(caseExists.value) {
+        disableEscalate.value = true
+        message.value = "The case is already assigned. Please use search."
     }
-    if (caseId.trim() === '') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
 });
-
-function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
-    if (caseExists && caseIsEscalated) {
-        disableEscalate.value = true;
-        return "Already escalated. Please check case number.";
-    }
-    if (caseExists && !caseIsEscalated)
-        return "This case is in the database. Escalate to continue.";
-    if (!caseExists) return "Assign case to proceed.";
-    else return "";
-}
-
-
 
 </script>
 
