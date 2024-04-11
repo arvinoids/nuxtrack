@@ -38,9 +38,6 @@
             </span>
           </nuxt-link>
         </div>
-        <div class="my-3">
-          <p class="text-xs">Last updated</p>
-        </div>
       </div>
       <div v-else class="text-xs mt-3">
         <p>No users in this group.</p>
@@ -71,11 +68,14 @@ const props = defineProps<{
   users: user[];
   usersequence: userSequence | undefined;
 }>();
+const filteredUsers = props.users.filter((user) => user.status !== "On leave");
+const usersOnLeave: user[] = props.users.filter((user) => !filteredUsers.includes(user));
+const userIdsOnLeave: string[] = usersOnLeave.map((user) => user.id);
 
 const pb = useNuxtApp().$pb;
 const loading = ref(true);
 const orderedUsers = ref();
-const groupUsers = ref(props.users);
+const groupUsers = ref(filteredUsers);
 const displayUsers = ref<user[]>([]);
 const anchor: string = "#" + props.group.id + "select";
 const updateCard = ref(0);
@@ -88,7 +88,26 @@ onMounted(async () => {
     const res = await pb
       .collection("usersequence")
       .getFirstListItem(`group="${props.group.id}"`);
-    orderedUsers.value = res.user_order;
+    const storedOrder: string[] = res.user_order;
+    // if some users came back from leave
+    if (filteredUsers.length > storedOrder.length) {
+      const filteredUserIds = filteredUsers.map((user) => user.id);
+      const usersFromLeave = filteredUserIds.filter(
+        (user) => !storedOrder.includes(user)
+      );
+      const newOrder = [...usersFromLeave, storedOrder];
+      await pb.collection("usersequence").update(res.id, { user_sequence: newOrder });
+    }
+    // if someone went on leave
+    if (userIdsOnLeave.length > 0 && res.user_order.length > 0) {
+      const updatedSequence: string[] = storedOrder.filter(
+        (userId) => !userIdsOnLeave.includes(userId)
+      );
+      await pb.collection("usersequence").update(res.id, { user_order: updatedSequence });
+      orderedUsers.value = updatedSequence;
+    } else {
+      orderedUsers.value = res.user_order;
+    }
     sequenceId.value = res.id;
   } catch {
     const usersequence = groupUsers.value.map((item) => item.id);
@@ -100,7 +119,7 @@ onMounted(async () => {
   }
 
   for (let user of orderedUsers.value) {
-    let userInfo = props.users.find((item) => item.id === user);
+    let userInfo = filteredUsers.find((item) => item.id === user);
     displayUsers.value.push(userInfo!);
   }
   initialOrder.value = [...displayUsers.value];
@@ -109,9 +128,6 @@ onMounted(async () => {
 
 async function updateDisplayUsers(users: user[]) {
   displayUsers.value = users;
-  // await pb.collection("usersequence").update(sequenceId.value, {
-  //   user_order: getOrderedUserIds(displayUsers.value),
-  // });
 }
 
 const currentOrder = computed(() => {
