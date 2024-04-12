@@ -25,7 +25,7 @@
             </select>
           </div>
         </div>
-        <div class="border my-2 py-2 px-3 text-sm text-warning" v-if="message">
+        <div class="border my-2 py-2 px-3 text-sm text-error" v-if="message">
           <p>{{ message }}</p>
         </div>
 
@@ -60,10 +60,6 @@ const caseIsEscalated = ref(false);
 const caseIsBlank = ref(false);
 const disableEscalate = ref(false);
 
-async function doAssign() {
-  useAssignCase(caseId.value, user.id, selectedGroupId.value);
-}
-
 async function submitCase(caseId: string, userId: string, group: string) {
   const groupName = await useGetGroupName(group);
   const res = await useSubmitCase(caseId, userId, group);
@@ -92,30 +88,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
   logActivity(logData);
 }
 
-async function escalateCase(caseId: string, id: string, group: string) {
-  const groupName = useGetGroupName(group);
-  const res = await useEscalateCase(caseId, id, group);
-  miniToast(res.status, res.message);
-  const currentTime = useFormatDate(new Date(Date.now()));
-  useDataUpdated().value++;
-  if (res.status === "success") {
-    const user = await pb.collection("users").getOne(id);
-    const email = {
-      to: user.email,
-      subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
-    };
-    const emailres = await useSendEmail(email);
-    miniToast(emailres.status, emailres.message);
-  }
-  const logData: LogData = {
-    user: currentUser!.username,
-    type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(id)),
-  };
-  logActivity(logData);
-}
-
 watch(caseId, async (caseId) => {
   caseExists.value = await useCaseExists(caseId.trim());
   caseIsEscalated.value = await useCaseIsEscalated(caseId.trim());
@@ -136,7 +108,7 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
     return "Already escalated. Please check case number.";
   }
   if (caseExists && !caseIsEscalated)
-    return "This case is in the database. Escalate to continue.";
+    return "This case is already assigned. Please use search.";
   if (!caseExists) return "Assign case to proceed.";
   else return "";
 }
