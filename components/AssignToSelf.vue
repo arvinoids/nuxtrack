@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { Record } from "pocketbase";
+import type { RecordModel } from "pocketbase";
 import type { LogData } from "custom-types";
 const pb = useNuxtApp().$pb;
 const caseId = ref("");
@@ -53,7 +53,7 @@ const message = ref("");
 const currentUser = pb.authStore.model!;
 
 const user = await pb.collection("users").getOne(currentUser.id, { expand: "memberOf" });
-const groups = user.expand.memberOf as Record[];
+const groups = user.expand!.memberOf;
 const selectedGroupId = ref(groups[0].id);
 const caseExists = ref(false);
 const caseIsEscalated = ref(false);

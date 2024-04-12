@@ -9,11 +9,15 @@
             group.description
           }}</NuxtLink>
         </h2>
-        <div class="flex items-center">
-          <div
-            class="tooltip tooltip-bottom tooltip-accent"
-            data-tip="Click this if you checked for new cases."
-          ></div>
+        <div class="flex items-center mx-2">
+          <div class="tooltip tooltip-top tooltip-accent" data-tip="Update count">
+            <button
+              class="btn btn-sm btn-circle btn-secondary text-white btn-ghost"
+              @click="updateUserCount"
+            >
+              <Icon name="ic:round-refresh" size="1.6rem" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -21,7 +25,7 @@
 
     <div v-else>
       <div v-if="displayUsers.length > 0" :key="updateCard">
-        <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
+        <div v-for="user in displayUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.username}`"
             class="tooltip tooltip-top"
@@ -31,7 +35,7 @@
               user.status +
               ' - ' +
               user.cases +
-              'cases'
+              ' cases'
             "
           >
             <Icon
@@ -154,8 +158,27 @@ function resetOrder() {
   displayUsers.value = [...initialOrder.value];
 }
 
+async function updateUserCount() {
+  loading.value = true;
+  try {
+    const cases = await pb.collection("cases").getFullList({ fields: "user" });
+    for (let user of props.users) {
+      const userCases = cases.filter((item) => item.user === user.id);
+      await pb.collection("users").update(user.id, { cases: userCases.length });
+    }
+    miniToast("success", `User count for ${props.group.description} has been updated.`);
+  } catch (e: any) {
+    miniToast("failed", e.message);
+  }
+  loading.value = false;
+}
+
 // realtime updates to sequence
 pb.collection("usersequence").subscribe("*", async () => {
+  const res = await getOrderedUsers(props.group.id);
+  if (displayUsers.value !== res) displayUsers.value = res;
+});
+pb.collection("users").subscribe("*", async () => {
   const res = await getOrderedUsers(props.group.id);
   if (displayUsers.value !== res) displayUsers.value = res;
 });

@@ -48,10 +48,6 @@ let cases: RecordModel[];
 
 onMounted(async () => {
   // before loading users, update case counts
-  cases = await pb.collection("cases").getFullList({ fields: "user" });
-  for (let user of users) {
-    await useUpdateUserCaseCount(user.id);
-  }
   users = await pb.collection("users").getFullList({ sort: "+username" });
   groups = await pb.collection("groups").getFullList({ sort: "+order" });
   userSequence = await pb.collection("usersequence").getFullList();
@@ -72,8 +68,6 @@ function getGroupUsers(groupId: string) {
 }
 
 pb.collection("users").subscribe("*", async () => {
-  loading.value = true;
   users = await pb.collection("users").getFullList();
-  loading.value = false;
 });
 </script>

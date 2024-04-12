@@ -28,11 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import { Record } from "pocketbase";
+import type { user } from "pocketbase-types";
 const route = useRoute();
 
 const props = defineProps<{
-  user: Record;
+  user: user;
 }>();
 
 function allCasesButton() {

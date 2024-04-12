@@ -77,7 +77,6 @@ async function submitCase(caseId: string, userId: string, groupId: string) {
     };
     logActivity(logData);
 }
-/** Escalates the case: renames the old case to [case]-escalated */
 
 watch(caseId, async (caseId) => {
     caseExists.value = await useCaseExists(caseId.trim());

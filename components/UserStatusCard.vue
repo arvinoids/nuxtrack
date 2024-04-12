@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import type { statuschoice, LogData } from "custom-types";
-import { Record } from "pocketbase";
+import type { RecordModel } from "pocketbase";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{
   id: string;
@@ -103,7 +103,7 @@ function getAvatarUrl() {
   if (pb.authStore.model?.avatar === "") {
     return null;
   } else {
-    const user = pb.authStore.model as Record;
+    const user = pb.authStore.model as RecordModel;
     const url = pb.files.getUrl(user, user!.avatar, { thumb: "100x100" });
     return url;
   }
@@ -162,7 +162,7 @@ async function logout() {
 }
 
 const menu = ref(null);
-onClickOutside(menu, (event) => {
+onClickOutside(menu as MaybeRef, (event) => {
   show.value = false;
 });
 

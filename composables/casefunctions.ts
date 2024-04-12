@@ -35,11 +35,11 @@ async function updateCounter(group: string, user: string) {
   }
 }
 
-async function getCount(user: string, group: string) {
+async function getCount(userId: string, group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res = await pb.collection("cases").getList(1, 10000, {
-    filter: `group="${group}"&&user="${user}"`,
+    filter: `group="${group}"&&user="${userId}"`,
   });
   return res.totalItems;
 }
@@ -68,7 +68,8 @@ export async function useAssignCase(
     return result;
   } else {
     await pb.collection("cases").create(data);
-    await updateCounter(group, user);
+    await incrementCaseCount(user)
+    // await updateCounter(group, user);
     let owner = (await useGetUsernameFromId(user)).toUpperCase();
     
     // move user to bottom
@@ -272,7 +273,7 @@ export async function useSubmitCase(
 ) {
   const res: notification = await useAssignCase(caseId, user, group);
   const result = { message: res.message, status: res.status };
-  useUpdateGroup(group)
+  // useUpdateGroup(group)
   return result;
 }
 
@@ -394,7 +395,7 @@ export async function useEscalateCase(
     let owner = (await useGetUsernameFromId(user)).toUpperCase();
     result.message = `Case has been escalated. ${owner} should receive a notification shortly.`;
     result.status = "success";
-    useUpdateGroup(group)
+    // useUpdateGroup(group)
   } catch (e) {
     console.log(e)
     result.message = "Failed to escalate.";
@@ -750,22 +751,22 @@ export async function useGetGroupStats(group: string, description?: string) {
   }
 }
 
-export async function useUpdateGroup(group: string) {
-  const pb = useNuxtApp().$pb
-  pb.autoCancellation(false);
-  const res: notification = { message: '', status: 'failed' }
-  let timestamp = Date.now();
-  let currentTime = new Date(timestamp).toISOString();
-  try {
-    await pb.collection('groups').update(group, { updated: currentTime })
-    res.message = 'Group timestamp updated'
-    res.status = 'success'
-  } catch (e: any) {
-    res.message = e.message
-    console.log(e)
-  }
-  return res
-}
+// export async function useUpdateGroup(group: string) {
+//   const pb = useNuxtApp().$pb
+//   pb.autoCancellation(false);
+//   const res: notification = { message: '', status: 'failed' }
+//   let timestamp = Date.now();
+//   let currentTime = new Date(timestamp).toISOString();
+//   try {
+//     await pb.collection('groups').update(group, { updated: currentTime })
+//     res.message = 'Group timestamp updated'
+//     res.status = 'success'
+//   } catch (e: any) {
+//     res.message = e.message
+//     console.log(e)
+//   }
+//   return res
+// }
 
 //**Force-update the counters for all users in a group
 /**
