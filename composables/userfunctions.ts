@@ -1,4 +1,5 @@
-import { ListResult } from "pocketbase";
+import { useDataUpdated } from './states';
+import type { ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice } from "custom-types";
 import type { expandedUsers,user } from "pocketbase-types";
 // const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
@@ -71,7 +72,7 @@ export async function useUpdateUser(id: string, userData: {
 export async function useGetUsers(group?: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    let users: ListResult;
+    let users: ListResult<user>;
     if (group === null) {
         users = await pb.collection("users").getList();
     } else
@@ -125,7 +126,7 @@ export async function useChangeUserStatus(id: string, newStatus: statuschoice, n
 export async function useGetAllUsers() {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    let users: ListResult;
+    let users: ListResult<user>;
     users = await pb.collection("users").getList(1, 1000, { expand: 'memberOf', sort: 'fullname' })
     return users
 }
@@ -191,25 +192,6 @@ async function savedDifference(user: string, group: string) {
 }
 
 
-async function restoreDifference(user: string, group: string, sortedUsers: expandedUsers) {
-    const pb = useNuxtApp().$pb
-    pb.autoCancellation(false);
-    const users = sortedUsers.items.length
-    const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${user}"&&group="${group}"`);
-    let toAdd: number
-    if (users === 2) {
-        if (userLeaveRecord.position === 0) {
-            toAdd = sortedUsers.items[1].count + userLeaveRecord.difference
-        } else {
-            toAdd = sortedUsers.items[0].count + userLeaveRecord.difference
-        }
-    } else {
-        const lowest = sortedUsers.items[0].count
-        toAdd = userLeaveRecord.difference + lowest
-    }
-    return toAdd
-}
-
 async function storeUserCount(user: string, group: string, position: number, difference: number) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
@@ -273,6 +255,9 @@ async function cleanUpCounter(group: string) {
     }
 }
 
+/** Takes a groupId and retrieve the users in that group, then it creates the usersequence or retrieves the existing entry
+ * @returns an array of users
+ */
 export async function getOrderedUsers(groupId: string) {
     const pb = useNuxtApp().$pb;
     let groupUsers = await pb.collection("users").getList(1, 100, { filter: `memberOf~"${groupId}"` }).then((res) => res.items)
@@ -299,10 +284,50 @@ export async function getOrderedUsers(groupId: string) {
     return usersData
 }
 
+/** Takes a list of users with data and returns an array of userIds*/
 export function getOrderedUserIds(users:user[]){
     let userIds:string[]=[];
     for(let user of users){
         userIds.push(user.id);
     }
     return userIds;
+}
+
+/** Takes a list of users and a userId and moves the user to the bottom of the list
+ * @returns an array of users with the user moved to the bottom of the list.
+ */
+export async function useMoveUserToBottom(users:string[],userIdToMove:string){
+      // Find the index of the string
+  const index = users.indexOf(userIdToMove);
+  // If the item is in the array, move it to the end
+  if (index > -1) {
+    users.push(users.splice(index, 1)[0]);
+  }
+  return users;
+}
+
+/** Updates the usersequence for the group
+ * @returns the updated sequence record
+ */
+export async function useUpdateUserSequence(groupId: string, newSequence: string[]) {
+    const pb = useNuxtApp().$pb;
+    const record = await useGetUserSequence(groupId);
+    const res = await pb.collection("usersequence").update(record.id, { user_order: newSequence });
+    return res;
+}
+
+/** Retrieves the user sequence record using the groupId */
+export async function useGetUserSequence(groupId:string){
+    const pb = useNuxtApp().$pb;
+    const res = await pb.collection("usersequence").getFirstListItem(`group="${groupId}"`);
+    return res;
+}
+
+/** Moves a userid to the start of the array
+ * @returns the updated sequence record
+ */
+export async function useMoveUserToTop(oldSequence:string[],userIdToMove:string) {
+    const newSequence = oldSequence.filter((id) => id !== userIdToMove);
+    newSequence.unshift(userIdToMove);
+    return newSequence;
 }

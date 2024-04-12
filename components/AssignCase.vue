@@ -30,10 +30,10 @@
 
 <script setup lang="ts">
 import type { LogData } from 'custom-types';
-import { Record } from 'pocketbase';
+import type { user } from 'pocketbase-types';
 const pb = useNuxtApp().$pb
 const props = defineProps<{
-    user: Record,
+    user: user,
     group: string
 }>()
 
@@ -54,8 +54,9 @@ const caseId = ref('')
 const message = ref('')
 const currentUser = useCurrentUser()
 
-async function submitCase(caseId: string, userId: string, group: string) {
-    const res = await useSubmitCase(caseId, userId, group);
+async function submitCase(caseId: string, userId: string, groupId: string) {
+    const res = await useSubmitCase(caseId, userId, groupId);
+    
     const currentTime = useFormatDate(new Date(Date.now()));
     miniToast(res.status, res.message);
     useDataUpdated().value++;
@@ -79,7 +80,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
 /** Escalates the case: renames the old case to [case]-escalated */
 
 watch(caseId, async (caseId) => {
-    caseExists.value = await useCaseExists(caseId);
+    caseExists.value = await useCaseExists(caseId.trim());
     disableEscalate.value = false
     message.value = 'Assign case to proceed.'
     if(caseIsBlank.value) {

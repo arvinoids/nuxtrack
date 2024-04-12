@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import type { group, user, userSequence } from "pocketbase-types";
+import type { RecordModel } from "pocketbase";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -43,16 +44,27 @@ const loading = ref(true);
 let groups: group[];
 let users: user[];
 let userSequence: userSequence[];
+let cases: RecordModel[];
 
 onMounted(async () => {
-  groups = await pb.collection("groups").getFullList({ sort: "+order" });
+  // before loading users, update case counts
+  cases = await pb.collection("cases").getFullList({ fields: "user" });
+  for (let user of users) {
+    await useUpdateUserCaseCount(user.id);
+  }
   users = await pb.collection("users").getFullList({ sort: "+username" });
+  groups = await pb.collection("groups").getFullList({ sort: "+order" });
   userSequence = await pb.collection("usersequence").getFullList();
   loading.value = false;
 });
 
 function getGroupUserSequence(groupId: string) {
   return userSequence.find((item) => item.group === groupId);
+}
+
+function getCaseCount(userId: string, allCases: RecordModel[]) {
+  const userCases = allCases.filter((item) => item.user === userId);
+  return userCases.length;
 }
 
 function getGroupUsers(groupId: string) {

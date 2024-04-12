@@ -25,7 +25,14 @@
           <nuxt-link
             :to="`/${group.name}/${user.username}`"
             class="tooltip tooltip-top"
-            :data-tip="user.username.toUpperCase() + ' is ' + user.status + ' - '"
+            :data-tip="
+              user.username.toUpperCase() +
+              ' is ' +
+              user.status +
+              ' - ' +
+              user.cases +
+              'cases'
+            "
           >
             <Icon
               name="ic:sharp-circle"

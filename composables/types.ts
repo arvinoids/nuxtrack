@@ -14,6 +14,7 @@ declare module 'pocketbase-types' {
         "verified": boolean,
         "status": string,
         "statusmessage": string,
+        "cases": number
     }
 
     type group = {
