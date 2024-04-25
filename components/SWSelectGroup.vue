@@ -110,7 +110,7 @@ const invalidFormat = computed(() => {
 });
 
 const caseIsBlank = computed(() => {
-  return caseId.value === "";
+  return caseId.value.trim() === "";
 });
 
 const hideSubmit = ref(true);
@@ -123,7 +123,7 @@ watch([caseId, forced], async () => {
   } else if (invalidFormat.value) {
     message.value = "Incorrect case ID format. Please recheck.";
     hideSubmit.value = true;
-  } else if (await useCaseExists(caseId.value)) {
+  } else if (await useCaseExists(caseId.value.trim())) {
     message.value = "This case is already assigned. Please use search.";
     hideSubmit.value = true;
   } else if (firstUser.value.status !== "Available" && !forced.value) {

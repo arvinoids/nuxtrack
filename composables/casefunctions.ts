@@ -73,7 +73,7 @@ export async function useAssignCase(
     let owner = (await useGetUsernameFromId(user)).toUpperCase();
     
     // move user to bottom
-    const currentSequence = await useGetUserSequence(group)
+    const currentSequence = await useGetUserSequenceData(group)
     const newOrder = await useMoveUserToBottom(currentSequence.user_order,user)
     await useUpdateUserSequence(group,newOrder)
 

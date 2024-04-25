@@ -1,5 +1,4 @@
-import { useDataUpdated } from './states';
-import type { ListResult } from "pocketbase";
+import type { ListResult,RecordModel } from "pocketbase";
 import type { userEntry, userStatus, statuschoice } from "custom-types";
 import type { expandedUsers,user } from "pocketbase-types";
 // const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
@@ -69,7 +68,7 @@ export async function useUpdateUser(id: string, userData: {
     return result;
 }
 
-export async function useGetUsers(group?: string) {
+export async function useGetUsersOfGroup(group?: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     let users: ListResult<user>;
@@ -311,16 +310,16 @@ export async function useMoveUserToBottom(users:string[],userIdToMove:string){
  */
 export async function useUpdateUserSequence(groupId: string, newSequence: string[]) {
     const pb = useNuxtApp().$pb;
-    const record = await useGetUserSequence(groupId);
+    const record = await useGetUserSequenceData(groupId);
     const res = await pb.collection("usersequence").update(record.id, { user_order: newSequence });
     return res;
 }
 
 /** Retrieves the user sequence record using the groupId */
-export async function useGetUserSequence(groupId:string){
+export async function useGetUserSequenceData(groupId:string){
     const pb = useNuxtApp().$pb;
     const res = await pb.collection("usersequence").getFirstListItem(`group="${groupId}"`);
-    return res;
+    return res as sequence;
 }
 
 /** Moves a userid to the start of the array
@@ -331,3 +330,5 @@ export async function useMoveUserToTop(oldSequence:string[],userIdToMove:string)
     newSequence.unshift(userIdToMove);
     return newSequence;
 }
+
+type sequence = RecordModel&{ group:string, user_order:string[]}

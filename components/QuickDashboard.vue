@@ -15,7 +15,7 @@
       <div ref="dashboard" class="flex flex-row flex-wrap justify-center">
         <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
           <transition>
-            <GroupCard
+            <SWGroupCard
               :group="group"
               :users="getGroupUsers(group.id)"
               :usersequence="getGroupUserSequence(group.id)"
@@ -44,7 +44,6 @@ const loading = ref(true);
 let groups: group[];
 let users: user[];
 let userSequence: userSequence[];
-let cases: RecordModel[];
 
 onMounted(async () => {
   // before loading users, update case counts
@@ -56,11 +55,6 @@ onMounted(async () => {
 
 function getGroupUserSequence(groupId: string) {
   return userSequence.find((item) => item.group === groupId);
-}
-
-function getCaseCount(userId: string, allCases: RecordModel[]) {
-  const userCases = allCases.filter((item) => item.user === userId);
-  return userCases.length;
 }
 
 function getGroupUsers(groupId: string) {

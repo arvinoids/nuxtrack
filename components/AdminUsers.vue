@@ -28,9 +28,11 @@
             <td>{{ user.fullname }}</td>
             <td>{{ user.username }}</td>
             <td>
-              <span v-for="group in user.expand.memberOf">
-                <p>{{ group.description }}</p>
-              </span>
+              <div v-if="user.expand">
+                <span v-for="group in user.expand.memberOf">
+                  <p>{{ group.description }}</p></span
+                >
+              </div>
             </td>
 
             <td>
@@ -69,6 +71,7 @@ let users = ref();
 
 onMounted(async () => {
   users.value = await getUsers();
+  console.log("users: ", users.value);
   loading.value = false;
 });
 
