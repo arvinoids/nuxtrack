@@ -71,11 +71,6 @@ const firstUser = computed(() => {
   return props.users[0];
 });
 
-watch(userlist, () => {
-  console.log(userlist.value);
-  console.log(firstUser.value.username);
-});
-
 const emit = defineEmits(["shift", "reset", "update"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref("");

@@ -197,7 +197,6 @@ async function refreshCard() {
   const currentUsersData = await useGetUsersOfGroup(props.group.id).then(
     (res) => res.items
   );
-  console.log("current users data:", currentUsersData);
 
   // check sequence if all users are not on leave, otherwise remove.
   const newActiveUsers = currentUsersData
