@@ -32,6 +32,7 @@ const caseId = props.caseId;
 const update = useDataUpdated();
 async function deleteCase(id: string) {
   const res = await useDeleteCase(id);
+  await useRevertLastAssigned(props.caseOwner);
   update.value++;
   miniToast(res.status, res.message + " has been deleted.");
   const logData: LogData = {

@@ -9,7 +9,7 @@
       <p class="py-4">
         <input
           type="text"
-          placeholder="CAS-XXXXXXXXXXX"
+          placeholder="CAS-XXXXXXX-XXXXXX"
           class="input input-bordered my-2 w-[300px]"
           v-model="caseId"
         />
@@ -34,13 +34,6 @@
 
       <div class="modal-action justify-center">
         <a
-          v-if="cursor !== 0"
-          class="btn btn-outline btn-warning"
-          @click="previousUser(userlist)"
-          >Previous</a
-        >
-        <a class="btn btn-outline btn-secondary" @click="nextUser(userlist)">Skip</a>
-        <a
           href="#"
           class="btn btn-primary"
           :class="{
@@ -59,6 +52,7 @@
 import type { user } from "pocketbase-types";
 import type { LogData, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
+import { useUpdateUserLastAssigned } from "~/composables/userfunctions";
 const pb = useNuxtApp().$pb;
 
 const props = defineProps<{
@@ -71,7 +65,7 @@ const firstUser = computed(() => {
   return props.users[0];
 });
 
-const emit = defineEmits(["shift", "reset", "update"]);
+// const emit = defineEmits(["shift", "reset", "update"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref("");
 let cursor = ref(0);
@@ -83,7 +77,6 @@ const groupName: string = await useGetGroupName(props.group);
 function nextUser(users: user[]) {
   let firstUser = users.shift();
   users.push(firstUser!);
-  emit("shift", users);
   cursor.value++;
 }
 
@@ -95,7 +88,6 @@ function previousUser(users: user[]) {
     type: "skipped user",
     details: `${lastUser!.username} was moved to top.`,
   });
-  emit("shift", users);
   cursor.value--;
 }
 
@@ -129,7 +121,6 @@ watch([caseId, forced], async () => {
 });
 
 async function resetSelection() {
-  emit("reset");
   userlist.value = props.users;
   caseId.value = "";
   await pb.collection("logs").create({
@@ -142,12 +133,12 @@ async function resetSelection() {
 async function submitCase(caseId: string, userId: string, group: string) {
   const res: notification = await useSubmitCase(caseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
+  await useUpdateUserLastAssigned(userId);
   miniToast(res.status, res.message);
   // await resetSelection();
   useDataUpdated().value++;
   if (res.status === "success") {
     const user = await pb.collection("users").getOne(userId);
-    emit("update");
     const email = {
       to: user.email,
       subject: "New case assigned to you",
@@ -159,7 +150,8 @@ async function submitCase(caseId: string, userId: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
+    details:
+      `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)).toUpperCase(),
   };
 
   logActivity(logData);

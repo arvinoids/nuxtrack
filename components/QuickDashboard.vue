@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center w-full">
     <div class="self-center mt-3 flex flex-col items-center">
       <p class="text-lg text-secondary mx-10">
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
@@ -15,15 +15,15 @@
       <div ref="dashboard" class="flex flex-row flex-wrap justify-center">
         <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
           <transition>
-            <SWGroupCard
+            <SWNewGroupCard
               :group="group"
               :users="getGroupUsers(group.id)"
-              :usersequence="getGroupUserSequence(group.id)"
               class="flex-grow"
             />
           </transition>
         </div>
       </div>
+      <TechTalkHosting />
     </div>
     <div v-else class="h-[120px] flex flex-col justify-center p-5 items-center gap-2">
       <div>Data loading, please wait...</div>
@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import type { group, user, userSequence } from "pocketbase-types";
 import type { RecordModel } from "pocketbase";
+import SWNewGroupCard from "./SWNewGroupCard.vue";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -47,15 +48,11 @@ let userSequence: userSequence[];
 
 onMounted(async () => {
   // before loading users, update case counts
-  users = await pb.collection("users").getFullList({ sort: "+username" });
+  users = await pb.collection("users").getFullList({ sort: "+last_assigned,+username" });
   groups = await pb.collection("groups").getFullList({ sort: "+order" });
   userSequence = await pb.collection("usersequence").getFullList();
   loading.value = false;
 });
-
-function getGroupUserSequence(groupId: string) {
-  return userSequence.find((item) => item.group === groupId);
-}
 
 function getGroupUsers(groupId: string) {
   return users.filter((user) => user.memberOf.includes(groupId));

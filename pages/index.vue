@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col overflow-hidden" v-if="authenticated">
-    <div class="self-center">
+  <div class="flex flex-col overflow-hidden w-full" v-if="authenticated">
+    <div class="self-center w-full">
       <QuickDashboard />
     </div>
   </div>

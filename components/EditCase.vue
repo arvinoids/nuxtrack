@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import type { LogData } from "custom-types";
+import { useRevertLastAssigned } from "~/composables/userfunctions";
 const loggedInUser = useLoggedInUsername();
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -85,6 +86,7 @@ const message = ref("");
 const updated = useDataUpdated();
 
 async function doUpdate() {
+  await useRevertLastAssigned(props.owner);
   const res = await useUpdateCase(
     props.id,
     newUser.value,
@@ -92,6 +94,7 @@ async function doUpdate() {
     newCase,
     pb.authStore.model!.username
   );
+  await useUpdateUserLastAssigned(newUser.value);
   updated.value++;
   useShowToast(res.message, res.status);
   const logData: LogData = {

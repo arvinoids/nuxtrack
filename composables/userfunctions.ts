@@ -77,7 +77,7 @@ export async function useGetUsersOfGroup(group?: string) {
     } else
         users = await pb
             .collection("users")
-            .getList(1, 1000, { filter: `memberOf~"${group}"` });
+            .getList(1, 1000, { filter: `memberOf~"${group}"`, sort:'+last_assigned,+username' });
     return users;
 }
 
@@ -330,5 +330,21 @@ export async function useMoveUserToTop(oldSequence:string[],userIdToMove:string)
     newSequence.unshift(userIdToMove);
     return newSequence;
 }
+export async function useUpdateUserLastAssigned(userId:string) {
+    const pb = useNuxtApp().$pb;
+    const userData = await pb.collection('users').getOne(userId,{fields:'last_assigned'})
+    const res = await pb.collection("users").update(userId, { last_assigned: new Date(), last_assigned_previous:userData.last_assigned });
+    return res;
+}
+
+export async function useRevertLastAssigned(userId:string){
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
+    const user = await pb.collection("users").getOne(userId);
+    await pb.collection('users').update(userId, {
+      last_assigned:user.last_assigned_previous,last_assigned_previous:null
+    })
+  }
+  
 
 type sequence = RecordModel&{ group:string, user_order:string[]}

@@ -71,7 +71,6 @@ let users = ref();
 
 onMounted(async () => {
   users.value = await getUsers();
-  console.log("users: ", users.value);
   loading.value = false;
 });
 
