@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col text-center m-1 w-[250px] shadow-lg border bg-base-100">
+  <div class="flex flex-col text-center m-1 w-[250px] shadow border bg-base-100">
     <div class="bg-secondary">
       <div class="flex items-center justify-between">
         <h2
@@ -21,11 +21,13 @@
         </div>
       </div>
     </div>
-    <div v-if="loading" class="m-10"><Spinner /></div>
+    <div v-if="loading" class="m-10 relative" :style="`height:${userBoxHeight}`">
+      <Spinner />
+    </div>
 
-    <div v-else class="">
+    <div v-else>
       <div v-if="activeUsers.length > 0">
-        <div :key="listUpdated" class="flex flex-col items-center">
+        <div :key="listUpdated" class="flex flex-col items-center" ref="userBox">
           <div v-for="user in activeUsers" :key="user.id" class="hovered-user">
             <nuxt-link
               :to="`/${group.name}/${user.username}`"
@@ -43,7 +45,7 @@
                 name="ic:sharp-circle"
                 :class="`text-${getColor(user.status)}`"
                 class="mx-1"
-                size="0.5rem"
+                size="0.7rem"
               />
               <span class="hover:text-accent">
                 {{ user.fullname }}
@@ -59,7 +61,7 @@
         <p>No users are currently active.</p>
       </div>
       <div v-if="usersOnLeave.length > 0" :key="listUpdated">
-        <div class="font-bold mt-4">Users on Leave</div>
+        <div class="font-bold mt-3">Users on Leave</div>
         <div v-for="user in usersOnLeave" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.username}`"
@@ -77,7 +79,7 @@
               name="ic:sharp-circle"
               :class="`text-${getColor(user.status)}`"
               class="mx-1"
-              size="0.5rem"
+              size=".7rem"
             />
             <span class="hover:text-accent">
               {{ user.fullname }}
@@ -94,9 +96,14 @@
       :key="listUpdated"
       v-if="activeUsers.length > 0"
     >
-      <div class="flex justify-center mt-auto gap-2">
+      <div class="flex justify-center mt-auto gap-1">
         <a :href="anchor"
-          ><button v-if="true" class="btn w-24 self-center mb-3">Select</button></a
+          ><button
+            v-if="true"
+            class="btn btn-secondary btn-outline w-24 self-center mb-3"
+          >
+            Select
+          </button></a
         >
       </div>
       <SWSelectGroup :group="group.id" :users="activeUsers" />
@@ -118,6 +125,8 @@ pb.autoCancellation(false);
 // const dataUpdated = ref(0);
 const anchor: string = "#" + props.group.id + "select";
 const listUpdated = ref(0);
+const userBox: Ref<HTMLElement | null> = ref(null);
+const userBoxHeight: Ref<number | null> = ref(null);
 
 // reactive variables
 const loading = ref(true);
@@ -159,10 +168,14 @@ pb.collection("users").subscribe("*", async () => {
   await refreshCard();
   listUpdated.value++;
 });
+
+watch(userBox, () => {
+  if (userBox.value) userBoxHeight.value = userBox.value.clientHeight;
+});
 </script>
 
 <style scoped lang="postcss">
 .hovered-user {
-  @apply my-[0.1rem] hover:border-primary hover:bg-secondary hover:bg-opacity-10 border border-transparent w-fit px-3 py-1 rounded-lg duration-300 ease-in-out;
+  @apply my-[0.05rem] hover:border-primary hover:bg-secondary hover:bg-opacity-10 border border-transparent w-fit px-3 rounded-lg duration-300 ease-in-out;
 }
 </style>

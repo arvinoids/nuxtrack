@@ -68,28 +68,10 @@ const firstUser = computed(() => {
 // const emit = defineEmits(["shift", "reset", "update"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref("");
-let cursor = ref(0);
 const message = ref("");
 const forced = ref(false);
 const currentUser = pb.authStore.model!.fullname;
 const groupName: string = await useGetGroupName(props.group);
-
-function nextUser(users: user[]) {
-  let firstUser = users.shift();
-  users.push(firstUser!);
-  cursor.value++;
-}
-
-function previousUser(users: user[]) {
-  let lastUser = users.pop();
-  users.unshift(lastUser!);
-  logActivity({
-    user: loggedInUser.value,
-    type: "skipped user",
-    details: `${lastUser!.username} was moved to top.`,
-  });
-  cursor.value--;
-}
 
 const invalidFormat = computed(() => {
   const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;

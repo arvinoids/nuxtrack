@@ -33,7 +33,7 @@
           <label
             for="assignToSelf"
             class="btn btn-primary"
-            :class="{ hidden: caseExists || caseId === '' }"
+            :class="{ hidden: hideSubmit }"
             @click="submitCase(caseId, user.id, selectedGroupId)"
             >Assign</label
           >
@@ -45,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import type { RecordModel } from "pocketbase";
 import type { LogData } from "custom-types";
 const pb = useNuxtApp().$pb;
 const caseId = ref("");
@@ -55,15 +54,19 @@ const currentUser = pb.authStore.model!;
 const user = await pb.collection("users").getOne(currentUser.id, { expand: "memberOf" });
 const groups = user.expand!.memberOf;
 const selectedGroupId = ref(groups[0].id);
-const caseExists = ref(false);
-const caseIsEscalated = ref(false);
 const caseIsBlank = ref(false);
 const disableEscalate = ref(false);
+const hideSubmit = ref(true);
+const invalidFormat = computed(() => {
+  const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
+  return !pattern.test(caseId.value.trim());
+});
 
 async function submitCase(caseId: string, userId: string, group: string) {
   const groupName = await useGetGroupName(group);
   const res = await useSubmitCase(caseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
+  await useUpdateUserLastAssigned(userId);
   miniToast(res.status, res.message);
   useDataUpdated().value++;
   if (res.status === "success") {
@@ -89,16 +92,18 @@ async function submitCase(caseId: string, userId: string, group: string) {
 }
 
 watch(caseId, async (caseId) => {
-  caseExists.value = await useCaseExists(caseId.trim());
-  caseIsEscalated.value = await useCaseIsEscalated(caseId.trim());
-  if (caseId.trim().includes("escalated")) {
-    message.value = "Remove -escalated operator.";
+  message.value = "";
+  if (caseIsBlank.value) {
+    message.value = "Please enter a case ID.";
+    hideSubmit.value = true;
+  } else if (invalidFormat.value) {
+    message.value = "Incorrect case ID format. Please recheck.";
+    hideSubmit.value = true;
+  } else if (await useCaseExists(caseId.trim())) {
+    message.value = "This case is already assigned. Please use search.";
+    hideSubmit.value = true;
   } else {
-    message.value = errorMessage(caseExists.value, caseIsEscalated.value, caseId);
-  }
-  if (caseId.trim() === "") {
-    message.value = "Please enter a value.";
-    caseIsBlank.value = true;
+    hideSubmit.value = false;
   }
 });
 

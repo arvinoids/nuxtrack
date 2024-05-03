@@ -56,7 +56,7 @@
         <p>No users are currently active.</p>
       </div>
       <div v-if="usersOnLeave.length > 0" :key="listUpdated">
-        <div class="font-bold mt-4">Users on Leave</div>
+        <div class="font-bold mt-3">Users on Leave</div>
         <div v-for="user in usersOnLeave" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.username}`"
@@ -84,7 +84,7 @@
       </div>
     </div>
     <div
-      class="flex flex-col flex-grow mt-3"
+      class="flex flex-col flex-grow mt-2"
       :key="listUpdated"
       v-if="activeUsers.length > 0"
     >

@@ -9,6 +9,9 @@ module.exports = {
     "./nuxt.config.{js,ts}",
     "./app.vue",
   ],
+  safelist: [
+    'border-red-400',
+  ],
   theme: {
     extend: {},
   },
@@ -21,6 +24,7 @@ module.exports = {
         "accent": "#1C64B4",
         "neutral": "#c9c9d1",
         "base-100": "#ffffff",
+        "lex-gray-100": "#eff0f6",
         "base-200": "#CACACA",
         "base-300": "#8a8a8a",
         "info": "#006446",
@@ -37,6 +41,7 @@ module.exports = {
         "accent": "#a7f3d0",
         "neutral": "#1B1D1D",    
         "base-100": "#212121",
+        "base-150": "#eff0f6",
         "info": "#2563EB",
         "success": "#16A34A",
         "warning": "#D97706",
@@ -47,5 +52,5 @@ module.exports = {
         },
     }, ],
     darkTheme: "darkLex"
-  }
+  },
 }

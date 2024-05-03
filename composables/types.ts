@@ -107,7 +107,7 @@ declare module 'custom-types' {
     }
     type LogData = {
         user: string,
-        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out"|"directly assigned",
+        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out"|"directly assigned"|"clicked next host",
         details?: string
     }
 
@@ -140,5 +140,12 @@ declare module 'custom-types' {
     type notification = {
         status:'success'|'failed'|'warning',
         message:string,
+    }
+
+    type watcher = {
+        zoneId:'ap'|'emea'|'na'|'oem'
+        name:string,
+        start:string,
+        end:string
     }
 }
