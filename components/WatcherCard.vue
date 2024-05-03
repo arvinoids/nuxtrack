@@ -3,9 +3,9 @@
     <h1
       class="px-3 py-2 text-lg bg-neutral bg-opacity-30 w-full border-b-2 border-primary"
     >
-      Shift Watch
+      {{ title }}
     </h1>
-    <div class="p-5 flex justify-center lg:flex-row flex-col gap-3">
+    <div class="px-5 py-3 flex justify-center lg:flex-row flex-col gap-3">
       <div v-for="zone in timezones">
         <WatcherTimeZone
           :geo="zone.zone"
@@ -20,6 +20,11 @@
 <script setup lang="ts">
 import type { watcher } from "custom-types";
 const pb = useNuxtApp().$pb;
+
+const title = await pb
+  .collection("settings")
+  .getOne("pc78lgg2n2bido0")
+  .then((res) => res.value);
 
 const watchersrec = await pb.collection("settings").getOne("wzqow6lg9fwd0yq");
 const watchers = JSON.parse(watchersrec.value);

@@ -3,7 +3,7 @@
     <div
       class="px-3 py-2 text-lg bg-neutral bg-opacity-30 w-full border-b-2 border-primary"
     >
-      Weekly Tech Talk Hosting Rotation
+      {{ title }}
     </div>
     <div class="flex items-center py-2 px-2">
       <div v-for="(user, index) in hosts" :key="index">
@@ -31,6 +31,11 @@ const rec = await pb.collection("settings").getOne("r2nh8eqdweest7b");
 const hosts = JSON.parse(rec.value);
 const currentHost: Ref<number> = ref(await getCurrentHostValue()); // this is a zero-index value.
 const loggedInUser = useLoggedInUsername();
+
+const title = await pb
+  .collection("settings")
+  .getOne("tmemz0wt8thg3f0")
+  .then((res) => res.value);
 
 async function nextHost() {
   const current = currentHost.value;
