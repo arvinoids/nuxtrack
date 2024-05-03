@@ -8,8 +8,8 @@
     <div class="flex items-center py-2 px-2">
       <div v-for="(user, index) in hosts" :key="index">
         <div
-          class="mx-2 w-[12ch] text-center bg-warning bg-opacity-40 rounded-md p-3 shadow-md border-2 border-transparent"
-          :class="{ 'border-primary': isCurrentHost(index) }"
+          class="mx-2 w-[12ch] text-center bg-warning bg-opacity-40 rounded-md p-3 shadow-md border-4 border-transparent"
+          :class="{ selected: isCurrentHost(index) }"
         >
           {{ user.toUpperCase() }}
         </div>
@@ -58,7 +58,12 @@ function isCurrentHost(index: number) {
 
 onMounted(async () => {
   currentHost.value = await getCurrentHostValue();
+  console.log(currentHost.value);
 });
 </script>
 
-<style></style>
+<style>
+.selected {
+  @apply border-primary font-semibold;
+}
+</style>
