@@ -10,7 +10,7 @@ module.exports = {
     "./app.vue",
   ],
   safelist: [
-    'border-red-400',
+    'border-primary',
   ],
   theme: {
     extend: {},
