@@ -6,8 +6,8 @@
       </h5>
       <div class="flex flex-row">
         <div class="container w-auto p-5 m-2 border shadow-md h-min bg-base-100">
-          <h5 class="text-lg mb-2">Rotation</h5>
-          <Users :group="group.id" :users="users" />
+          <h5 class="text-lg mb-2 font-bold">Rotation</h5>
+          <GroupUsersList :users="users" :group="group" />
         </div>
         <div class="mx-5 w-min" :key="reloadTable">
           <PaginatedCases :group="group.id" />
@@ -18,17 +18,19 @@
 </template>
 
 <script setup lang="ts">
-import { getOrderedUsers } from "~/composables/userfunctions";
+import type { group, user } from "pocketbase-types";
 const pb = useNuxtApp().$pb;
 const route = useRoute();
+const userStore = useUserStore();
 
 const reloadTable = ref(0);
 
-const group = await pb
+const group: group = await pb
   .collection("groups")
   .getFirstListItem(`name="${route.params.groupname}"`);
 
-const users = await getOrderedUsers(group.id);
+let users: user[] = userStore.value.filter((user) => user.memberOf.includes(group.id));
+if (!users.length) users = (await useGetUsersOfGroup(group.id)).items;
 </script>
 
 <style></style>

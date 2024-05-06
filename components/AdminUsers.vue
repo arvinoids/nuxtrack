@@ -33,6 +33,7 @@
                   <p>{{ group.description }}</p></span
                 >
               </div>
+              <div v-else>None</div>
             </td>
 
             <td>

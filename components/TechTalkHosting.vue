@@ -1,7 +1,7 @@
 <template>
   <div class="border flex flex-col items-center gap-2 shadow w-fit pb-2 mb-1">
     <div
-      class="px-3 py-2 text-lg bg-neutral bg-opacity-30 w-full border-b-2 border-primary"
+      class="px-3 py-2 text-lg font-normal bg-neutral bg-opacity-30 w-full border-b-2 border-primary"
     >
       {{ title }}
     </div>
@@ -63,7 +63,6 @@ function isCurrentHost(index: number) {
 
 onMounted(async () => {
   currentHost.value = await getCurrentHostValue();
-  console.log(currentHost.value);
 });
 </script>
 

@@ -34,12 +34,14 @@
 <script setup lang="ts">
 import type { group, user, userSequence } from "pocketbase-types";
 import SWNewGroupCard from "./SWNewGroupCard.vue";
+import { useUserStore } from "~/composables/states";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
 const currentUser = useCurrentUser();
 const loading = ref(true);
-// const allCounters = useCounters();
+const userStore = useUserStore();
+const groupStore = useGroupStore();
 let groups: group[];
 let users: user[];
 let userSequence: userSequence[];
@@ -47,7 +49,9 @@ let userSequence: userSequence[];
 onMounted(async () => {
   // before loading users, update case counts
   users = await pb.collection("users").getFullList({ sort: "+last_assigned,+username" });
+  userStore.value = users;
   groups = await pb.collection("groups").getFullList({ sort: "+order" });
+  groupStore.value = groups;
   userSequence = await pb.collection("usersequence").getFullList();
   loading.value = false;
 });
@@ -57,6 +61,7 @@ function getGroupUsers(groupId: string) {
 }
 
 pb.collection("users").subscribe("*", async () => {
-  users = await pb.collection("users").getFullList();
+  users = await pb.collection("users").getFullList({ sort: "+last_assigned,+username" });
+  userStore.value = users;
 });
 </script>

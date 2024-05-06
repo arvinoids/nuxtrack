@@ -1,7 +1,7 @@
 <template>
-  <div :key="updateTable" class="flex flex-col gap-3">
+  <div :key="updateTable" class="flex flex-col gap-3 lg:min-w-[105ch]">
     <div
-      class="overflow-x-auto flex flex-col w-[1080px] h-[525px] shadow-md"
+      class="overflow-x-auto flex flex-col w-[1080px] h-[525px] shadow-md border"
       v-if="cases.totalItems !== 0"
     >
       <table class="table table-compact" v-if="!loading">
@@ -47,14 +47,14 @@
       <div class="text-center m-auto" v-else><Spinner /></div>
     </div>
     <div class="flex flex-row gap-10">
-      <select class="select select-bordered w-full max-w-xs" v-model="itemsPerPage">
+      <select class="select w-full max-w-xs shadow-md" v-model="itemsPerPage">
         <option disabled>Items per page</option>
         <option>10</option>
         <option>20</option>
         <option>100</option>
       </select>
 
-      <div class="btn-group">
+      <div class="btn-group shadow-md">
         <button
           class="btn"
           :class="{ 'btn-disabled': currentPage === 1 }"
@@ -143,13 +143,6 @@ async function getPage(page: number) {
   updateTable.value++;
 }
 
-// watch(itemsPerPage, async () => {
-//   getPage(1);
-//   cases = await getCases(1);
-//   updateTable.value++;
-// });
-
-// new watchers
 watch(itemsPerPage, async () => {
   getPage(1);
   currentPage.value = 1;

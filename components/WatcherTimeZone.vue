@@ -1,7 +1,7 @@
 <template>
   <div class="p-7 mx-2 bg-warning bg-opacity-10">
     <div class="flex flex-col items-center mb-2">
-      <div class="font-bold text-accent">{{ geo }}</div>
+      <div class="font-semibold text-accent">{{ geo }}</div>
       <div>{{ range }}</div>
     </div>
 

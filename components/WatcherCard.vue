@@ -1,7 +1,7 @@
 <template>
   <div class="shadow border w-fit mb-1">
     <h1
-      class="px-3 py-2 text-lg bg-neutral bg-opacity-30 w-full border-b-2 border-primary"
+      class="px-3 py-2 text-lg font-normal bg-neutral bg-opacity-30 w-full border-b-2 border-primary"
     >
       {{ title }}
     </h1>

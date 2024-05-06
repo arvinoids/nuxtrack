@@ -13,7 +13,17 @@ module.exports = {
     'border-primary',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontWeight:{
+        thin:'200',
+        hairline: '300',
+        light: '400',
+        normal: '500',
+        medium: '600',
+        semibold: '700',
+        bold: '800',
+      }
+    },
   },
   plugins: [require("daisyui")],
   daisyui: {
@@ -34,6 +44,7 @@ module.exports = {
         "--btn-text-case":"none",
         "--rounded-btn":"none",
         "--rounded-box":"none",
+
       },
       dark: {
         "primary": "#a3e635", 

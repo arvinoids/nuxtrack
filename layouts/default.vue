@@ -9,11 +9,11 @@
   </div>
 </template>
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Cabin&family=Inter:wght@400&family=Poppins:wght@300;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap");
 
 body {
-  font-family: "Inter", sans-serif;
-  background-image: none;
+  font-family: "Urbanist", sans-serif;
+  @apply font-normal;
 }
 
 .page-enter-active,
