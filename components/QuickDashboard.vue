@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center w-full">
-    <div class="self-center mt-3 flex flex-col items-center">
-      <p class="text-lg text-secondary mx-10">
+    <div class="self-center mt-1 flex flex-col items-center">
+      <p class="text-lg text-secondary">
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
         >. To assign a case, please select a group below.
 
@@ -11,16 +11,14 @@
         >
       </p>
     </div>
-    <div v-if="!loading" class="flex flex-col items-center">
-      <div ref="dashboard" class="flex flex-row flex-wrap justify-center">
-        <div v-for="group in groups" :key="group.id" class="m-3 flex items-stretch">
-          <transition>
-            <SWNewGroupCard
-              :group="group"
-              :users="getGroupUsers(group.id)"
-              class="flex-grow"
-            />
-          </transition>
+    <div v-if="!loading" class="flex flex-col items-center gap-3">
+      <div ref="dashboard" class="flex flex-row flex-wrap justify-center gap-3">
+        <div v-for="group in groups" :key="group.id" class="flex">
+          <SWNewGroupCard
+            :group="group"
+            :users="getGroupUsers(group.id)"
+            class="flex-grow"
+          />
         </div>
       </div>
       <TechTalkHosting />
