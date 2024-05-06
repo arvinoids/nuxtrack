@@ -28,9 +28,11 @@
             <td>{{ user.fullname }}</td>
             <td>{{ user.username }}</td>
             <td>
-              <span v-for="group in user.expand.memberOf">
-                <p>{{ group.description }}</p>
-              </span>
+              <span v-if="user.expand">
+                <span v-for="group in user.expand.memberOf">
+                  <p>{{ group.description }}</p>
+                </span> </span
+              ><span v-else>None</span>
             </td>
 
             <td>
@@ -76,7 +78,7 @@ async function getUsers() {
   const res = await pb.collection("users").getFullList(1000, {
     sort: "+fullname",
     expand: "memberOf",
-    fields: "id,fullname, username,expand.memberOf,status",
+    fields: "id,fullname,username,expand.memberOf,status",
   });
   return res;
 }
