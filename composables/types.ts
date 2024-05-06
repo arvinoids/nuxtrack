@@ -11,6 +11,8 @@ declare module 'pocketbase-types' {
         "role": string,
         "updated": Date,
         "username": string,
+        'avatar':'string'
+        'email':string,
         "verified": boolean,
         "status": string,
         "statusmessage": string,
