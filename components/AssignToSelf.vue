@@ -89,7 +89,8 @@ async function submitCase(caseId: string, userId: string, group: string) {
       } on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres = await useSendEmail(email);
-    useShowToast(emailres.message, emailres.status);
+    miniToast(emailres.status, emailres.message);
+    useUpdateGroup(group);
   }
   const logData: LogData = {
     user: currentUser!.username,
@@ -113,7 +114,8 @@ async function escalateCase(caseId: string, id: string, group: string) {
       body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres = await useSendEmail(email);
-    useShowToast(emailres.message, emailres.status);
+    miniToast(emailres.status, emailres.message);
+    useUpdateGroup(group);
   }
   const logData: LogData = {
     user: currentUser!.username,

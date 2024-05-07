@@ -266,7 +266,6 @@ export async function useSubmitCase(
 ) {
   const res: notification = await useAssignCase(caseId, user, group);
   const result = { message: res.message, status: res.status };
-  useUpdateGroup(group)
   return result;
 }
 
@@ -742,13 +741,22 @@ export async function useGetGroupStats(group: string, description?: string) {
     lowestCount
   }
 }
-
+/**Updates the group timestamp to the current time
+ * @param group - the group Id
+ * @returns a promise that resolves when the timestamp has been updated
+ * @description this function updates the timestamp for the group.
+ * It first gets the group entry, then updates the timestamp.
+ * The function returns a promise that resolves when the timestamp has been updated.
+ * @example
+ * useUpdateGroup('group-id').then(() => {
+ *   // timestamp has been updated
+ * }
+ */
 export async function useUpdateGroup(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res: notification = { message: '', status: 'failed' }
-  let timestamp = new Date();
-  let currentTime = new Date(timestamp).toISOString();
+  let currentTime = new Date().toISOString();
   try {
     await pb.collection('groups').update(group, { updated: currentTime })
     res.message = 'Group timestamp updated'

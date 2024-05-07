@@ -84,7 +84,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
   const currentTime = useFormatDate(new Date());
   miniToast(res.status, res.message);
   await resetSelection();
-  useDataUpdated().value++;
   if (res.status === 'success') {
     const user = (await pb.collection('users').getOne(userId))
     const email = {
@@ -94,6 +93,8 @@ async function submitCase(caseId: string, userId: string, group: string) {
     }
     const emailres: result = (await useSendEmail(email)) as result
     miniToast(emailres.status, emailres.message)
+    useUpdateGroup(group)
+    useDataUpdated().value++;
   }
   const logData: LogData = {
     user: loggedInUser.value,
@@ -122,6 +123,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
     }
     const emailres: notification = (await useSendEmail(email)) as notification
     miniToast(emailres.status, emailres.message)
+    useUpdateGroup(group)
   }
   const logData: LogData = {
     user: loggedInUser.value,
