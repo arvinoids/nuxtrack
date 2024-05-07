@@ -120,23 +120,29 @@
 </template>
 
 <script setup lang="ts">
-import { ListResult } from "pocketbase";
+import type { ListResult } from "pocketbase";
+import type { user, group } from "pocketbase-types";
 import type { LogData } from "custom-types";
 
 const casesChanged = useCaseCountChanged();
-const users: ListResult = await useGetAllUsers();
+const users: ListResult<user> = await useGetAllUsers();
 const tickets = ref(1);
 const validUsers = getValidUsers();
-const selectedUser = ref(validUsers[0]);
+type userExpandedMemberOf = user & {
+  expand: {
+    memberOf: group[];
+  };
+};
+const selectedUser: Ref<userExpandedMemberOf> = ref(
+  validUsers[0] as userExpandedMemberOf
+);
 const availableGroups = computed(() => {
   return selectedUser.value.expand.memberOf;
 });
 
 // show only users with elements inside memberOf[]
 function getValidUsers() {
-  const filtered = users.items.filter((item) => {
-    return !(item.memberOf == ![]);
-  });
+  const filtered = users.items.filter((item) => item.memberOf.length > 0);
   return filtered;
 }
 

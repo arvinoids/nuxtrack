@@ -34,7 +34,7 @@
         <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
-            class="tooltip tooltip-top hover:border hover:border-primary mx-1 border-transparent w-full"
+            class="tooltip tooltip-top mx-1 w-full"
             :data-tip="
               user.expand.user.username.toUpperCase() +
               ' is ' +
