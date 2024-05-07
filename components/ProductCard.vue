@@ -143,6 +143,7 @@ function resetSelection() {
 }
 
 async function updatedCase(group: string) {
+  lastUpdated.value = "Updating...";
   let result = { status: "failed", message: "" };
   const logData: LogData = {
     user: useCurrentUser()!.username,
@@ -152,6 +153,7 @@ async function updatedCase(group: string) {
   try {
     const res: notification = await useUpdateGroup(group);
     await logActivity(logData);
+    result.message = "Group timestamp updated";
     miniToast(res.status, result.message);
     updateCard.value++;
   } catch (e: any) {
@@ -164,4 +166,9 @@ async function updateCounter() {
   await useForceUpdateCounters(props.group.id);
   loading.value = false;
 }
+
+pb.collection("groups").subscribe(props.group.id, async () => {
+  const group = await pb.collection("groups").getOne(props.group.id);
+  lastUpdated.value = useFormatDate(new Date(group.updated));
+});
 </script>

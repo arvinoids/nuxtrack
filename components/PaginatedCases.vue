@@ -19,10 +19,21 @@
           <tr
             v-for="item in (cases as unknown as expandedCaseRecordList).items"
             :key="item.id"
-            class="hover"
           >
             <td class="rounded-none">{{ item.expand.user.username }}</td>
-            <td>{{ item.case }}</td>
+            <td>
+              <div class="flex flex-row items-center">
+                <span ref="caseToCopy">{{ item.case }}</span>
+                <button
+                  class="hover:bg-gray-300 mx-1 px-[3px] py-[2px] rounded w-fit group relative"
+                  @click="copyToClipboard(item.case)"
+                >
+                  <Icon name="ic:twotone-content-copy" size="1rem" /><Tooltip
+                    >Copy to clipboard</Tooltip
+                  >
+                </button>
+              </div>
+            </td>
             <td>{{ item.expand.group.description }}</td>
             <td>{{ item.assignedBy }}</td>
             <td>{{ useFormatDate(new Date(item.created)) }}</td>
@@ -131,6 +142,14 @@ function userIsAdmin() {
   if (pb.authStore.model!.role === "lead" || pb.authStore.model!.role === "admin")
     return true;
   else return false;
+}
+
+const caseToCopy: Ref<HTMLSpanElement[]> = ref([]);
+
+function copyToClipboard(caseId: string) {
+  navigator.clipboard
+    .writeText(caseId)
+    .then(() => miniToast("success", "Copied to clipboard"));
 }
 
 watch(updated, async () => {

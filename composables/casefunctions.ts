@@ -747,7 +747,7 @@ export async function useUpdateGroup(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res: notification = { message: '', status: 'failed' }
-  let timestamp = Date.now();
+  let timestamp = new Date();
   let currentTime = new Date(timestamp).toISOString();
   try {
     await pb.collection('groups').update(group, { updated: currentTime })
