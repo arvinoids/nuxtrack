@@ -81,7 +81,7 @@ async function skipCatch(user: user) {
 
 async function submitCase(caseId: string, userId: string, group: string) {
   const res:notification = await useSubmitCase(caseId, userId, group);
-  const currentTime = useFormatDate(new Date(Date.now()));
+  const currentTime = useFormatDate(new Date());
   miniToast(res.status, res.message);
   await resetSelection();
   useDataUpdated().value++;
