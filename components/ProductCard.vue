@@ -34,7 +34,7 @@
         <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
-            class="tooltip tooltip-top"
+            class="tooltip tooltip-top hover:border hover:border-primary mx-1 border-transparent w-full"
             :data-tip="
               user.expand.user.username.toUpperCase() +
               ' is ' +
@@ -51,7 +51,7 @@
               size="0.5rem"
             />
             <span
-              class="hover:font-semibold hover:text-accent"
+              class="hover:text-accent hover:font-semibold"
               :class="id === selectedUser ? 'text-accent font-bold my-3' : 'text-sm'"
             >
               {{ user.expand.user.fullname }}
