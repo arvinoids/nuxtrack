@@ -99,7 +99,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
+    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   // first get the id of the counter for this group and user
   const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}"`)
@@ -128,7 +128,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
+    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}`)
   //then increment counter
