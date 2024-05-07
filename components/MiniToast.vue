@@ -12,7 +12,7 @@
       >
         <span class="px-2">{{ notification.message }}</span>
         <button
-          class="absolute top-2 right-2 text-lex-neutral-3 text-xs"
+          class="absolute top-[5px] right-2 text-lex-neutral-3 text-xs"
           @click="removeToast()"
         >
           ✖

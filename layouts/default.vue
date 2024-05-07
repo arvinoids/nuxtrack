@@ -9,7 +9,7 @@
   </div>
 </template>
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Cabin&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cabin&family=Inter:wght@300;400;500;600;700;900&family=Poppins:wght@400;500;600;700&display=swap");
 
 body {
   font-family: "Inter", sans-serif;
