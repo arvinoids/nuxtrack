@@ -89,12 +89,13 @@ async function submitCase(caseId: string, userId: string, group: string) {
       } on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres = await useSendEmail(email);
-    useShowToast(emailres.message, emailres.status);
+    miniToast(emailres.status, emailres.message);
+    useUpdateGroup(group);
   }
   const logData: LogData = {
     user: currentUser!.username,
     type: "assigned case",
-    details: `${caseId} to ` + (await useGetUsernameFromId(userId)),
+    details: `${caseId} to ` + " self",
   };
   logActivity(logData);
 }
@@ -113,12 +114,13 @@ async function escalateCase(caseId: string, id: string, group: string) {
       body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres = await useSendEmail(email);
-    useShowToast(emailres.message, emailres.status);
+    miniToast(emailres.status, emailres.message);
+    useUpdateGroup(group);
   }
   const logData: LogData = {
     user: currentUser!.username,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(id)),
+    details: `assigned ${caseId} to ` + " self",
   };
   logActivity(logData);
 }

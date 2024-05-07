@@ -84,7 +84,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
   const currentTime = useFormatDate(new Date());
   miniToast(res.status, res.message);
   await resetSelection();
-  useDataUpdated().value++;
   if (res.status === 'success') {
     const user = (await pb.collection('users').getOne(userId))
     const email = {
@@ -94,11 +93,13 @@ async function submitCase(caseId: string, userId: string, group: string) {
     }
     const emailres: result = (await useSendEmail(email)) as result
     miniToast(emailres.status, emailres.message)
+    useUpdateGroup(group)
+    useDataUpdated().value++;
   }
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
+    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   // first get the id of the counter for this group and user
   const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}"`)
@@ -122,11 +123,12 @@ async function escalateCase(caseId: string, userId: string, group: string) {
     }
     const emailres: notification = (await useSendEmail(email)) as notification
     miniToast(emailres.status, emailres.message)
+    useUpdateGroup(group)
   }
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)),
+    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}`)
   //then increment counter
