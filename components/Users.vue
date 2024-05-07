@@ -9,11 +9,12 @@
 </template>
 
 <script setup lang="ts">
-import { ListResult } from "pocketbase";
+import type { ListResult } from "pocketbase";
+import type { user } from "pocketbase-types";
 
 const props = defineProps<{
   group: string;
-  users: ListResult;
+  users: ListResult<user>;
 }>();
 
 const groupName = await useGetGroupName(props.group);

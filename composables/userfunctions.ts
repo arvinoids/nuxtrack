@@ -1,6 +1,6 @@
-import  { ListResult } from "pocketbase";
+import  type { ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice } from "custom-types";
-import type { expandedUsers } from "pocketbase-types";
+import type {user, expandedUsers } from "pocketbase-types";
 // const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
 //pb.autoCancellation(false);
 
@@ -71,7 +71,7 @@ export async function useUpdateUser(id: string, userData: {
 export async function useGetUsers(group?: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    let users: ListResult;
+    let users: ListResult<user>;
     if (group === null) {
         users = await pb.collection("users").getList();
     } else
@@ -125,7 +125,7 @@ export async function useChangeUserStatus(id: string, newStatus: statuschoice, n
 export async function useGetAllUsers() {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    let users: ListResult;
+    let users: ListResult<user>;
     users = await pb.collection("users").getList(1, 1000, { expand: 'memberOf', sort: 'fullname' })
     return users
 }

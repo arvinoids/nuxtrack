@@ -1,6 +1,6 @@
 <template>
   <span>
-    <label for="assignToSelf" class="cursor-pointer hover:font-bold text-accent"
+    <label for="assignToSelf" class="cursor-pointer hover:font-semibold text-accent"
       ><slot
     /></label>
     <input type="checkbox" id="assignToSelf" class="modal-toggle" />

@@ -1,5 +1,5 @@
 import type { notification } from "custom-types";
-import { ListResult, Record } from "pocketbase";
+import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
@@ -325,7 +325,7 @@ export async function useSearchCase(id: string) {
   pb.autoCancellation(false);
   id = id.trim();
   let result = { message: "", status: "failed" };
-  let data: Record | undefined;
+  let data: RecordModel | undefined;
   try {
     data = await pb
       .collection("cases")
@@ -403,7 +403,7 @@ async function getCase(id: string) {
   return rec;
 }
 
-async function renameOldCase(rec: Record) {
+async function renameOldCase(rec: RecordModel) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   let newCaseId = rec.case + "-escalated";
@@ -508,7 +508,7 @@ export async function useRemoveUserFromGroups(id: string) {
 
 
 
-export async function useMakeCounter(group: string, users: ListResult) {
+export async function useMakeCounter(group: string, users: ListResult<user>) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
 
@@ -572,7 +572,7 @@ export async function useNewMakeCounter(group: string, users: user[]) {
   });
 }
 
-export async function useUpdateCounter(group: string, users: ListResult) {
+export async function useUpdateCounter(group: string, users: ListResult<user>) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   users.items.forEach(async (user) => {
@@ -635,7 +635,7 @@ export async function useFindCase(id: string) {
     message: "",
     status: "",
   };
-  let data: Record | null;
+  let data: RecordModel | null;
 
   try {
     data = await pb
