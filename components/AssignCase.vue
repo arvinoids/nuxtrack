@@ -34,7 +34,6 @@
 <script setup lang="ts">
 import type { LogData } from 'custom-types';
 import type { user } from 'pocketbase-types';
-import { useIncrementCount } from '~/composables/userfunctions';
 const pb = useNuxtApp().$pb
 const props = defineProps<{
     user: user,
@@ -64,8 +63,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
         }
         const emailres = (await useSendEmail(email))
         miniToast(emailres.status, emailres.message)
-        await useUpdateGroup(group)
-        await useIncrementCount(userId, group)
 
         useDataUpdated().value++;
     }
@@ -91,9 +88,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
         }
         const emailres = (await useSendEmail(email))
         miniToast(emailres.status, emailres.message)
-        await useUpdateGroup(group)
-        await useIncrementCount(userId, group)
-        
+
         useDataUpdated().value++;
     }
     const logData: LogData = {

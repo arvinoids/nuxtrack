@@ -264,9 +264,13 @@ export async function useSubmitCase(
   userId: string,
   groupId: string
 ) {
-  const res: notification = await useAssignCase(caseId, userId, groupId);
-  const result = { message: res.message, status: res.status };
-  return result;
+  let res: notification  = { status:'failed',message:'Error submitting case'}
+  res = await useAssignCase(caseId, userId, groupId);
+  if (res.status === "success") {
+    await useIncrementCount(userId, groupId);
+    await useUpdateGroup(groupId);
+  }
+  return res;
 }
 
 export async function useSubmitCaseProcess(caseId:string,userId:string,groupId:string){
@@ -374,8 +378,8 @@ export async function useCaseIsEscalated(id: string) {
 
 export async function useEscalateCase(
   caseId: string,
-  user: string,
-  group: string
+  userId: string,
+  groupId: string
 ) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
@@ -383,8 +387,8 @@ export async function useEscalateCase(
   await renameOldCase(caseRec);
 
   const data = {
-    user: user,
-    group: group,
+    user: userId,
+    group: groupId,
     case: caseId.trim(),
     assignedBy: pb.authStore.model!.username,
   };
@@ -392,12 +396,13 @@ export async function useEscalateCase(
   const result: notification = { message: "", status: "failed" };
   try {
     await pb.collection("cases").create(data);
-    await updateCounter(group, user);
+    await updateCounter(groupId, userId);
     // await createCurrentList(group);
-    let owner = (await useGetUsernameFromId(user)).toUpperCase();
+    let owner = (await useGetUsernameFromId(userId)).toUpperCase();
     result.message = `Case has been escalated. ${owner} should receive a notification shortly.`;
     result.status = "success";
-    useUpdateGroup(group)
+    useUpdateGroup(groupId)
+    useIncrementCount(userId,groupId)
   } catch (e) {
     console.log(e)
     result.message = "Failed to escalate.";

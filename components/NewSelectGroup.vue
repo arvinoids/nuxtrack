@@ -31,7 +31,6 @@
 import type { expandedCounter, user } from "pocketbase-types";
 import type { LogData, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
-import { useIncrementCount } from "~/composables/userfunctions";
 const pb = useNuxtApp().$pb
 
 const props = defineProps<{
@@ -94,9 +93,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
     }
     const emailres: result = (await useSendEmail(email)) as result
     miniToast(emailres.status, emailres.message)
-    await useIncrementCount(userId,group)
-    const notify = await useUpdateGroup(group)
-    miniToast(notify.status,notify.message)
     useDataUpdated().value++;
   }
   const logData: LogData = {
@@ -126,9 +122,6 @@ async function escalateCase(caseId: string, userId: string, group: string) {
     }
     const emailres: notification = (await useSendEmail(email)) as notification
     miniToast(emailres.status, emailres.message)
-    const notify = await useUpdateGroup(group)
-    miniToast(notify.status,notify.message)
-    await useIncrementCount(userId,group)
     useDataUpdated().value++;
   }
   const logData: LogData = {
