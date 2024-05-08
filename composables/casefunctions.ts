@@ -261,12 +261,35 @@ export async function useDeleteCase(id: string) {
 
 export async function useSubmitCase(
   caseId: string,
-  user: string,
-  group: string
+  userId: string,
+  groupId: string
 ) {
-  const res: notification = await useAssignCase(caseId, user, group);
+  const res: notification = await useAssignCase(caseId, userId, groupId);
   const result = { message: res.message, status: res.status };
   return result;
+}
+
+export async function useSubmitCaseProcess(caseId:string,userId:string,groupId:string){
+  try {
+    await useSubmitCase(caseId,userId,groupId)
+    await useIncrementCount(userId,groupId)
+    await useUpdateGroup(groupId)
+    return {status:'success', message:'Submit process success'} as notification
+  } catch(e:any){
+    console.log('Error:', e.message)
+  }
+}
+
+export async function useEmailUser(userId:string,caseId:string,groupName:string,currentUser:user){
+  const pb = useNuxtApp().$pb
+  const user = (await pb.collection('users').getOne(userId, { fields: 'fullname,email' }))
+  const email = {
+      to: user.email,
+      subject: "New case assigned to you",
+      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser!.fullname} on ${useFormatDate(new Date())}.\n\nRotation Tracker`
+  }
+  const emailres:notification = (await useSendEmail(email))
+  return emailres
 }
 
 export async function useRefreshAll() {
@@ -276,18 +299,6 @@ export async function useRefreshAll() {
   const rec = await pb.collection("groups").getList(1, 100);
   const groups = rec.items;
 
-  // for (let i = 0; i < groupsLength; i++) {
-  //   const group = groups[i];
-  //   const userRec = await pb
-  //     .collection("users")
-  //     .getList(1, 100, { filter: `memberOf~"${group.id}"` });
-  //   const users = userRec.items;
-  //   const usersLength = users.length;
-  //   for (let j = 0; j < usersLength; j++) {
-  //     const user = users[j];
-  //     await updateCounter(group.id, user.id);
-  //   }
-  // }
   groups.forEach(async (group) => {
     const userRec = await pb
       .collection("users")

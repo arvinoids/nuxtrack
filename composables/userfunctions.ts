@@ -1,5 +1,5 @@
 import  type { ListResult } from "pocketbase";
-import type { userEntry, userStatus, statuschoice } from "custom-types";
+import type { userEntry, userStatus, statuschoice, notification } from "custom-types";
 import type {user, expandedUsers } from "pocketbase-types";
 // const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
 //pb.autoCancellation(false);
@@ -267,6 +267,24 @@ async function cleanUpCounter(group: string) {
             const counter = await pb.collection('counter').getFirstListItem(`user="${user.user}"&&group="${group}"`)
             await pb.collection("counter").delete(counter.id);
         }
+    }
+}
+
+/** Adds 1 to the case count of the user in this specific group
+ * 
+ * @param userId 
+ * @param groupId 
+ * @returns notification
+ */
+export async function useIncrementCount(userId:string,groupId:string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
+    try {
+        const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${groupId}"`)
+    await pb.collection('counter').update(counter.id, {count:counter.count+1})
+    return { status: "success", message:"Counter updated" } as notification
+    } catch(e:any) {
+        return { status: "failed", message:e.message } as notification
     }
 }
 
