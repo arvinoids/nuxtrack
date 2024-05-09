@@ -269,23 +269,3 @@ async function cleanUpCounter(group: string) {
         }
     }
 }
-
-/** Adds 1 to the case count of the user in this specific group
- * 
- * @param userId 
- * @param groupId 
- * @returns notification
- */
-export async function useIncrementCount(userId:string,groupId:string) {
-    const pb = useNuxtApp().$pb
-    pb.autoCancellation(false);
-    try {
-        const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${groupId}"`)
-    await pb.collection('counter').update(counter.id, {count:counter.count+1})
-    return { status: "success", message:"Counter updated" } as notification
-    } catch(e:any) {
-        return { status: "failed", message:e.message } as notification
-    }
-}
-
-// user="8izk3mwibw3g2xp" &&  group="hzx2wvxbydofpi0"

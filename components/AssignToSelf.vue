@@ -69,6 +69,7 @@ const disableEscalate = ref(false);
 
 async function submitCase(caseId: string, userId: string, groupId: string) {
   const groupName = await useGetGroupName(groupId);
+
   const res = await useSubmitCase(caseId, userId, groupId);
   const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);

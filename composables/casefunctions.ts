@@ -264,35 +264,41 @@ export async function useSubmitCase(
   userId: string,
   groupId: string
 ) {
-  let res: notification  = { status:'failed',message:'Error submitting case'}
+  let res: notification = { status: 'failed', message: 'Error submitting case' }
   res = await useAssignCase(caseId, userId, groupId);
   if (res.status === "success") {
-    await useIncrementCount(userId, groupId);
+    await updateUserCaseCount(userId, groupId)
     await useUpdateGroup(groupId);
   }
   return res;
 }
 
-export async function useSubmitCaseProcess(caseId:string,userId:string,groupId:string){
+async function updateUserCaseCount(userId: string, groupId: string) {
+  const pb = useNuxtApp().$pb
+  const oldCounter = await pb
+    .collection("counter")
+    .getFirstListItem(`user="${userId}" && group="${groupId}"`);
+  let newCount = await countCases(userId, groupId);
+  let data = {
+    user: userId,
+    group: groupId,
+    count: newCount,
+  };
   try {
-    await useSubmitCase(caseId,userId,groupId)
-    await useIncrementCount(userId,groupId)
-    await useUpdateGroup(groupId)
-    return {status:'success', message:'Submit process success'} as notification
-  } catch(e:any){
-    console.log('Error:', e.message)
-  }
+    const res = await pb.collection("counter").update(oldCounter.id, data);
+  } catch (e: any) { console.log(e.message) }
 }
 
-export async function useEmailUser(userId:string,caseId:string,groupName:string,currentUser:user){
+
+export async function useEmailUser(userId: string, caseId: string, groupName: string, currentUser: user) {
   const pb = useNuxtApp().$pb
   const user = (await pb.collection('users').getOne(userId, { fields: 'fullname,email' }))
   const email = {
-      to: user.email,
-      subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser!.fullname} on ${useFormatDate(new Date())}.\n\nRotation Tracker`
+    to: user.email,
+    subject: "New case assigned to you",
+    body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser!.fullname} on ${useFormatDate(new Date())}.\n\nRotation Tracker`
   }
-  const emailres:notification = (await useSendEmail(email))
+  const emailres: notification = (await useSendEmail(email))
   return emailres
 }
 
@@ -401,8 +407,8 @@ export async function useEscalateCase(
     let owner = (await useGetUsernameFromId(userId)).toUpperCase();
     result.message = `Case has been escalated. ${owner} should receive a notification shortly.`;
     result.status = "success";
-    useUpdateGroup(groupId)
-    useIncrementCount(userId,groupId)
+    await updateUserCaseCount(userId, groupId)
+    await useUpdateGroup(groupId)
   } catch (e) {
     console.log(e)
     result.message = "Failed to escalate.";
@@ -814,7 +820,29 @@ export async function useForceUpdateCounters(groupId: string) {
       const oldCounter = await pb.collection('counter').getFirstListItem(`user="${user.id}"&&group="${groupId}"`, { fields: '' })
       await pb.collection('counter').update(oldCounter.id, data)
     } catch (e) {
-      if (users.totalItems>0) await pb.collection('counter').create(data)
+      if (users.totalItems > 0) await pb.collection('counter').create(data)
     }
   }
+}
+
+export async function useDeleteGroupCasesOlderThan(groupId:string,days:number){
+  const pb = useNuxtApp().$pb
+  const cases = await useGroupCasesOlderThan(groupId, days)
+    for (let caseItem of cases.items) {
+      await pb.collection('cases').delete(caseItem.id)
+    }
+}
+
+export async function useGroupCasesOlderThan(groupId:string,days:number){
+  const pb = useNuxtApp().$pb
+  const daysAgo = new Date()
+  daysAgo.setDate(daysAgo.getDate() - days)
+  const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${groupId}" && created <${daysAgo}`, fields:'' })
+  return res
+}
+
+export async function useGetAllCases(){
+  const pb = useNuxtApp().$pb
+  const res = await pb.collection('cases').getFullList({fields:'created,group'})
+  return res
 }
