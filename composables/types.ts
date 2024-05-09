@@ -97,6 +97,11 @@ declare module 'pocketbase-types' {
         "group": string,
         "user_sequence": JSON
      }
+
+     type link = {
+        "title": string,
+        "url": string,
+     }
 }
 
 declare module 'custom-types' {

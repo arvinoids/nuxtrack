@@ -1,32 +1,36 @@
 <template>
-  <div class="flex flex-col items-center w-full">
-    <div class="self-center mt-1 flex flex-col items-center">
-      <p class="text-lg text-secondary">
-        Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
-        >. To assign a case, please select a group below.
-
-        <span v-if="currentUser ? currentUser.memberOf.length !== 0 : false"
-          >You may also
-          <AssignToSelf class="mx-1">Assign case to yourself</AssignToSelf>.</span
-        >
-      </p>
+  <div class="flex gap-5">
+    <div class="w-1/5 pt-2 px-4">
+      <div class="w-full"><Links /></div>
     </div>
-    <div v-if="!loading" class="flex flex-col items-center gap-3">
-      <div ref="dashboard" class="flex flex-row flex-wrap justify-center gap-3">
-        <div v-for="group in groups" :key="group.id" class="flex">
-          <SWNewGroupCard
-            :group="group"
-            :users="getGroupUsers(group.id)"
-            class="flex-grow"
-          />
-        </div>
+    <div class="flex flex-col items-center w-full">
+      <div class="self-center mt-1 flex flex-col items-center">
+        <p class="text-lg text-secondary">
+          Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
+          >. To assign a case, please select a group below.
+          <span v-if="currentUser ? currentUser.memberOf.length !== 0 : false"
+            >You may also
+            <AssignToSelf class="mx-1">Assign case to yourself</AssignToSelf>.</span
+          >
+        </p>
       </div>
-      <TechTalkHosting />
-      <WatcherCard />
-    </div>
-    <div v-else class="h-[120px] flex flex-col justify-center p-5 items-center gap-2">
-      <div>Data loading, please wait...</div>
-      <div><Spinner /></div>
+      <div v-if="!loading" class="flex flex-col items-center gap-3">
+        <div ref="dashboard" class="flex flex-row flex-wrap justify-center gap-3">
+          <div v-for="group in groups" :key="group.id" class="flex">
+            <SWNewGroupCard
+              :group="group"
+              :users="getGroupUsers(group.id)"
+              class="flex-grow"
+            />
+          </div>
+        </div>
+        <TechTalkHosting />
+        <WatcherCard />
+      </div>
+      <div v-else class="h-[120px] flex flex-col justify-center p-5 items-center gap-2">
+        <div>Data loading, please wait...</div>
+        <div><Spinner /></div>
+      </div>
     </div>
   </div>
 </template>

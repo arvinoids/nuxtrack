@@ -1,4 +1,5 @@
 import type { emailContent,LogData } from "custom-types";
+import type { link } from "pocketbase-types";
 
 //const 
 
@@ -43,4 +44,10 @@ export function useGetBooleanFromLocalStorage(value:string|null){
     } catch (e: any) {
       console.log(e.message);
     }
+  }
+
+  export async function useGetLinks(){
+    const pb = useNuxtApp().$pb
+    const links = await pb.collection('links').getFullList()
+    return links as unknown as link[]
   }
