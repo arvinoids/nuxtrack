@@ -12,6 +12,9 @@
     <nuxt-link class="tab tab-bordered" active-class="tab-active" to="/Admin/Groups"
       >Groups</nuxt-link
     >
+    <nuxt-link class="tab tab-bordered" active-class="tab-active" to="/Admin/System"
+      >System</nuxt-link
+    >
   </div>
 </template>
 

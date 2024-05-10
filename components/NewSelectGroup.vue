@@ -81,10 +81,10 @@ async function skipCatch(user: user) {
 
 async function submitCase(caseId: string, userId: string, group: string) {
   const res:notification = await useSubmitCase(caseId, userId, group);
-  const currentTime = useFormatDate(new Date());
   miniToast(res.status, res.message);
   await resetSelection();
   if (res.status === 'success') {
+    const currentTime = useFormatDate(new Date());
     const user = (await pb.collection('users').getOne(userId))
     const email = {
       to: user.email,
@@ -93,7 +93,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
     }
     const emailres: result = (await useSendEmail(email)) as result
     miniToast(emailres.status, emailres.message)
-    useUpdateGroup(group)
     useDataUpdated().value++;
   }
   const logData: LogData = {
@@ -113,7 +112,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
   miniToast(res.status, res.message);
   const currentTime = useFormatDate(new Date(Date.now()));
   await resetSelection();
-  useDataUpdated().value++;
+  
   if (res.status === 'success') {
     const user = (await pb.collection('users').getOne(userId))
     const email = {
@@ -123,16 +122,13 @@ async function escalateCase(caseId: string, userId: string, group: string) {
     }
     const emailres: notification = (await useSendEmail(email)) as notification
     miniToast(emailres.status, emailres.message)
-    useUpdateGroup(group)
+    useDataUpdated().value++;
   }
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
     details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
-  const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}`)
-  //then increment counter
-  // await pb.collection('counter').update(counter.id,{count:counter.count+1})
   logActivity(logData);
 }
 

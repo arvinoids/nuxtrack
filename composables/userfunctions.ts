@@ -1,5 +1,5 @@
 import  type { ListResult } from "pocketbase";
-import type { userEntry, userStatus, statuschoice } from "custom-types";
+import type { userEntry, userStatus, statuschoice, notification } from "custom-types";
 import type {user, expandedUsers } from "pocketbase-types";
 // const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
 //pb.autoCancellation(false);
@@ -269,5 +269,3 @@ async function cleanUpCounter(group: string) {
         }
     }
 }
-
-// user="8izk3mwibw3g2xp" &&  group="hzx2wvxbydofpi0"

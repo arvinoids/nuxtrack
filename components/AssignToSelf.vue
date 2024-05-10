@@ -67,13 +67,10 @@ const caseIsEscalated = ref(false);
 const caseIsBlank = ref(false);
 const disableEscalate = ref(false);
 
-async function doAssign() {
-  useAssignCase(caseId.value, user.id, selectedGroupId.value);
-}
+async function submitCase(caseId: string, userId: string, groupId: string) {
+  const groupName = await useGetGroupName(groupId);
 
-async function submitCase(caseId: string, userId: string, group: string) {
-  const groupName = await useGetGroupName(group);
-  const res = await useSubmitCase(caseId, userId, group);
+  const res = await useSubmitCase(caseId, userId, groupId);
   const currentTime = useFormatDate(new Date(Date.now()));
   useShowToast(res.message, res.status);
   useDataUpdated().value++;
@@ -90,7 +87,6 @@ async function submitCase(caseId: string, userId: string, group: string) {
     };
     const emailres = await useSendEmail(email);
     miniToast(emailres.status, emailres.message);
-    useUpdateGroup(group);
   }
   const logData: LogData = {
     user: currentUser!.username,
@@ -100,14 +96,14 @@ async function submitCase(caseId: string, userId: string, group: string) {
   logActivity(logData);
 }
 
-async function escalateCase(caseId: string, id: string, group: string) {
-  const groupName = useGetGroupName(group);
-  const res = await useEscalateCase(caseId, id, group);
+async function escalateCase(caseId: string, userId: string, groupId: string) {
+  const groupName = useGetGroupName(groupId);
+  const res = await useEscalateCase(caseId, userId, groupId);
   useShowToast(res.message, res.status);
   const currentTime = useFormatDate(new Date(Date.now()));
   useDataUpdated().value++;
   if (res.status === "success") {
-    const user = await pb.collection("users").getOne(id);
+    const user = await pb.collection("users").getOne(userId);
     const email = {
       to: user.email,
       subject: "New case assigned to you",
@@ -115,7 +111,6 @@ async function escalateCase(caseId: string, id: string, group: string) {
     };
     const emailres = await useSendEmail(email);
     miniToast(emailres.status, emailres.message);
-    useUpdateGroup(group);
   }
   const logData: LogData = {
     user: currentUser!.username,

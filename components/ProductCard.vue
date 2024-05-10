@@ -19,7 +19,7 @@
           >
             <button
               class="btn btn-ghost btn-circle btn-sm mr-1"
-              @click="updatedCase(group.id)"
+              @click="updatedTimestamp(group.id)"
             >
               <Icon name="mdi:alarm-check" size="1.2rem" class="text-neutral-100" />
             </button>
@@ -142,7 +142,7 @@ function resetSelection() {
   selectedUser.value = 0;
 }
 
-async function updatedCase(group: string) {
+async function updatedTimestamp(group: string) {
   lastUpdated.value = "Updating...";
   let result = { status: "failed", message: "" };
   const logData: LogData = {
