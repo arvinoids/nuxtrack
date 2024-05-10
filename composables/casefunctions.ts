@@ -1,6 +1,7 @@
 import type { notification } from "custom-types";
 import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
+import type { ArchiveRecord, BaseSystemFields, CasesRecord } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -825,24 +826,87 @@ export async function useForceUpdateCounters(groupId: string) {
   }
 }
 
-export async function useDeleteGroupCasesOlderThan(groupId:string,days:number){
+export async function useDeleteGroupCasesOlderThan(groupId: string, days: number) {
   const pb = useNuxtApp().$pb
   const cases = await useGroupCasesOlderThan(groupId, days)
-    for (let caseItem of cases.items) {
-      await pb.collection('cases').delete(caseItem.id)
-    }
+  for (let caseItem of cases.items) {
+    await pb.collection('cases').delete(caseItem.id)
+  }
 }
 
-export async function useGroupCasesOlderThan(groupId:string,days:number){
+export async function useGroupCasesOlderThan(groupId: string, days: number) {
   const pb = useNuxtApp().$pb
   const daysAgo = new Date()
   daysAgo.setDate(daysAgo.getDate() - days)
-  const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${groupId}" && created <${daysAgo}`, fields:'' })
+  const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${groupId}" && created <${daysAgo}`, fields: '' })
   return res
 }
 
-export async function useGetAllCases(){
+export async function useGetAllCases() {
   const pb = useNuxtApp().$pb
-  const res = await pb.collection('cases').getFullList({fields:'created,group'})
+  const res = await pb.collection('cases').getFullList({ fields: 'created,group' })
   return res
+}
+
+export async function useGetFullCases(){
+  const pb = useNuxtApp().$pb
+  const res:(BaseSystemFields & CasesRecord)[]= await pb.collection('cases').getFullList()
+  return res
+}
+
+/** Converts the JSON cases to CSV
+ * @param cases - the JSON cases data
+ * @returns the CSV cases data
+
+ * The function returns the CSV cases data. */
+export function jsonToCSV(cases: CasesRecord[]): string {
+  // Check if jsonData is not an array or is an empty array
+  if (!Array.isArray(cases) || cases.length === 0) {
+    return '';
+  }
+
+  // Extract keys for CSV header
+  const csvHeader = Object.keys(cases[0]).join(',');
+
+  // Map JSON objects to CSV rows
+  const csvRows = cases.map(row => {
+    return Object.values(row).map(value =>
+      // Handle values that contain commas or newlines
+      `"${value.toString().replace(/"/g, '""')}"`
+    ).join(',');
+  });
+
+  // Combine header and rows with newline characters
+  return [csvHeader, ...csvRows].join('\\n');
+}
+
+function getCurrentTimestamp(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  return `${year}${month}${day}${hours}${minutes}${seconds}`;
+}
+
+export async function useSaveFileToDb(csvData: string) {
+  const pb = useNuxtApp().$pb
+  const csvFile = new Blob([csvData], { type: 'text/csv' });
+  const formData = new FormData()
+  const filename = 'cases-' + getCurrentTimestamp()
+
+  formData.append('file', csvFile, filename)
+  try {
+    const upload: ArchiveRecord = await pb.collection('archive').create(formData)
+    return {
+      status: 'success', message: 'File archived',
+      filename: 'filename',
+      data: { url: pb.files.getUrl(upload, filename) }
+    } as notification& { filename: string; data: { url: string }}
+  } catch (e: any) {
+    console.log('Error uploading file')
+    return { status: 'failed', message: e.message } as notification
+  }
 }

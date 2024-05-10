@@ -1,4 +1,5 @@
 import type { emailContent,LogData } from "custom-types";
+import type { CasesRecord } from "~/pocketbase-types";
 
 //const 
 
@@ -44,3 +45,16 @@ export function useGetBooleanFromLocalStorage(value:string|null){
       console.log(e.message);
     }
   }
+
+  function jsonCasesToCsv(cases:CasesRecord[]) {
+    let csv = '';
+    // Get the headers
+    let headers = Object.keys(cases[0]);
+    csv += headers.join(',') + '\n';
+    // Add the data
+    cases.forEach(function (row) {
+        let data = headers.map(header => JSON.stringify(row[header])).join(','); // Add JSON.stringify statement
+        csv += data + '\n';
+    });
+    return csv;
+}
