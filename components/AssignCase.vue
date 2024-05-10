@@ -56,7 +56,7 @@ const currentUser = useCurrentUser()
 
 async function submitCase(caseId: string, userId: string, groupId: string) {
     const res = await useSubmitCase(caseId, userId, groupId);
-    
+    await useUpdateUserLastAssigned(userId)
     const currentTime = useFormatDate(new Date(Date.now()));
     miniToast(res.status, res.message);
     useDataUpdated().value++;
