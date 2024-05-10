@@ -6,6 +6,7 @@ import type PocketBase from 'pocketbase'
 import type { RecordService } from 'pocketbase'
 
 export enum Collections {
+	Archive = "archive",
 	Cases = "cases",
 	Changelog = "changelog",
 	Completion = "completion",
@@ -48,6 +49,12 @@ export type AuthSystemFields<T = never> = {
 } & BaseSystemFields<T>
 
 // Record types for each collection
+
+export type ArchiveRecord = {
+	description?: string
+	field?: string
+	name?: string
+}
 
 export type CasesRecord = {
 	assignedBy?: string
@@ -227,6 +234,7 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
+export type ArchiveResponse<Texpand = unknown> = Required<ArchiveRecord> & BaseSystemFields<Texpand>
 export type CasesResponse<Texpand = unknown> = Required<CasesRecord> & BaseSystemFields<Texpand>
 export type ChangelogResponse<Texpand = unknown> = Required<ChangelogRecord> & BaseSystemFields<Texpand>
 export type CompletionResponse<Texpand = unknown> = Required<CompletionRecord> & BaseSystemFields<Texpand>
@@ -248,6 +256,7 @@ export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSyste
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
+	archive: ArchiveRecord
 	cases: CasesRecord
 	changelog: ChangelogRecord
 	completion: CompletionRecord
@@ -268,6 +277,7 @@ export type CollectionRecords = {
 }
 
 export type CollectionResponses = {
+	archive: ArchiveResponse
 	cases: CasesResponse
 	changelog: ChangelogResponse
 	completion: CompletionResponse
@@ -291,6 +301,7 @@ export type CollectionResponses = {
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = PocketBase & {
+	collection(idOrName: 'archive'): RecordService<ArchiveResponse>
 	collection(idOrName: 'cases'): RecordService<CasesResponse>
 	collection(idOrName: 'changelog'): RecordService<ChangelogResponse>
 	collection(idOrName: 'completion'): RecordService<CompletionResponse>
