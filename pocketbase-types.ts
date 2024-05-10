@@ -52,7 +52,7 @@ export type AuthSystemFields<T = never> = {
 
 export type ArchiveRecord = {
 	description?: string
-	field?: string
+	file?: string
 	name?: string
 }
 
