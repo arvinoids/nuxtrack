@@ -66,7 +66,7 @@
         </div>
       </div>
       <p class="text-center my-3 text-sm">
-        Total <span class="text-accent">{{ logs!.totalItems }}</span> Cases
+        Total <span class="text-accent">{{ logs!.totalItems }}</span> logs
       </p>
     </div>
   </div>
