@@ -1,5 +1,7 @@
 <template>
-  <div class="absolute w-screen z-50 h-screen flex items-center justify-center">
+  <div
+    class="absolute w-screen z-50 h-screen flex items-center justify-center backdrop-grayscale"
+  >
     <div
       class="flex items-center justify-center relative p-10 bg-base-100 border gap-4 z-50 mx-10 backdrop-blur-2xl shadow-xl w-[500px]"
     >
