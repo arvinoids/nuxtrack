@@ -35,8 +35,13 @@ npm run dev
 
 ## Production
 
-Build the application for production:
+This is a static app, so there is no need to deploy with a server:
 
+```bash
+npm run generate
+```
+
+If you want to deploy it with nitro, you can also do it, but there is no server-side code:
 ```bash
 npm run build
 ```
@@ -47,4 +52,4 @@ Locally preview production build:
 npm run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+This is a Nuxt3 app, so yo can check out the Nuxt [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
