@@ -1,6 +1,6 @@
 # Rotation Tracker
 
-This app helps teams manage rotation of tasks/tickets.
+This app helps teams manage rotation of tasks/tickets. The app determines the user sequence based on the number of cases each user has been assigned. This ensures that all users get the same amount of work.
 
 ## Setup
 
@@ -16,6 +16,14 @@ npm install
 # pnpm
 pnpm install --shamefully-hoist
 ```
+
+## Database
+
+This project uses PocketBase as the backend (https://pocketbase.io)
+You can import the schema (as of 05/23/2024) called /pb_schema.json to populate the collections.
+
+## Environment file
+Please see the .env_example file for the environment variables needed.
 
 ## Development Server
 
