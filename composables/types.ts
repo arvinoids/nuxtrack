@@ -112,7 +112,7 @@ declare module 'custom-types' {
     }
     type LogData = {
         user: string,
-        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out"|"directly assigned"|"clicked next host",
+        type: "changed note" | "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out"|"directly assigned"|"clicked next host",
         details?: string
     }
 
