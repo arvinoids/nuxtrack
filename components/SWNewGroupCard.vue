@@ -60,6 +60,37 @@
       <div v-else class="text-xs mt-3">
         <p>No users are currently active.</p>
       </div>
+
+      <div v-if="inactiveUsers.length > 0" :key="listUpdated">
+        <div class="font-bold mt-3">Inactive users</div>
+        <div v-for="user in inactiveUsers" :key="user.id" class="my-[0.1rem]">
+          <nuxt-link
+            :to="`/${group.name}/${user.username}`"
+            class="tooltip tooltip-right"
+            :data-tip="
+              user.username.toUpperCase() +
+              ' is ' +
+              user.status +
+              ' - ' +
+              user.cases +
+              ' cases'
+            "
+          >
+            <Icon
+              name="ic:sharp-circle"
+              :class="`text-${getColor(user.status)}`"
+              class="mx-1"
+              size=".7rem"
+            />
+            <span class="hover:text-accent">
+              {{ user.fullname }}
+            </span>
+          </nuxt-link>
+          <div class="text-[0.6rem] text-warning">
+            {{ useFormatDate(user.last_assigned) }}
+          </div>
+        </div>
+      </div>
       <div v-if="usersOnLeave.length > 0" :key="listUpdated">
         <div class="font-bold mt-3">Users on Leave</div>
         <div v-for="user in usersOnLeave" :key="user.id" class="my-[0.1rem]">
@@ -131,10 +162,14 @@ const userBoxHeight: Ref<number | null> = ref(null);
 // reactive variables
 const loading = ref(true);
 const activeUsers: Ref<user[]> = ref(
-  props.users.filter((user) => user.status !== "On leave")
+  props.users.filter((user) => user.status === "Available")
 );
 const usersOnLeave: Ref<user[]> = ref(
   props.users.filter((user) => user.status === "On leave")
+);
+
+const inactiveUsers: Ref<user[]> = ref(
+  props.users.filter((user) => user.status !== "Available" && user.status !== "On leave")
 );
 // const sequenceData = ref(await getOrCreateSequence(props.group.id));
 

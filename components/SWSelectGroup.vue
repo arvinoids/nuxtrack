@@ -42,7 +42,7 @@
           @click="submitCase(caseId, firstUser.id, group)"
           >Assign</a
         >
-        <a href="#" class="btn btn-outline btn-error" @click="resetSelection()">Cancel</a>
+        <a href="#" class="btn btn-outline btn-primary">Skip</a>
       </div>
     </div>
   </div>
