@@ -202,7 +202,9 @@ async function refreshCard() {
   const newActiveUsers = currentUsersData
     .filter((user) => user.status !== "On leave")
     .map((user) => user.id);
-  const newFilteredSequence = storedOrder.filter((user) => newActiveUsers.includes(user));
+  const newFilteredSequence = storedOrder.filter((user: string) =>
+    newActiveUsers.includes(user)
+  );
   if (storedOrder.length !== newFilteredSequence.length) {
     await useUpdateUserSequence(props.group.id, newFilteredSequence);
   }

@@ -3,7 +3,7 @@
     <div class="modal-box">
       <h3 class="text-lg font">
         Assign case to
-        <span class="text-accent">{{ firstUser ? firstUser.fullname : null }}</span>
+        <span class="text-accent">{{ selectedUser ? selectedUser.fullname : null }}</span>
       </h3>
 
       <p class="py-4">
@@ -15,15 +15,15 @@
         />
       </p>
 
-      <div v-if="firstUser" class="text-xs">
+      <div v-if="selectedUser" class="text-xs">
         User is
         <span class="text-xs text-neutral-500 capitalize">
-          {{ firstUser.status }}
+          {{ selectedUser.status }}
         </span>
 
         <div
           class="flex flex-row justify-center items-center"
-          v-if="firstUser.status !== 'Available'"
+          v-if="selectedUser.status !== 'Available'"
         >
           <input type="checkbox" v-model="forced" /><label class="text-xs mx-2"
             >Force assign</label
@@ -39,9 +39,12 @@
           :class="{
             hidden: hideSubmit,
           }"
-          @click="submitCase(caseId, firstUser.id, group)"
+          @click="submitCase(caseId, selectedUser.id, group)"
           >Assign</a
         >
+        <div class="btn btn-outline btn-secondary" @click="skipCatch(selectedUser)">
+          Skip
+        </div>
         <a href="#" class="btn btn-outline btn-error" @click="resetSelection()">Cancel</a>
       </div>
     </div>
@@ -54,6 +57,7 @@ import type { LogData, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
 import { useUpdateUserLastAssigned } from "~/composables/userfunctions";
 const pb = useNuxtApp().$pb;
+let cursor = ref(0);
 
 const props = defineProps<{
   group: string;
@@ -61,8 +65,8 @@ const props = defineProps<{
 }>();
 
 let userlist = ref(props.users);
-const firstUser = computed(() => {
-  return props.users[0];
+const selectedUser = computed(() => {
+  return props.users[cursor.value];
 });
 
 // const emit = defineEmits(["shift", "reset", "update"]);
@@ -84,7 +88,7 @@ const caseIsBlank = computed(() => {
 
 const hideSubmit = ref(true);
 
-watch([caseId, forced], async () => {
+watch([caseId, forced, cursor], async () => {
   message.value = "";
   if (caseIsBlank.value) {
     message.value = "Please enter a case ID.";
@@ -95,7 +99,7 @@ watch([caseId, forced], async () => {
   } else if (await useCaseExists(caseId.value.trim())) {
     message.value = "This case is already assigned. Please use search.";
     hideSubmit.value = true;
-  } else if (firstUser.value.status !== "Available" && !forced.value) {
+  } else if (selectedUser.value.status !== "Available" && !forced.value) {
     hideSubmit.value = true;
   } else {
     hideSubmit.value = false;
@@ -103,6 +107,7 @@ watch([caseId, forced], async () => {
 });
 
 async function resetSelection() {
+  cursor.value = 0;
   userlist.value = props.users;
   caseId.value = "";
   await pb.collection("logs").create({
@@ -137,6 +142,28 @@ async function submitCase(caseId: string, userId: string, group: string) {
   };
 
   logActivity(logData);
+}
+
+const emit = defineEmits(["skip"]);
+
+async function skipCatch(user: user) {
+  const message = `${user.fullname} was skipped.`;
+  // useShowToast(message, "success");
+  emit("skip");
+  moveCursor();
+
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "skipped user",
+    details: message,
+  };
+  logActivity(logData);
+}
+
+function moveCursor() {
+  if (cursor.value === props.users.length - 1) {
+    cursor.value = 0;
+  } else cursor.value++;
 }
 </script>
 
