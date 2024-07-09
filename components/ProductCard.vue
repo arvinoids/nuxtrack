@@ -10,7 +10,11 @@
           }}</NuxtLink>
         </h2>
         <div class="flex items-center">
-          <button class="btn btn-sm btn-ghost btn-circle" @click="updateCounter()">
+          <button
+            class="btn btn-sm btn-ghost btn-circle"
+            @click="updateCounter()"
+            :disabled="loading"
+          >
             <Icon name="ic:twotone-refresh" size="1.2rem" class="text-slate-50" />
           </button>
           <div

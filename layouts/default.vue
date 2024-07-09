@@ -9,10 +9,10 @@
   </div>
 </template>
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Cabin&family=Inter:wght@300;400;500;600;700;900&family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cabin&family=Inter:wght@300;400;500;600;700;900&family=Poppins:wght@400;500;600;700&family=Figtree:ital,wght@0,300..900;1,300..900&display=swap");
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: "Figtree", sans-serif;
 }
 
 .page-enter-active,
