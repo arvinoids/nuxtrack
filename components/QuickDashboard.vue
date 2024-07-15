@@ -1,6 +1,6 @@
 <template>
   <div class="flex gap-5">
-    <div class="w-1/5 pt-2 px-4">
+    <div class="w-1/5 pt-2 px-4 min-w-60">
       <div class="w-full"><Links /></div>
       <div class="w-full"><Notebox /></div>
     </div>
@@ -33,6 +33,7 @@
         <div><Spinner /></div>
       </div>
     </div>
+    <MiniToast />
   </div>
 </template>
 

@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import type { statuschoice, LogData } from "custom-types";
-import type { RecordModel } from "pocketbase";
+import type { Record } from "pocketbase";
 const pb = useNuxtApp().$pb;
 const props = defineProps<{
   id: string;
@@ -103,7 +103,7 @@ function getAvatarUrl() {
   if (pb.authStore.model?.avatar === "") {
     return null;
   } else {
-    const user = pb.authStore.model as RecordModel;
+    const user = pb.authStore.model as Record;
     const url = pb.files.getUrl(user, user!.avatar, { thumb: "100x100" });
     return url;
   }

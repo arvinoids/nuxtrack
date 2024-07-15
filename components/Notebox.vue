@@ -6,8 +6,10 @@
       >
         Notes
       </div>
-      <div class="py-2 px-5">
-        <textarea rows="" cols="" v-model="content">{{ content }}</textarea>
+      <div class="py-1 px-1">
+        <textarea rows="" cols="" class="w-full md:h-[60ch] textarea" v-model="content">{{
+          content
+        }}</textarea>
         <div class="w-full flex justify-end">
           <button class="btn btn-secondary btn-sm" @click="updateNotes()">Save</button>
         </div>
@@ -26,13 +28,18 @@ const content = ref(contentRec.value.value);
 
 async function updateNotes() {
   const rec = await pb.collection("others").getFirstListItem('item="note"');
-  await pb.collection("others").update(rec.id, { value: content.value });
-  const logData: LogData = {
-    user: currentUser!.username,
-    type: "changed note",
-    details: "current note: " + content.value,
-  };
-  logActivity(logData);
+  try {
+    await pb.collection("others").update(rec.id, { value: content.value });
+    const logData: LogData = {
+      user: currentUser!.username,
+      type: "changed note",
+      details: "current note: " + content.value,
+    };
+    logActivity(logData);
+    miniToast("success", "Note has been updated");
+  } catch (e: any) {
+    miniToast("failed", e.message);
+  }
 }
 </script>
 
