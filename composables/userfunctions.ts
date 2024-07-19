@@ -157,7 +157,14 @@ async function userIsBackFromLeave(userId: string, groupId: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     await useRefreshGroupCounter(groupId);
-    const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}&&active=true"`);
+    let userLeaveRecord
+    try{
+        userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`);
+    } catch (e: any) {
+        console.log(e)
+        return
+    }
+    console.log('update for leave record id: ', userLeaveRecord.id)
     const sortedUsers = await useGetSortedUsers(groupId);
     let casesToAdd: number
     if (sortedUsers.items.length === 2) {
@@ -177,6 +184,27 @@ async function userIsBackFromLeave(userId: string, groupId: string) {
     await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
     await pb.collection('leaves').update(userLeaveRecord.id, { active: false })
     await useRefreshGroupCounter(groupId);
+}
+
+export async function useUserIsBackFromLeave(id: string) {
+    const groups = await useGetUserGroups(id);
+    console.log('user groups: ',groups)
+    try {
+            groups.forEach(async (group: string) => {
+            console.log('user is back from leave on group', group)
+            await userIsBackFromLeave(id, group);
+        });
+        // for (let group of groups) {
+        //     console.log('user is back from leave on group', group)
+        //     await userIsBackFromLeave(id, group);
+        // }
+        return { status: 'success', message: 'updated user case count after leave' }
+    } catch (e: any) {
+        return {
+            status: 'failed',
+            message: e.message
+        }
+    }
 }
 
 async function savedDifference(user: string, group: string) {
@@ -235,24 +263,7 @@ export async function useUserOnLeave(id: string) {
     }
 }
 
-export async function useUserIsBackFromLeave(id: string) {
-    const groups = await useGetUserGroups(id);
-    try {
-        //     groups.forEach(async (group: string) => {
-        //     await userIsBackFromLeave(id, group);
-        // });
-        for (let group of groups) {
-            console.log('user is back from leave on group', group)
-            await userIsBackFromLeave(id, group);
-        }
-        return { status: 'success', message: 'updated user case count after leave' }
-    } catch (e: any) {
-        return {
-            status: 'failed',
-            message: e.message
-        }
-    }
-}
+
 
 export async function useGetUserById(id: string) {
     const pb = useNuxtApp().$pb

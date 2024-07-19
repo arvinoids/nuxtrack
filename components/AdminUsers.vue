@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center" :key="updateTable">
     <div class="flex flex-row justify-start gap-2 items-center my-3">
       <div class="tooltip tooltip-top tooltip-accent" data-tip="Refresh View">
-        <button class="btn" @click="updated.value++">
+        <button class="btn" @click="updated++">
           <Icon name="mdi:refresh" size="1.2rem" />
         </button>
       </div>
