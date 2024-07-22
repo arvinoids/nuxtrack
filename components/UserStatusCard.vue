@@ -182,8 +182,7 @@ if (!isAdminUsersPage.value) {
     if (newStatus.status === "On leave") {
       await useUserOnLeave(user.id);
       console.log("executed useronleave");
-    }
-    if (oldStatus.status === "On leave") {
+    } else if (oldStatus.status === "On leave") {
       console.log("execute userbackfromleave");
       const res = await useUserIsBackFromLeave(user.id);
       logActivity({

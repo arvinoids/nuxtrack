@@ -910,3 +910,16 @@ export async function useSaveFileToDb(csvData: string) {
     return { status: 'failed', message: e.message } as notification
   }
 }
+
+export async function useGetGroupCaseCount(groupId:string) {
+  const pb = useNuxtApp().$pb
+  const res = await pb.collection('cases').getList(1,10000,{filter:`group="${groupId}"`, fields: ''})
+  return res.totalItems
+}
+
+export async function useGetGroupMemberCount(groupId:string) {
+  const pb = useNuxtApp().$pb
+  const res = await pb.collection('users').getList(1, 10000, { filter: `memberOf~"${groupId}"`, fields: '' })
+  const totalMembers = res.totalItems
+  return totalMembers
+}
