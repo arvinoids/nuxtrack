@@ -24,7 +24,7 @@
         class="absolute right-0 mt-3 py-2 bg-base-100 shadow-xl min-w-[400px] border z-40 flex flex-row"
         ref="menu"
       >
-        <UserStatusCard :id="userId" />
+        <UserStatusCard />
         <div class="flex flex-col">
           <NuxtLink
             to="/Admin"

@@ -92,9 +92,7 @@
 import type { statuschoice, LogData } from "custom-types";
 import type { RecordModel } from "pocketbase";
 const pb = useNuxtApp().$pb;
-const props = defineProps<{
-  id: string;
-}>();
+
 const user = ref(pb.authStore.model!);
 const show = ref(false);
 const avatarUrl = getAvatarUrl();
