@@ -321,14 +321,18 @@ async function getCasesToAdd(userId:string,groupId:string){
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const newCount = await useGetGroupCaseCount(groupId)
-    const oldCount = await pb.collection('leaves').getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`).then(res=>res.total_cases)
+    const leaveRecord = await pb.collection('leaves').getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`)    
     const groupMemberCount = await useGetGroupMemberCount(groupId)
-    const userPosition = await getUserPositionInGroup(userId, groupId)
+    const oldCount = leaveRecord.total_cases
+    const userPosition = leaveRecord.position
     let casesToAdd: number
     const countDiff = (newCount - oldCount)
-    casesToAdd = countDiff/groupMemberCount
+    console.log('computing cases to add...',"oldCount: ",oldCount, 'newCount: ', newCount, 'diff: ',countDiff)
+    casesToAdd = Math.floor(countDiff/groupMemberCount)
+    console.log('cases to add before remainder: ', casesToAdd)
     let remainder = countDiff%groupMemberCount
     if(remainder>userPosition) casesToAdd++
+    console.log('cases to add after remainder: ', casesToAdd)
     return casesToAdd
 }
 

@@ -27,7 +27,7 @@
         class="badge badge-sm min-w-max cursor-pointer"
         :class="{ [`badge-${badgeColor}`]: true }"
         @click="show = true"
-        v-if="!isAdminUsersPage"
+        v-if="currentPath.fullPath !== '/Admin/Users'"
       >
         {{ status.status }}
       </div>
@@ -95,7 +95,7 @@ const pb = useNuxtApp().$pb;
 const props = defineProps<{
   id: string;
 }>();
-const user = pb.authStore.model!;
+const user = ref(pb.authStore.model!);
 const show = ref(false);
 const avatarUrl = getAvatarUrl();
 
@@ -109,23 +109,33 @@ function getAvatarUrl() {
   }
 }
 
-const status = ref(await useGetUserStatus(props.id));
+const status = ref<{ status: string; message: string }>({
+  status: pb.authStore.model!.status,
+  message: pb.authStore.model!.message,
+});
 const auth = useAuth();
 let choices = STATUS_CHOICES;
-if (user.role === "user") choices = STATUS_CHOICES_USER;
+if (user.value.role === "user") choices = STATUS_CHOICES_USER;
 
 async function changeStatus(newStatus: statuschoice) {
   try {
-    useUserWhoChangedStatus().value = user.username;
-    await useChangeUserStatus(user.id, newStatus, status.value.message);
+    const oldStatus = pb.authStore.model!.status;
+    useUserWhoChangedStatus().value = user.value.username;
+    await useChangeUserStatus(user.value.id, newStatus, status.value.message);
     status.value.status = newStatus;
+    if (oldStatus === "On leave" && oldStatus !== newStatus) {
+      await useUserIsBackFromLeave(user.value.id);
+    }
+    if (newStatus === "On leave" && oldStatus !== newStatus) {
+      await useUserOnLeave(user.value.id);
+    }
     const logData: LogData = {
-      user: user.username,
+      user: user.value.username,
       type: "changed status",
       details: newStatus + " - " + status.value.message,
     };
     let log = await logActivity(logData);
-    useUserWhoChangedStatus().value = user.username;
+    useUserWhoChangedStatus().value = user.value.username;
   } catch (e) {
     console.log(e);
   }
@@ -146,12 +156,12 @@ const badgeColor = computed(() => {
 });
 
 async function logout() {
-  const outStatus = user.role === "user" ? "Outside shift" : "Not available";
+  const outStatus = user.value.role === "user" ? "Outside shift" : "Not available";
 
-  useChangeUserStatus(user.id, outStatus, null);
+  useChangeUserStatus(user.value.id, outStatus, null);
 
   logActivity({
-    user: user.username,
+    user: user.value.username,
     type: "logged out",
     details: outStatus,
   });
@@ -166,33 +176,52 @@ onClickOutside(menu as MaybeRef, (event) => {
   show.value = false;
 });
 
-pb.collection("users").subscribe(user.id, async () => {
-  status.value = await useGetUserStatus(user.id);
+pb.collection("users").subscribe(user.value.id, async () => {
+  status.value = await useGetUserStatus(user.value.id);
+});
+
+pb.collection("users").subscribe(pb.authStore.model!.id, (e) => {
+  if (e.action === "update") {
+    pb.authStore.save(pb.authStore.token, e.record);
+    console.log("AuthStore updated with realtime data:", pb.authStore.model);
+  }
 });
 
 const router = useRouter();
 const currentPath = ref(router.currentRoute);
-const isAdminUsersPage = ref(currentPath.value.fullPath === "/Admin/Users");
-watchEffect(() => {
-  isAdminUsersPage.value = currentPath.value.fullPath === "/Admin/Users";
-});
 
-if (!isAdminUsersPage.value) {
-  watch(status, async (newStatus, oldStatus) => {
-    if (newStatus.status === "On leave") {
-      await useUserOnLeave(user.id);
-      console.log("executed useronleave");
-    } else if (oldStatus.status === "On leave") {
-      console.log("execute userbackfromleave");
-      const res = await useUserIsBackFromLeave(user.id);
-      logActivity({
-        user: user.username,
-        type: "changed status",
-        details: res.status + ":" + res.message,
-      });
-    }
-  });
-}
+// watch(status, async (newStatus, oldStatus) => {
+//   console.log("selected:", status.value.status);
+//   console.log("old:", oldStatus.status, "new:", newStatus.status);
+//   if (newStatus.status === "On leave" && currentPath.value.fullPath !== "/Admin/Users") {
+//     console.log("oldStatus: ", oldStatus, "newStatus: ", newStatus);
+//     console.log("Current path: ", currentPath.value.fullPath);
+//     console.log("admin path?", currentPath.value.fullPath !== "/Admin/Users");
+
+//     await useUserOnLeave(user.value.id);
+//     logActivity({
+//       user: user.value.username,
+//       type: "changed status",
+//       details: `from ${oldStatus.status} to ${newStatus}`,
+//     });
+//     console.log("executed useronleave");
+//   } else if (
+//     oldStatus.status === "On leave" &&
+//     currentPath.value.fullPath !== "/Admin/Users"
+//   ) {
+//     console.log("oldStatus: ", oldStatus, "newStatus: ", newStatus);
+//     console.log("Current path: ", currentPath.value.fullPath);
+//     console.log("admin path?", currentPath.value.fullPath !== "/Admin/Users");
+//     console.log("execute userbackfromleave");
+//     let res;
+//     res = await useUserIsBackFromLeave(user.value.id);
+//     logActivity({
+//       user: user.value.username,
+//       type: "changed status",
+//       details: res.status + ":" + res.message,
+//     });
+//   }
+// });
 </script>
 
 <style scoped>
