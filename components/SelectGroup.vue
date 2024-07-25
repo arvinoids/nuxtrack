@@ -65,7 +65,7 @@ function moveCursor() {
 }
 
 async function skipCatch(user: user) {
-  const message = `${user.fullname} was skipped.`;
+  const message = `${user.username.toLowerCase()} was skipped.`;
   // useShowToast(message, "success");
   emit("skip");
   moveCursor();

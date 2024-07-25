@@ -106,7 +106,7 @@ export async function useSkipOut(userId: string, groupId: string) {
     await updateCounter(groupId, userId);
     // await createCurrentList(groupId)
     const user = await pb.collection("users").getOne(userId);
-    result.message = `${user.fullname} is out of the office and was skipped.`;
+    result.message = `${user.username.toLowerCase() } is out of the office and was skipped.`;
     result.status = "success";
   } catch (e: any) {
     result.message = e.message;
@@ -274,6 +274,11 @@ export async function useSubmitCase(
   return res;
 }
 
+/**
+ * Updates the counter of the user in this group. First gets the current record, then queries the cases and saves the new count.
+ * @param userId the user Id
+ * @param groupId the group Id
+ */
 async function updateUserCaseCount(userId: string, groupId: string) {
   const pb = useNuxtApp().$pb
   const oldCounter = await pb
@@ -632,17 +637,17 @@ export async function useNewUpdateCounter(group: string, users: user[]) {
   });
 }
 
-/** Counts the number of cases for a user in a group
+/** Counts the number of cases for a user in a group. Queries the cases and filter by userId and groupId
  * @params user - the id of the user
  * @params group - the id of the group
  * @returns the number of cases for the user in the group.
  */
-async function countCases(user: string, group: string) {
+async function countCases(userId: string, groupId: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res = await pb
     .collection("cases")
-    .getList(1, 10000, { filter: `user="${user}"&&group="${group}"`, fields: '' });
+    .getList(1, 10000, { filter: `user="${userId}"&&group="${groupId}"`, fields: '' });
   return res.totalItems;
 }
 
@@ -650,6 +655,11 @@ async function countCases(user: string, group: string) {
 //   const counter = await pb.collection('counter').getList(1, 1000, { filter: `group="${group}"`, sort: "+count" })
 // }
 
+/**
+ * Finds a case in the database and returns the case details.
+ * @param id 
+ * @returns status, message, and data if available
+ */
 export async function useFindCase(id: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
@@ -673,12 +683,22 @@ export async function useFindCase(id: string) {
   return { res, data };
 }
 
+/**Generates a dummy case Id for use as fillers in Leaves or for other purposes
+ * @param prefix - the prefix for the case id to be generated
+ * @returns a string of the case Id
+ */
 function generateDummyCase(prefix: string) {
   const random = Math.random().toString(36).substring(3, 9);
   const caseId: string = prefix + random
   return caseId
 }
 
+/**Mass-creates dummy cases
+ * 
+ * @param quantity 
+ * @param prefix 
+ * @returns an array of strings(cases)
+ */
 function createDummyCases(quantity: number, prefix: string) {
   let cases: string[] = []
   while (quantity > 0) {
@@ -688,14 +708,22 @@ function createDummyCases(quantity: number, prefix: string) {
   return cases
 }
 
-export async function useAddDummyCases(quantity: number, user: string, group: string, prefix: string) {
+/** Adds dummy cases to the database
+ * 
+ * @param quantity 
+ * @param userId 
+ * @param groupId 
+ * @param prefix 
+ * @returns a success or fail status, and a message. Used for notifications.
+ */
+export async function useAddDummyCases(quantity: number, userId: string, groupId: string, prefix: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const cases = createDummyCases(quantity, prefix)
   cases.forEach(async (caseId) => {
     let data = {
-      user,
-      group,
+      user: userId,
+      group: groupId,
       case: caseId,
       assignedBy: useCurrentUser()!.username,
     };
@@ -708,12 +736,14 @@ export async function useAddDummyCases(quantity: number, user: string, group: st
   return { status: 'success', message: `${quantity} Cases created` }
 }
 
+/** Returns a pocketbase ListResult that contains the list of groups */
 export async function useGetAllGroups() {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res = await pb.collection('groups').getList()
   return res
 }
+
 /** Deletes all cases in selected group
  * @param group - the group Id
  */
@@ -764,6 +794,7 @@ export async function useGetGroupStats(group: string, description?: string) {
     lowestCount
   }
 }
+
 /**Updates the group timestamp to the current time
  * @param group - the group Id
  * @returns a promise that resolves when the timestamp has been updated
@@ -826,6 +857,11 @@ export async function useForceUpdateCounters(groupId: string) {
   }
 }
 
+/** beta phase - deletes old cases
+ * 
+ * @param groupId 
+ * @param days how old is the case
+ */
 export async function useDeleteGroupCasesOlderThan(groupId: string, days: number) {
   const pb = useNuxtApp().$pb
   const cases = await useGroupCasesOlderThan(groupId, days)

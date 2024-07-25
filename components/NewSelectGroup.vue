@@ -67,7 +67,7 @@ function moveCursor() {
 }
 
 async function skipCatch(user: user) {
-  const message = `${user.fullname} was skipped.`;
+  const message = `${user.username.toLowerCase()} was skipped.`;
   // useShowToast(message, "success");
   emit("skip");
   moveCursor();
@@ -98,7 +98,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
+    details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   // first get the id of the counter for this group and user
   const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}"`)
@@ -127,7 +127,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details: `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
+    details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   logActivity(logData);
 }
