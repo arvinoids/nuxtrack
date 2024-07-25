@@ -82,7 +82,7 @@ async function skipCatch(user: user) {
 async function submitCase(caseId: string, userId: string, group: string) {
   const res:notification = await useSubmitCase(caseId, userId, group);
   miniToast(res.status, res.message);
-  await resetSelection();
+  resetSelection();
   if (res.status === 'success') {
     const currentTime = useFormatDate(new Date());
     const user = (await pb.collection('users').getOne(userId))
@@ -111,7 +111,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
   const res = await useEscalateCase(caseId, userId, group);
   miniToast(res.status, res.message);
   const currentTime = useFormatDate(new Date(Date.now()));
-  await resetSelection();
+  resetSelection();
   
   if (res.status === 'success') {
     const user = (await pb.collection('users').getOne(userId))
@@ -161,7 +161,7 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
   else return "";
 }
 
-async function resetSelection() {
+function resetSelection() {
   emit('reset')
   caseId.value = "";
 }

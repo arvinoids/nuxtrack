@@ -81,10 +81,10 @@
           </button></a
         >
       </div>
-      <div v-if="users.length">
+      <div v-if="users.length" :key="updateCard">
         <NewSelectGroup
           :group="group.id"
-          :users="users"
+          :users="displayUsers"
           @skip="nextUser"
           @reset="resetSelection"
         />
@@ -143,6 +143,7 @@ function nextUser() {
 }
 
 function resetSelection() {
+  updateCard.value++;
   selectedUser.value = 0;
 }
 
