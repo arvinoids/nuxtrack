@@ -1,5 +1,6 @@
 import type { notification } from "custom-types"
-import type { expandedCounter } from "pocketbase-types"
+import type { AuthModel } from "pocketbase"
+import type { expandedCounter, user } from "pocketbase-types"
 
 export const useAuth = ()=> 
 useState(() => ({ 
@@ -33,4 +34,5 @@ export const useUserWhoChangedStatus =()=> useState(()=>(''))
 
 export const useCounters = ()=> useState<expandedCounter[]>(()=>([]))
 export const useNotifications = ()=> useState<notification[]>(()=>([]))
+export const useCurrentUser = ()=> useState<AuthModel>(()=>[])
  

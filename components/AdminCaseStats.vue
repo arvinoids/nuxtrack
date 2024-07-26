@@ -32,7 +32,10 @@
       </table>
     </div>
 
-    <div v-else class="border h-auto w-[450px] flex flex-col justify-center items-center">
+    <div
+      v-else
+      class="border h-auto w-[450px] flex flex-col justify-center items-center py-20"
+    >
       <Spinner />
     </div>
     <div class="btn btn-sm btn-warning" @click="refresh">Refresh</div>
@@ -74,12 +77,13 @@ const selectedGroupDescription: Ref<string | undefined> = ref("");
 const loading = ref(true);
 const groups = (await useGetAllGroups()).items;
 const casesChanged = useCaseCountChanged();
+const currentUser = useCurrentUser();
 
 async function deleteGroupCases(group: string) {
   const res = await useDeleteGroupCases(group);
   useShowToast(res.message, res.status);
   const logData: LogData = {
-    user: useCurrentUser()!.username,
+    user: currentUser.value?.username,
     type: "deleted case",
     details: `Deleted all cases in group ${group}`,
   };

@@ -128,6 +128,7 @@ const casesChanged = useCaseCountChanged();
 const users: ListResult<user> = await useGetAllUsers();
 const tickets = ref(1);
 const validUsers = getValidUsers();
+const currentuser = useCurrentUser();
 type userExpandedMemberOf = user & {
   expand: {
     memberOf: group[];
@@ -171,7 +172,7 @@ async function AddDummyCases() {
   }
   useShowToast(result.message, result.status);
   const data: LogData = {
-    user: useCurrentUser()!.username,
+    user: currentuser.value?.username,
     type: "assigned case",
     details: `${tickets.value} cases assigned to ${selectedUser.value.username} in ${selectedGroup.value.description}`,
   };

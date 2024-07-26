@@ -115,6 +115,7 @@ const updateCard = ref(0);
 const lastUpdated = ref(useFormatDate(new Date(props.group.updated)));
 const anchor: string = "#" + props.group.id + "select";
 const allCounters = useCounters();
+const currentUser = useCurrentUser();
 
 let users: expandedCounter[] = allCounters.value.filter(
   (user) => user.group === props.group.id
@@ -151,7 +152,7 @@ async function updatedTimestamp(group: string) {
   lastUpdated.value = "Updating...";
   let result = { status: "failed", message: "" };
   const logData: LogData = {
-    user: useCurrentUser()!.username,
+    user: currentUser.value!.username,
     type: "checked for new cases",
     details: `in ${await useGetGroupName(group)}`,
   };

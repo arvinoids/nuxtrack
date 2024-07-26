@@ -28,7 +28,7 @@
         <div class="flex flex-col">
           <NuxtLink
             to="/Admin"
-            v-if="userRole === 'admin'"
+            v-if="userIsAdmin()"
             class="block px-4 py-2 text-sm hover:bg-neutral"
             @click="show = !show"
           >
@@ -65,14 +65,17 @@
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
 const auth = useAuth();
-const loggedInUser = useLoggedInUsername();
-const userRole = ref(pb.authStore.model!.role);
-const userId = ref(pb.authStore.model!.id);
+const currentUser = useCurrentUser();
 const show = ref(false);
+
+function userIsAdmin() {
+  return currentUser.value!.role === "admin" || currentUser.value!.role === "lead";
+}
+
+currentUser.value = pb.authStore.model;
 
 if (pb.authStore.isValid) {
   auth.value.isAuthenticated = true;
-  loggedInUser.value = pb.authStore.model!.username;
 }
 
 const menu = ref(null);

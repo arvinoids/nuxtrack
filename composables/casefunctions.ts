@@ -725,7 +725,7 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
       user: userId,
       group: groupId,
       case: caseId,
-      assignedBy: useCurrentUser()!.username,
+      assignedBy: useCurrentUser().value?.username,
     };
     try {
       const rec = await pb.collection("cases").create(data);

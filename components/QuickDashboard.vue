@@ -29,6 +29,7 @@
       <div>Data loading, please wait...</div>
       <div><Spinner /></div>
     </div>
+    <div class="z-50"><UserLeaveNotification /></div>
   </div>
 </template>
 
@@ -71,6 +72,7 @@ pb.collection("users").subscribe("*", async () => {
     .collection("counter")
     .getFullList({ sort: "+count", expand: "user" });
   loading.value = false;
+  pb.collection("users").authRefresh();
 });
 </script>
 

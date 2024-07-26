@@ -25,3 +25,16 @@ body {
   filter: blur(1rem);
 }
 </style>
+
+<script lang="ts">
+const currentUser = useCurrentUser();
+
+const pb = useNuxtApp().$pb;
+pb.collection("users").subscribe(pb.authStore.model!.id, () => {
+  pb.collection("users").authRefresh();
+});
+
+pb.authStore.onChange(() => {
+  currentUser.value = pb.authStore.model;
+});
+</script>

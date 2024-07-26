@@ -1,15 +1,7 @@
 import type { ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice, notification } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
-// import { useGetGroupCaseCount, useGetGroupMemberCount } from "./casefunctions";
-// const pb = new PocketBase("https://solutionsteam.lrdc.lexmark.com/pb/");
-//pb.autoCancellation(false);
 
-export function useCurrentUser() {
-    const pb = useNuxtApp().$pb
-    pb.autoCancellation(false);
-    return pb.authStore.model
-}
 
 export async function useDeleteUser(id: string) {
     const pb = useNuxtApp().$pb
@@ -113,7 +105,7 @@ export async function useGetUserStatus(id: string) {
     return status
 }
 
-export async function useChangeUserStatus(id: string, newStatus: statuschoice, newMessage: string | null) {
+export async function useChangeUserStatus(id: string, newStatus: statuschoice, newMessage?: string | null) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     try {
@@ -232,7 +224,7 @@ export async function useGetSortedUsers(group: string) {
 //     });
 // }
 
-export async function useUserIsBackFromLeave(id: string) {
+export async function useUserIsBackFromLeave(id: string):Promise<{status:'success'|'failed'|'warning',message:string}> {
     const groups = await useGetUserGroups(id);
     console.log('user groups: ',groups)
     try {
@@ -317,6 +309,11 @@ async function getUserPositionInGroup(userId: string, groupId: string) {
     return userPosition
 }
 
+/** Computes the number of cases to add when a user comes bock from leave
+ * @param userId the user id
+ * @param groupId the group id
+ * @returns the number of cases to add
+ */
 async function getCasesToAdd(userId:string,groupId:string){
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);

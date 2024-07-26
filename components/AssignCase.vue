@@ -59,7 +59,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
         const email = {
             to: user.email,
             subject: "New case assigned to you",
-            body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser!.fullname} on ${currentTime}.\n\nRotation Tracker`
+            body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser.value!.fullname} on ${currentTime}.\n\nRotation Tracker`
         }
         const emailres = (await useSendEmail(email))
         miniToast(emailres.status, emailres.message)
@@ -67,7 +67,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
         useDataUpdated().value++;
     }
     const logData: LogData = {
-        user: currentUser!.username,
+        user: currentUser!.value?.username,
         type: "assigned case",
         details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via direct',
     };
@@ -92,7 +92,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
         useDataUpdated().value++;
     }
     const logData: LogData = {
-        user: currentUser!.username,
+        user: currentUser.value!.username,
         type: "assigned case",
         details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via direct',
     };

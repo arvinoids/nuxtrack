@@ -187,39 +187,6 @@ pb.collection("users").subscribe(pb.authStore.model!.id, (e) => {
 
 const router = useRouter();
 const currentPath = ref(router.currentRoute);
-
-// watch(status, async (newStatus, oldStatus) => {
-//   console.log("selected:", status.value.status);
-//   console.log("old:", oldStatus.status, "new:", newStatus.status);
-//   if (newStatus.status === "On leave" && currentPath.value.fullPath !== "/Admin/Users") {
-//     console.log("oldStatus: ", oldStatus, "newStatus: ", newStatus);
-//     console.log("Current path: ", currentPath.value.fullPath);
-//     console.log("admin path?", currentPath.value.fullPath !== "/Admin/Users");
-
-//     await useUserOnLeave(user.value.id);
-//     logActivity({
-//       user: user.value.username,
-//       type: "changed status",
-//       details: `from ${oldStatus.status} to ${newStatus}`,
-//     });
-//     console.log("executed useronleave");
-//   } else if (
-//     oldStatus.status === "On leave" &&
-//     currentPath.value.fullPath !== "/Admin/Users"
-//   ) {
-//     console.log("oldStatus: ", oldStatus, "newStatus: ", newStatus);
-//     console.log("Current path: ", currentPath.value.fullPath);
-//     console.log("admin path?", currentPath.value.fullPath !== "/Admin/Users");
-//     console.log("execute userbackfromleave");
-//     let res;
-//     res = await useUserIsBackFromLeave(user.value.id);
-//     logActivity({
-//       user: user.value.username,
-//       type: "changed status",
-//       details: res.status + ":" + res.message,
-//     });
-//   }
-// });
 </script>
 
 <style scoped>

@@ -54,17 +54,17 @@ let username = "";
 let password = "";
 let message = ref("");
 const authenticated = useAuth();
-const loggedInUser = useLoggedInUsername();
-
+const currentUser = useCurrentUser();
 const pb = useNuxtApp().$pb;
 async function login() {
   try {
     const authData = await pb.collection("users").authWithPassword(username, password);
     authenticated.value.isAuthenticated = pb.authStore.isValid;
     authenticated.value.role = authData.record.role;
-    loggedInUser.value = pb.authStore.model!.username;
+    currentUser.value = pb.authStore.model;
+
     logActivity({
-      user: loggedInUser.value,
+      user: currentUser.value!.username,
       type: "logged in",
     });
     navigateTo("/");
