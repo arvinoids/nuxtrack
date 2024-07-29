@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar bg-[#44434e] shadow-md mb-3">
+  <div class="navbar bg-[#44434e]">
     <div class="navbar-start">
       <img
         src="~/assets/img/logo_darkmode.svg"
@@ -8,9 +8,7 @@
       />
       <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
         <NuxtLink to="/">{{ APP_NAME }}</NuxtLink>
-        <DevOnly
-          ><span class="text-red-600 px-10 bg-base-200">DEVELOPMENT MODE</span></DevOnly
-        >
+        <DevOnly><span class="text-red-600 px-10 bg-base-200">DEV MODE</span></DevOnly>
       </h1>
     </div>
     <div class="navbar-center"></div>

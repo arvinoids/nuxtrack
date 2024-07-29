@@ -1,8 +1,9 @@
 <template>
   <div>
     <div class="w-full" v-if="usersOnLeave.length > 0">
+      <p></p>
       <div class="font-semibold text-error md: w-[300px] mb-2">
-        These users are currently on leave:
+        Attention: These users are currently on leave:
       </div>
       <div v-for="user in usersOnLeave" class="py-1">
         <div><AdminSetUserToAvail :user="user" /></div>

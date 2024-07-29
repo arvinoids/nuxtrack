@@ -29,7 +29,6 @@
       <div>Data loading, please wait...</div>
       <div><Spinner /></div>
     </div>
-    <div class="z-50"><UserLeaveNotification /></div>
   </div>
 </template>
 

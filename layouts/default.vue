@@ -1,6 +1,7 @@
 <template>
   <div>
     <Navbar />
+    <UserLeaveNotification />
     <div class="flex flex-col items-center">
       <slot />
     </div>
@@ -27,6 +28,8 @@ body {
 </style>
 
 <script lang="ts">
+import UserLeaveNotification from "~/components/UserLeaveNotification.vue";
+
 const currentUser = useCurrentUser();
 
 const pb = useNuxtApp().$pb;

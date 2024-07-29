@@ -19,7 +19,6 @@ async function setToAvail(userId: string) {
   try {
     await useChangeUserStatus(userId, "Available");
     const res = await useUserIsBackFromLeave(userId);
-    miniToast(res.status, res.message);
   } catch (e: any) {
     miniToast("failed", e.message);
   }
