@@ -448,24 +448,18 @@ async function renameOldCase(rec: RecordModel) {
 /**
  * Reassigns cases before deleting the user.
  */
-export async function useReassignCases(oldUser: string, newUser: string) {
+export async function useReassignCases(oldUserId: string, newUserId: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res = { message: "Reassign failed", status: "failed" };
   const userCases = await pb
     .collection("cases")
-    .getList(1, 10000, { filter: `user="${oldUser}"` });
-  const newUserName = await useGetUsernameFromId(newUser);
+    .getList(1, 10000, { filter: `user="${oldUserId}"` });
+  const newUserName = await useGetUsernameFromId(newUserId);
   if (userCases.totalItems > 0) {
     userCases.items.forEach(async (item) => {
-      const data = {
-        user: newUser,
-        group: item.group,
-        case: item.case,
-        assignedBy: item.assignedBy,
-      };
       try {
-        const rec = await pb.collection("cases").update(item.id, data);
+        await pb.collection("cases").update(item.id, {user:newUserId});
         res.message = `Cases assigned to user ${newUserName}.`;
         res.status = "success";
       } catch (e) {

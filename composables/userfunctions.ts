@@ -1,25 +1,25 @@
 import type { ListResult } from "pocketbase";
-import type { userEntry, userStatus, statuschoice, notification } from "custom-types";
+import type { userEntry, userStatus, statuschoice, notification, LogData } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
 
 
-export async function useDeleteUser(id: string) {
+export async function useDeleteUser(userId: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const result = { message: "", status: "success" };
-
     try {
-        const userRecord = await pb.collection("users").getOne(id);
+        const userRecord = await pb.collection("users").getOne(userId, { fields: 'username' });
         const username = userRecord.username;
-        await pb.collection("users").delete(id);
-        result.message = `${username} is deleted`;
+        await pb.collection("users").delete(userId);
+        result.message = `${username} has been deleted`;
         useRefreshAll();
-        return result;
+
     } catch (e: any) {
         result.status = "failed";
         result.message = e.message;
-        return result;
+
     }
+    return result
 }
 
 export async function useCreateUser(userData: userEntry) {
@@ -81,11 +81,11 @@ export async function useGetUserGroups(userId: string) {
     return res.memberOf;
 }
 
-export async function useGetUsernameFromId(id: string) {
+export async function useGetUsernameFromId(id: string): Promise<string> {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const res = await pb.collection("users").getOne(id, { fields: 'username' });
-    return res.username;
+    return res.username as string;
 }
 
 export async function useGetUserStatus(id: string) {
@@ -224,11 +224,11 @@ export async function useGetSortedUsers(group: string) {
 //     });
 // }
 
-export async function useUserIsBackFromLeave(id: string):Promise<{status:'success'|'failed'|'warning',message:string}> {
+export async function useUserIsBackFromLeave(id: string): Promise<{ status: 'success' | 'failed' | 'warning', message: string }> {
     const groups = await useGetUserGroups(id);
-    console.log('user groups: ',groups)
+    console.log('user groups: ', groups)
     try {
-            groups.forEach(async (group: string) => {
+        groups.forEach(async (group: string) => {
             console.log('user is back from leave on group', group)
             await userIsBackFromLeave(id, group);
         });
@@ -295,7 +295,7 @@ async function useSaveLeaveRecord(userId: string, groupId: string, position: num
 export async function userGoesOnLeave(userId: string, groupId: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    const position  = await getUserPositionInGroup(userId,groupId)
+    const position = await getUserPositionInGroup(userId, groupId)
     await useSaveLeaveRecord(userId, groupId, position);
 }
 
@@ -305,7 +305,7 @@ async function getUserPositionInGroup(userId: string, groupId: string) {
     const sortedUsers = await useGetSortedUsers(groupId);
     console.log('sorted users: ', sortedUsers)
     const userPosition = sortedUsers.items.findIndex((item) => userId === item.user);
-    console.log('user position in group',groupId, userPosition)
+    console.log('user position in group', groupId, userPosition)
     return userPosition
 }
 
@@ -314,21 +314,21 @@ async function getUserPositionInGroup(userId: string, groupId: string) {
  * @param groupId the group id
  * @returns the number of cases to add
  */
-async function getCasesToAdd(userId:string,groupId:string){
+async function getCasesToAdd(userId: string, groupId: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const newCount = await useGetGroupCaseCount(groupId)
-    const leaveRecord = await pb.collection('leaves').getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`)    
+    const leaveRecord = await pb.collection('leaves').getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`)
     const groupMemberCount = await useGetGroupMemberCount(groupId)
     const oldCount = leaveRecord.total_cases
     const userPosition = leaveRecord.position
     let casesToAdd: number
     const countDiff = (newCount - oldCount)
-    console.log('computing cases to add...',"oldCount: ",oldCount, 'newCount: ', newCount, 'diff: ',countDiff)
-    casesToAdd = Math.floor(countDiff/groupMemberCount)
+    console.log('computing cases to add...', "oldCount: ", oldCount, 'newCount: ', newCount, 'diff: ', countDiff)
+    casesToAdd = Math.floor(countDiff / groupMemberCount)
     console.log('cases to add before remainder: ', casesToAdd)
-    let remainder = countDiff%groupMemberCount
-    if(remainder>userPosition) casesToAdd++
+    let remainder = countDiff % groupMemberCount
+    if (remainder > userPosition) casesToAdd++
     console.log('cases to add after remainder: ', casesToAdd)
     return casesToAdd
 }
@@ -341,4 +341,18 @@ async function userIsBackFromLeave(userId: string, groupId: string) {
     await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
     await pb.collection('leaves').update(userLeaveRecord.id, { active: false })
     await useRefreshGroupCounter(groupId);
+}
+
+export async function useRemoveLeaveRecords(userId: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
+    const result = { message: "Leave records have been removed", status: "success" };
+    const leaveRecords = await pb.collection("leaves").getList(1, 1000, { filter: `user="${userId}` });
+    try {
+        leaveRecords.items.forEach(async (record) => await pb.collection('leaves').delete(record.id))
+    } catch (e: any) {
+        result.message = 'Failed deleting leave records'
+        result.status = 'failed'
+    }
+    return result
 }

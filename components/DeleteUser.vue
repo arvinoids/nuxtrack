@@ -26,7 +26,7 @@
           class="btn btn-warning"
           :class="{ 'btn-disabled': deleteDisabled }"
           @click="deleteUser(id)"
-          >Delete {{ username.toUpperCase() }}</label
+          >Reassign and Delete {{ username.toUpperCase() }}</label
         >
       </div>
     </div>
@@ -50,12 +50,14 @@ const users = usersData.items;
 
 const update = useDataUpdated();
 
-async function deleteUser(id: string) {
-  const assign = await useReassignCases(id, newUser.value);
+async function deleteUser(userId: string) {
+  const assign = await useReassignCases(userId, newUser.value);
   useShowToast(assign.message, assign.status);
-  const removeGroups = await useRemoveUserFromGroups(id);
+  const removeGroups = await useRemoveUserFromGroups(userId);
   useShowToast(removeGroups.message, removeGroups.status);
-  const res = await useDeleteUser(id);
+  const removeLeaveRecords = await useRemoveLeaveRecords(userId);
+  useShowToast(removeLeaveRecords.message, removeLeaveRecords.status);
+  const res = await useDeleteUser(userId);
   update.value++;
   useShowToast(res.message, res.status);
   const logData: LogData = {
