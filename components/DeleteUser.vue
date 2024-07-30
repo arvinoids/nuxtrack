@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import type { LogData } from "custom-types";
-const loggedInUser = useLoggedInUsername();
+const currentUser = useCurrentUser();
 const pb = useNuxtApp().$pb;
 const deleteDisabled = ref(true);
 
@@ -61,7 +61,7 @@ async function deleteUser(userId: string) {
   update.value++;
   useShowToast(res.message, res.status);
   const logData: LogData = {
-    user: loggedInUser.value,
+    user: currentUser.value?.username,
     type: "deleted user",
     details: res.message,
   };
