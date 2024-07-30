@@ -347,7 +347,7 @@ export async function useRemoveLeaveRecords(userId: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const result = { message: "Leave records have been removed", status: "success" };
-    const leaveRecords = await pb.collection("leaves").getList(1, 1000, { filter: `user="${userId}` });
+    const leaveRecords = await pb.collection("leaves").getList(1, 1000, { filter: `user="${userId}"` });
     try {
         leaveRecords.items.forEach(async (record) => await pb.collection('leaves').delete(record.id))
     } catch (e: any) {
