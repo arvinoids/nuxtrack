@@ -26,15 +26,15 @@
 
 <style scoped>
 .success {
-  @apply z-50 my-1 relative alert alert-success border-info border w-auto bg-opacity-30 backdrop-blur-sm;
+  @apply z-50 my-1 relative alert alert-success border-info border w-auto bg-opacity-30 backdrop-blur-lg;
 }
 
 .warning {
-  @apply z-50 my-1 relative alert alert-warning border-warning border w-auto bg-opacity-30 backdrop-blur-sm;
+  @apply z-50 my-1 relative alert alert-warning border-warning border w-auto bg-opacity-30 backdrop-blur-lg;
 }
 
 .failed {
-  @apply z-50 my-1 relative alert alert-error border-error text-black border w-auto bg-opacity-30 backdrop-blur-sm;
+  @apply z-50 my-1 relative alert alert-error border-error text-black border w-auto bg-opacity-30 backdrop-blur-lg;
 }
 
 .v-enter-active,

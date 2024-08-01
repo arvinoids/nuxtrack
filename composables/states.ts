@@ -22,7 +22,6 @@ export const useTheme = ()=> useState(()=>('mytheme'))
 export const useReload = ()=> useState(()=> (0))
 export const useSelectedUser = ()=> useState(()=> (''))
 
-export const useLoggedInUsername = ()=> useState(()=> (''))
 export const useEscalation = ()=> useState(()=> (false))
 
 export const useNotify = ()=> useState(()=> (false))

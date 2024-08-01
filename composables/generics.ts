@@ -39,6 +39,7 @@ export function useGetBooleanFromLocalStorage(value:string|null){
 
   export async function logActivity(data: LogData) {
     const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
     try {
       pb.collection("logs").create(data);
     } catch (e: any) {

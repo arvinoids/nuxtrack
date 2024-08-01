@@ -677,6 +677,13 @@ export async function useFindCase(id: string) {
   return { res, data };
 }
 
+async function useFindCases(caseId:string){
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+  const res = await pb.collection('cases').getList(1, 100, { filter: `case="${caseId}"` })
+  return res
+}
+
 /**Generates a dummy case Id for use as fillers in Leaves or for other purposes
  * @param prefix - the prefix for the case id to be generated
  * @returns a string of the case Id

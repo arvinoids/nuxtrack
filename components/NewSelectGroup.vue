@@ -32,6 +32,7 @@ import type { expandedCounter, user } from "pocketbase-types";
 import type { LogData, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
 const pb = useNuxtApp().$pb
+pb.autoCancellation(false)
 
 const props = defineProps<{
   group: string;
@@ -39,7 +40,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["skip", "reset"]);
-const loggedInUser = useLoggedInUsername();
+const loggedInUser = useCurrentUser()
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
 const caseExists = ref(false);
@@ -72,7 +73,7 @@ async function skipCatch(user: user) {
   emit("skip");
   moveCursor();
   const logData: LogData = {
-    user: loggedInUser.value,
+    user: loggedInUser.value?.username,
     type: "skipped user",
     details: message,
   };
@@ -96,7 +97,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
     useDataUpdated().value++;
   }
   const logData: LogData = {
-    user: loggedInUser.value,
+    user: loggedInUser.value?.username,
     type: "assigned case",
     details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
@@ -125,7 +126,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
     useDataUpdated().value++;
   }
   const logData: LogData = {
-    user: loggedInUser.value,
+    user: loggedInUser.value?.username,
     type: "assigned case",
     details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };

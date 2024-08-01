@@ -11,13 +11,13 @@ module.exports = {
   ],
   theme: {
     extend: {},
-    fontWeight:{
-      thin:'300,',
-      normal:'400',
-      medium:'500',
-      semibold:'600',
-      bold:'700',
-      extrabold:'900'
+    fontWeight: {
+      thin: '300,',
+      normal: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+      extrabold: '900'
     }
   },
   plugins: [require("daisyui")],
@@ -35,25 +35,29 @@ module.exports = {
         "success": "#3AF23A",
         "warning": "#FAA519",
         "error": "#dc2626",
-        "--btn-text-case":"none",
-        "--rounded-btn":"none",
-        "--rounded-box":"none",
+        "--btn-text-case": "none",
+        "--rounded-btn": "none",
+        "--rounded-box": "none",
       },
       dark: {
-        "primary": "#a3e635", 
+        "primary": "#a3e635",
         "secondary": "#15803d",
         "accent": "#a7f3d0",
-        "neutral": "#1B1D1D",    
+        "neutral": "#1B1D1D",
         "base-100": "#212121",
         "info": "#2563EB",
         "success": "#16A34A",
         "warning": "#D97706",
         "error": "#DC2626",
         "--btn-text-case": "none",
-        "--rounded-btn":"none",
-        "--rounded-box":"none",
-        },
-    }, ],
+        "--rounded-btn": "none",
+        "--rounded-box": "none",
+      },
+    },],
     darkTheme: "darkLex"
-  }
+  }, safelist: [
+
+    '-top-7',
+    '-bottom-7'
+  ],
 }

@@ -1,38 +1,36 @@
 <template>
-  <div class="btn btn-ghost btn-circle">
+  <div class="btn btn-ghost btn-circle group relative">
     <label class="swap swap-rotate">
       <!-- this hidden checkbox controls the state -->
-      <input type="checkbox" v-model="mode" />
-
+      <input type="checkbox" v-model="checked" />
       <!-- moon icon -->
-      <Icon name="ic:outline-brightness-5" class="swap-on text-gray-200" size="1.6rem" />
-
+      <Icon name="ph:sun-duotone" class="swap-on text-gray-200" size="1.6rem" />
       <!-- sun icon -->
-      <Icon name="ic:outline-brightness-4" class="swap-off text-gray-200" size="1.6rem" />
-    </label>
+      <Icon
+        name="ph:moon-stars-duotone"
+        class="swap-off text-gray-200"
+        size="1.6rem"
+      /> </label
+    ><Tooltip position="bottom">Toogle dark/light mode</Tooltip>
   </div>
 </template>
 
 <script setup lang="ts">
 const colorMode = useColorMode();
-const storedMode = ref(localStorage.getItem("colorMode"));
-let mode = ref(getStoredMode());
-onMounted(() => {
-  if (storedMode.value === null) localStorage.setItem("colorMode", "light");
-  mode.value = false;
-});
 
-function getStoredMode() {
-  if (storedMode.value === "dark" || storedMode.value === null) return true;
-  else return false;
+function getMode() {
+  return localStorage.getItem("dark") === "1" ? true : false;
 }
-watch(mode, (mode) => {
-  if (mode === true) {
+
+const checked = ref(getMode());
+
+watch(checked, (checked) => {
+  if (checked === true) {
     colorMode.preference = "dark";
-    localStorage.setItem("colorMode", "dark");
+    localStorage.setItem("dark", "1");
   } else {
     colorMode.preference = "light";
-    localStorage.setItem("colorMode", "light");
+    localStorage.setItem("dark", "0");
   }
 });
 </script>

@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import type { LogData, emailContent } from "custom-types";
-const loggedInUser = useLoggedInUsername();
+const loggedInUser = useCurrentUser();
 
 const props = defineProps<{
   id: string;
@@ -35,7 +35,7 @@ async function deleteCase(id: string) {
   update.value++;
   useShowToast(res.message + " has been deleted.", res.status);
   const logData: LogData = {
-    user: loggedInUser.value,
+    user: loggedInUser.value?.username,
     type: "deleted case",
     details: res.message,
   };

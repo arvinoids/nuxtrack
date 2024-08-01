@@ -15,7 +15,7 @@
         <h3 class="text-lg font-bold">Find a case</h3>
         <label for="finder" class="btn w-min self-center absolute right-3 top-3 btn-ghost hover:btn-error">✖</label>
         <input
-            class="input mt-3 bg-neutral text-center w-[19rem]"
+            class="input mt-3 bg-base-200 text-center w-[19rem]"
             type="search"
             v-model="caseId"
             placeholder="CAS-XXXXXXX-XXXXXX"

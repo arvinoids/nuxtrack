@@ -1,12 +1,14 @@
 <template>
-  <nuxt-link to="/Logs" class="btn btn-circle btn-ghost">
-    <Icon
-      name="ic:baseline-notifications-active"
-      size="1.8rem"
-      :class="newEvent ? 'text-error' : 'text-gray-200'"
-      @click="newEvent = false"
-    />
-  </nuxt-link>
+  <div class="indicator">
+    <nuxt-link to="/Logs" class="btn btn-circle btn-ghost">
+      <Icon
+        name="ic:baseline-notifications-active"
+        size="1.8rem"
+        :class="newEvent ? 'text-error' : 'text-gray-200'"
+        @click="newEvent = false"
+      />
+    </nuxt-link>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +24,8 @@ pb.collection("logs").subscribe("*", async () => {
   const update = latest.items[0];
 
   if (currentUser !== update.user) {
-    useShowToast(`${update.user} ${update.type} ${update.details}`, "success");
+    //useShowToast(`${update.user} ${update.type} ${update.details}`, "success");
+    miniToast("success", `${update.user} ${update.type} ${update.details}`);
   }
   newEvent.value = true;
 });
