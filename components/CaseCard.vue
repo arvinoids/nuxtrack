@@ -30,6 +30,7 @@ type Texpand = {};
 const props = defineProps<{
   caseRecord: CasesRecord & BaseModel & Texpand;
 }>();
+console.log("props passed: ", props.caseRecord);
 </script>
 
 <style></style>

@@ -14,7 +14,7 @@
     <div class="navbar-center"></div>
     <div class="navbar-end">
       <div class="flex gap-2 items-center md:mr-[5rem]">
-        <CaseFinder />
+        <NewCaseFinder />
         <ColorToggle />
         <Notifier />
         <Dropdown />

@@ -677,10 +677,10 @@ export async function useFindCase(id: string) {
   return { res, data };
 }
 
-async function useFindCases(caseId:string){
+export async function useFindCases(caseId:string){
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const res = await pb.collection('cases').getList(1, 100, { filter: `case="${caseId}"` })
+  const res = await pb.collection('cases').getList(1, 100, { filter: `case~"${caseId}"`,expand:'user,group',sort:'-created' })
   return res
 }
 

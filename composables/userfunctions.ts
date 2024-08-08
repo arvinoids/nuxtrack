@@ -135,102 +135,36 @@ export async function useGetSortedUsers(group: string) {
     return (users as unknown) as expandedUsers;
 }
 
-// async function userGoesOnLeave(user: string, group: string) {
-//     // if user is top of list, then just get top count upon return and assign as the count of the user
-//     // if user is not on top, get difference from top, store in db, then add difference to user's count upon return
-//     const pb = useNuxtApp().$pb
-//     pb.autoCancellation(false);
-//     const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
-//     const userPosition = sortedUsers.findIndex((item) => user === item.user);
-//     const difference = await savedDifference(user, group)
-//     await storeUserCount(user, group, userPosition, difference);
-// }
+/** Runs the back from leave function and returns cases added to user in group
+ * @param userId 
+ * @param groupId 
+ * @returns cases added to user in this group
+ */
+async function userIsBackFromLeave(userId: string, groupId: string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
+    const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`);
+    let casesToAdd: number = await getCasesToAdd(userId, groupId)
+    await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
+    await pb.collection('leaves').update(userLeaveRecord.id, { active: false })
+    await useRefreshGroupCounter(groupId);
+    return casesToAdd
+}
 
-// async function userIsBackFromLeave(userId: string, groupId: string) {
-//     const pb = useNuxtApp().$pb
-//     pb.autoCancellation(false);
-//     await useRefreshGroupCounter(groupId);
-//     let userLeaveRecord
-//     try{
-//         userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`);
-//     } catch (e: any) {
-//         console.log(e)
-//         return
-//     }
-//     console.log('update for leave record id: ', userLeaveRecord.id)
-//     const sortedUsers = await useGetSortedUsers(groupId);
-//     let casesToAdd: number
-//     if (sortedUsers.items.length === 2) {
-//         console.log("two users")
-//         if (userLeaveRecord.position === 0) {
-//             console.log("user is first")
-//             casesToAdd = sortedUsers.items[1].count - sortedUsers.items[0].count - userLeaveRecord.difference
-//         } else {
-//             casesToAdd = userLeaveRecord.difference - sortedUsers.items[1].count + sortedUsers.items[0].count
-//         }
-//     }
-//     else {
-//         console.log("more than two users")
-//         casesToAdd = userLeaveRecord.difference - ((sortedUsers.items[userLeaveRecord.position].count) - sortedUsers.items[0].count)
-//     }
-//     console.log(`cases to add in ${groupId}: `, casesToAdd)
-//     await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
-//     await pb.collection('leaves').update(userLeaveRecord.id, { active: false })
-//     await useRefreshGroupCounter(groupId);
-// }
-
-// async function savedDifference(user: string, group: string) {
-//     const pb = useNuxtApp().$pb
-//     pb.autoCancellation(false);
-//     const sortedUsers = await useGetSortedUsers(group).then((res) => res.items);
-//     const users = sortedUsers.length
-//     const userPosition = sortedUsers.findIndex((item) => user === item.user);
-//     let difference: number
-//     if (users === 2) difference = Math.abs(sortedUsers[0].count - sortedUsers[1].count)
-//     else {
-//         difference = sortedUsers[userPosition].count - sortedUsers[0].count
-//     }
-//     return difference
-// }
-
-// async function restoreDifference(user: string, group: string, sortedUsers: expandedUsers) {
-//     const pb = useNuxtApp().$pb
-//     pb.autoCancellation(false);
-//     const users = sortedUsers.items.length
-//     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${user}"&&group="${group}"`);
-//     let toAdd: number
-//     if (users === 2) {
-//         if (userLeaveRecord.position === 0) {
-//             toAdd = sortedUsers.items[1].count + userLeaveRecord.difference
-//         } else {
-//             toAdd = sortedUsers.items[0].count + userLeaveRecord.difference
-//         }
-//     } else {
-//         const lowest = sortedUsers.items[0].count
-//         toAdd = userLeaveRecord.difference + lowest
-//     }
-//     return toAdd
-// }
-
-// async function storeUserCount(user: string, group: string, position: number, difference: number) {
-//     const pb = useNuxtApp().$pb
-//     pb.autoCancellation(false);
-//     await pb.collection("leaves").create({
-//         user,
-//         difference,
-//         group,
-//         position,
-//         active: true
-//     });
-// }
-
-export async function useUserIsBackFromLeave(id: string): Promise<{ status: 'success' | 'failed' | 'warning', message: string }> {
-    const groups = await useGetUserGroups(id);
+export async function useUserIsBackFromLeave(userId: string): Promise<{ status: 'success' | 'failed' | 'warning', message: string }> {
+    const groups = await useGetUserGroups(userId);
     console.log('user groups: ', groups)
     try {
         groups.forEach(async (group: string) => {
             console.log('user is back from leave on group', group)
-            await userIsBackFromLeave(id, group);
+            const casesToAdd = await userIsBackFromLeave(userId, group);
+            const groupName = await useGetGroupName(group)
+            const logData: LogData = {
+                user: 'system',
+                type: 'assigned case',
+                details: `${casesToAdd} cases skipped in ${groupName} from leave`
+            }
+            await logActivity(logData)
         });
         return { status: 'success', message: 'updated user case count after leave' }
     } catch (e: any) {
@@ -333,15 +267,6 @@ async function getCasesToAdd(userId: string, groupId: string) {
     return casesToAdd
 }
 
-async function userIsBackFromLeave(userId: string, groupId: string) {
-    const pb = useNuxtApp().$pb
-    pb.autoCancellation(false);
-    const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`);
-    let casesToAdd: number = await getCasesToAdd(userId, groupId)
-    await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
-    await pb.collection('leaves').update(userLeaveRecord.id, { active: false })
-    await useRefreshGroupCounter(groupId);
-}
 
 export async function useRemoveLeaveRecords(userId: string) {
     const pb = useNuxtApp().$pb
