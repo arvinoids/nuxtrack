@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center">
-    <div class="self-center mt-3 flex flex-col items-center">
+    <div class="self-center flex flex-col items-center">
       <p class="text-lg text-secondary mx-10">
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
         >. To assign or escalate a case, please select a group below.

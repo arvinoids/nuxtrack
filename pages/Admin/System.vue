@@ -1,7 +1,6 @@
 <template>
   <div>
-    <div>Here you can archive old cases to optimize free space and performance.</div>
-    <div><SystemArchiveCases /></div>
+    <div><SystemArchiveLogs /></div>
   </div>
 </template>
 

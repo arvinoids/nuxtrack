@@ -1,6 +1,7 @@
-import type { ListResult } from "pocketbase";
-import type { userEntry, userStatus, statuschoice, notification, LogData } from "custom-types";
+import type { AuthModel, ListResult } from "pocketbase";
+import type { userEntry, userStatus, statuschoice, notification, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
+import type { UsersResponse } from "~/pocketbase-types";
 
 
 export async function useDeleteUser(userId: string) {
@@ -159,10 +160,11 @@ export async function useUserIsBackFromLeave(userId: string): Promise<{ status: 
             console.log('user is back from leave on group', group)
             const casesToAdd = await userIsBackFromLeave(userId, group);
             const groupName = await useGetGroupName(group)
+            const userName = await useGetUsernameFromId(userId)
             const logData: LogData = {
                 user: 'system',
                 type: 'assigned case',
-                details: `${casesToAdd} cases skipped in ${groupName} from leave`
+                details: `${casesToAdd} cases skipped in ${groupName} for ${userName} from leave`
             }
             await logActivity(logData)
         });
@@ -278,6 +280,25 @@ export async function useRemoveLeaveRecords(userId: string) {
     } catch (e: any) {
         result.message = 'Failed deleting leave records'
         result.status = 'failed'
+    }
+    return result
+}
+
+export async function useGetAvatarUrl(user: AuthModel) {
+    const pb = useNuxtApp().$pb;
+    const url = pb.files.getUrl(user!, user!.avatar, { thumb: "100x100" });
+    return url;
+}
+
+export async function useUpdateAvatar(userId:string, formData: FormData) {
+    const pb = useNuxtApp().$pb
+    const result:result = { status: 'failed', message: 'Failed updating avatar' }
+    try {
+        const res = await pb.collection('users').update(userId, formData)
+        result.status = 'success'
+        result.message = 'Avatar updated'
+    } catch (e: any) {
+        result.message = e.message
     }
     return result
 }

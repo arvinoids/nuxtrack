@@ -56,6 +56,13 @@
             @click="show = !show"
             >Change Password</NuxtLink
           >
+
+          <NuxtLink
+            to="/ChangeAvatar"
+            class="block px-4 py-2 text-sm hover:bg-neutral"
+            @click="show = !show"
+            >Change Avatar</NuxtLink
+          >
         </div>
       </div>
     </transition>

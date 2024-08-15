@@ -27,7 +27,7 @@
     "daisyui": "^2.51.0",
     "defu": "^6.1.4",
     "nuxt-headlessui": "^1.1.4",
-    "pocketbase": "^0.21.2",
+    "pocketbase": "^0.21.4",
     "vee-validate": "^4.8.3",
     "vue": "^3.4.27",
     "vue3-toastify": "^0.1.0",

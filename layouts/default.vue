@@ -2,7 +2,7 @@
   <div>
     <Navbar />
     <UserLeaveNotification />
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center py-3">
       <slot />
     </div>
     <Footer />

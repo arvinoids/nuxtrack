@@ -891,31 +891,31 @@ export async function useGetFullCases(){
   return res
 }
 
-/** Converts the JSON cases to CSV
- * @param cases - the JSON cases data
- * @returns the CSV cases data
+// /** Converts the JSON cases to CSV
+//  * @param cases - the JSON cases data
+//  * @returns the CSV cases data
 
- * The function returns the CSV cases data. */
-export function jsonToCSV(cases: CasesRecord[]): string {
-  // Check if jsonData is not an array or is an empty array
-  if (!Array.isArray(cases) || cases.length === 0) {
-    return '';
-  }
+//  * The function returns the CSV cases data. */
+// export function jsonToCSV(cases: CasesRecord[]): string {
+//   // Check if jsonData is not an array or is an empty array
+//   if (!Array.isArray(cases) || cases.length === 0) {
+//     return '';
+//   }
 
-  // Extract keys for CSV header
-  const csvHeader = Object.keys(cases[0]).join(',');
+//   // Extract keys for CSV header
+//   const csvHeader = Object.keys(cases[0]).join(',');
 
-  // Map JSON objects to CSV rows
-  const csvRows = cases.map(row => {
-    return Object.values(row).map(value =>
-      // Handle values that contain commas or newlines
-      `"${value.toString().replace(/"/g, '""')}"`
-    ).join(',');
-  });
+//   // Map JSON objects to CSV rows
+//   const csvRows = cases.map(row => {
+//     return Object.values(row).map(value =>
+//       // Handle values that contain commas or newlines
+//       `"${value.toString().replace(/"/g, '""')}"`
+//     ).join(',');
+//   });
 
-  // Combine header and rows with newline characters
-  return [csvHeader, ...csvRows].join('\\n');
-}
+//   // Combine header and rows with newline characters
+//   return [csvHeader, ...csvRows].join('\\n');
+// }
 
 function getCurrentTimestamp(): string {
   const now = new Date();
