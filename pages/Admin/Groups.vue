@@ -2,6 +2,10 @@
   <div><AddGroup /><GroupSorting /></div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  middleware: "admin",
+});
+</script>
 
 <style></style>

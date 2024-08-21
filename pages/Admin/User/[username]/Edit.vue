@@ -92,6 +92,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: "admin",
+});
+
 const username = useRoute().params.username;
 const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });

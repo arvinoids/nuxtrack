@@ -7,6 +7,9 @@
 
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
+definePageMeta({
+  middleware: "auth",
+});
 const auth = useAuth();
 if (pb.authStore.isValid) {
   auth.value.isAuthenticated = true;

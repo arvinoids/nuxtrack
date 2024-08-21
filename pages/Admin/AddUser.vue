@@ -114,6 +114,10 @@
 <script setup lang="ts">
 import type { userEntry } from "custom-types";
 
+definePageMeta({
+  middleware: "admin",
+});
+
 const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });
 const message = ref("");

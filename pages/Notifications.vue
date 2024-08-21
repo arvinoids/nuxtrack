@@ -8,6 +8,9 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: "auth",
+});
 const pb = useNuxtApp().$pb;
 const newEvent = useNotify();
 const items = ref((await pb.collection("logs").getList()).totalItems);

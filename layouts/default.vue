@@ -33,6 +33,11 @@ import UserLeaveNotification from "~/components/UserLeaveNotification.vue";
 const currentUser = useCurrentUser();
 
 const pb = useNuxtApp().$pb;
+
+if (!currentUser.value || currentUser.value.length === 0) {
+  currentUser.value = pb.authStore.model;
+}
+
 pb.collection("users").subscribe(pb.authStore.model!.id, () => {
   pb.collection("users").authRefresh();
 });

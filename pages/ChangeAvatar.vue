@@ -36,6 +36,9 @@
 
 <script setup lang="ts">
 const user = useCurrentUser();
+definePageMeta({
+  middleware: "auth",
+});
 const avatarUrl = ref(await useGetAvatarUrl(user.value));
 const file = ref<File | null>(null);
 
