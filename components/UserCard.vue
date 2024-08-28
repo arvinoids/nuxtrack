@@ -1,5 +1,17 @@
 <template>
-  <div class="p-3 shadow-lg border w-[300px]">
+  <div class="p-3 shadow-lg border w-[300px] justify-center flex flex-col">
+    <div class="flex flex-row w-full justify-center p-5" v-if="avatar">
+      <NuxtLink to="/ChangeAvatar" v-if="user.id === currentUser?.id"
+        ><img :src="avatar" alt="" class="" title="Change Avatar"
+      /></NuxtLink>
+      <img v-else :src="avatar" alt="" class="" />
+    </div>
+    <div v-else class="flex flex-row w-full justify-center p-5">
+      <NuxtLink to="/ChangeAvatar" v-if="user.id === currentUser?.id"
+        ><Icon name="ic:twotone-account-circle" size="3rem"
+      /></NuxtLink>
+      <Icon v-else name="ic:twotone-account-circle" size="8rem" class="text-accent" />
+    </div>
     <h5 class="">
       User: <span class="text-accent">{{ user.fullname }}</span>
     </h5>
@@ -30,10 +42,12 @@
 <script setup lang="ts">
 import type { user } from "pocketbase-types";
 const route = useRoute();
+const currentUser = useCurrentUser();
 
-defineProps<{
+const props = defineProps<{
   user: user;
 }>();
+const avatar = await useGetAvatarUrl(props.user);
 
 function allCasesButton() {
   if (route.params.groupname !== undefined) return true;

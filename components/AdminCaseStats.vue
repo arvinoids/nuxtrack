@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-center items-center gap-2 w-auto">
-    <p class="text-sm font-bold self-start">Case Stats</p>
+    <p class="font-bold text-center">Case Stats</p>
     <div v-if="!loading" class="h-auto w-[450px]">
       <table class="border table table-compact table-zebra rounded-none">
         <thead>

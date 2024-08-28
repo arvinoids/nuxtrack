@@ -960,3 +960,9 @@ export async function useGetGroupMemberCount(groupId:string) {
   const totalMembers = res.totalItems
   return totalMembers
 }
+
+export async function useGetCaseReport(userId:string, groupId:string, from:Date,to:Date){
+  const pb = useNuxtApp().$pb
+  const res = await pb.collection('cases').getList(1, 10000, {filter:`user="${userId}"&&group="${groupId}"&&created >= "${from}"&&created<="${to}"`, expand: 'user,group'})
+  return res
+}

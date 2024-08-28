@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-col items-center gap-5">
+    <AdminCasesReporter />
     <AdminCaseStats />
     <AdminCreateDummyCases />
   </div>

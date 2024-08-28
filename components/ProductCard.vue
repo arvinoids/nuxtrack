@@ -38,8 +38,8 @@
         <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
-            class="tooltip tooltip-top mx-1 w-full"
-            :data-tip="
+            class="mx-1 w-full flex flex-row h-auto justify-center items-center gap-1"
+            :title="
               user.expand.user.username.toUpperCase() +
               ' is ' +
               user.expand.user.status +
@@ -48,12 +48,7 @@
               ' case(s)'
             "
           >
-            <Icon
-              name="ic:sharp-circle"
-              :class="`text-${getColor(user.expand.user.status)}`"
-              class="mx-1"
-              size="0.5rem"
-            />
+            <UserIcon :user="user.expand.user" />
             <span
               class="hover:text-accent hover:font-semibold"
               :class="id === selectedUser ? 'text-accent font-bold my-3' : 'text-sm'"

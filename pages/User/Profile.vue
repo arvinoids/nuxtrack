@@ -9,8 +9,9 @@
 
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
+import type { user } from "pocketbase-types";
 
-const userData = await pb.collection("users").getOne(pb.authStore.model!.id);
+const userData: user = await pb.collection("users").getOne(pb.authStore.model!.id);
 </script>
 
 <style></style>

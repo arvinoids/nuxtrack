@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-start w-full">
-    <p class="text-sm mb-2 font-bold">Create dummy cases for user</p>
-    <div class="flex items-center gap-2">
+    <p class="mb-2 font-bold text-center">Create dummy cases for user</p>
+    <div class="flex justify-center items-center gap-2">
       <HeadlessListbox v-model="selectedUser">
         <div class="relative">
           <HeadlessListboxButton
