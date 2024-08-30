@@ -28,7 +28,6 @@ const props = defineProps<{
   user: user;
 }>();
 const avatar = await useGetAvatarUrl(props.user);
-console.log(props.user);
 </script>
 
 <style></style>
