@@ -5,7 +5,7 @@
         Assign case to
         <span class="text-accent">{{ taggedUser.fullname }}</span>
       </h3>
-      <p class="text-sm">Status: <span class="font-semibold" :class="{ [`text-${getColor(taggedUser.status)}`]: true }">{{
+      <p class="text-sm">Status: <span class="font-semibold" :class="{ [`badge badge-sm badge-${getColor(taggedUser.status)}`]: true }">{{
         taggedUser.status }}</span></p>
       <p class="py-4">
         <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]" v-model="caseId" />
