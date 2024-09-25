@@ -122,7 +122,7 @@ declare module 'custom-types' {
         body: string,
       }
 
-    type statuschoice =  'Available'|'Busy'|'Outside shift'|'On leave'|'Not available'|'Unknown'
+    type statuschoice =  'Available'|'Busy'|'Outside shift'|'On leave'|'Not available'|'Unknown'|'Rest day'
 
     interface userStatus {
         status:statuschoice,

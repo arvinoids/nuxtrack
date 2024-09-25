@@ -220,6 +220,7 @@ export enum UsersStatusOptions {
 	"Busy" = "Busy",
 	"Outside shift" = "Outside shift",
 	"On leave" = "On leave",
+	"Rest day" = "Rest day",
 	"Not available" = "Not available",
 	"Unknown" = "Unknown",
 }

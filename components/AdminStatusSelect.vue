@@ -75,10 +75,10 @@ const selected = ref(props.user.status);
 
 watch(selected, async (newStatus, oldStatus) => {
   await useChangeUserStatus(props.user.id, newStatus as statuschoice, "");
-  if (newStatus === "On leave") {
+  if (newStatus === "On leave" || newStatus === "Rest day") {
     await useUserOnLeave(props.user.id);
   }
-  if (oldStatus === "On leave") {
+  if (oldStatus === "On leave" || oldStatus === "Rest day") {
     console.log("running back on leave script for", props.user.username);
     await useUserIsBackFromLeave(props.user.id);
   }

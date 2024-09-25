@@ -110,10 +110,16 @@ async function changeStatus(newStatus: statuschoice) {
     useUserWhoChangedStatus().value = user.value.username;
     await useChangeUserStatus(user.value.id, newStatus, status.value.message);
     status.value.status = newStatus;
-    if (oldStatus === "On leave" && oldStatus !== newStatus) {
+    if (
+      (oldStatus === "On leave" || oldStatus === "Rest day") &&
+      oldStatus !== newStatus
+    ) {
       await useUserIsBackFromLeave(user.value.id);
     }
-    if (newStatus === "On leave" && oldStatus !== newStatus) {
+    if (
+      (newStatus === "On leave" || newStatus === "Rest day") &&
+      oldStatus !== newStatus
+    ) {
       await useUserOnLeave(user.value.id);
     }
     const logData: LogData = {
