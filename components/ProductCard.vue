@@ -34,7 +34,7 @@
     <div v-if="loading" class="m-10"><Spinner /></div>
 
     <div v-else>
-      <div v-if="displayUsers.length > 0" :key="updateCard">
+      <div v-if="displayUsers.length > 0" :key="updateCard" v-auto-animate>
         <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
