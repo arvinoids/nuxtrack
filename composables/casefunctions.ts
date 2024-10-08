@@ -1,5 +1,5 @@
-import type { notification } from "custom-types";
-import type { ListResult, RecordModel } from "pocketbase";
+import type { notification, result } from "custom-types";
+import type { ListResult, Record } from "pocketbase";
 import type { user } from "pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
@@ -71,11 +71,11 @@ export async function useAssignCase(
     await incrementCaseCount(user)
     // await updateCounter(group, user);
     let owner = (await useGetUsernameFromId(user)).toUpperCase();
-    
+
     // move user to bottom
     const currentSequence = await useGetUserSequenceData(group)
-    const newOrder = await useMoveUserToBottom(currentSequence.user_order,user)
-    await useUpdateUserSequence(group,newOrder)
+    const newOrder = await useMoveUserToBottom(currentSequence.user_order, user)
+    await useUpdateUserSequence(group, newOrder)
 
     result.message = `Case has been assigned. ${owner} should receive a notification shortly.`;
     result.status = "success";
@@ -251,7 +251,7 @@ export async function useUpdateCase(
 export async function useDeleteCase(id: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const result:{message:string,status:'success'|'failed'|'warning'} = { message: "", status: "success" };
+  const result: { message: string, status: 'success' | 'failed' | 'warning' } = { message: "", status: "success" };
   try {
     const caseRecord = await pb.collection("cases").getOne(id);
     const caseId = caseRecord.case;
@@ -266,8 +266,6 @@ export async function useDeleteCase(id: string) {
   }
 }
 
-
-
 export async function useSubmitCase(
   caseId: string,
   user: string,
@@ -278,6 +276,26 @@ export async function useSubmitCase(
   // useUpdateGroup(group)
   return result;
 }
+
+export async function useReassignCase(caseId: string, newUserId: string) {
+  caseId = caseId.trim()
+  const pb = useNuxtApp().$pb;
+  console.log('running reassign')
+  const caseRecord = await pb.collection('cases').getFirstListItem(`case="${caseId}"`)
+  console.log(caseRecord)
+  const result:result = { status: "failed", message:'' }
+  try {
+    await pb.collection('cases').update(caseRecord.id, { user: newUserId })
+    result.message = `${caseId} has been reassigned`
+    result.status = "success"
+  } catch (e: any) {
+    result.message = e.message
+    result.status = "failed"
+  }
+  return result;
+}
+
+
 
 export async function useRefreshAll() {
   const pb = useNuxtApp().$pb
@@ -334,7 +352,7 @@ export async function useSearchCase(id: string) {
   pb.autoCancellation(false);
   id = id.trim();
   let result = { message: "", status: "failed" };
-  let data: RecordModel | undefined;
+  let data: Record | undefined;
   try {
     data = await pb
       .collection("cases")
@@ -413,7 +431,7 @@ async function getCase(id: string) {
   return rec;
 }
 
-async function renameOldCase(rec: RecordModel) {
+async function renameOldCase(rec: Record) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   let newCaseId = rec.case + "-escalated";
@@ -645,7 +663,7 @@ export async function useFindCase(id: string) {
     message: "",
     status: "",
   };
-  let data: RecordModel | null;
+  let data: Record | null;
 
   try {
     data = await pb
@@ -708,7 +726,7 @@ export async function useGetAllGroups() {
 export async function useDeleteGroupCases(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const result:notification = { message: '', status: 'failed' }
+  const result: notification = { message: '', status: 'failed' }
   try {
     const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${group}"` })
     res.items.forEach(async (item) => {
@@ -812,14 +830,14 @@ export async function useGetUserCaseCount(userId: string) {
   return res.totalItems
 }
 
-export async function useUpdateUserCaseCount(userId:string) {
+export async function useUpdateUserCaseCount(userId: string) {
   const count = await useGetUserCaseCount(userId)
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   await pb.collection('users').update(userId, { cases: count })
 }
 
-async function incrementCaseCount(userId:string){
+async function incrementCaseCount(userId: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const user = await pb.collection('users').getFirstListItem(`id="${userId}"`, { fields: 'cases' })

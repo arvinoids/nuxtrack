@@ -45,6 +45,13 @@
         <div class="btn btn-outline btn-secondary" @click="skipCatch(selectedUser)">
           Skip
         </div>
+        <div
+          v-if="reassignButton"
+          class="btn btn-outline btn-warning"
+          @click="reassignCase(caseId, selectedUser.id)"
+        >
+          Reassign
+        </div>
         <a href="#" class="btn btn-outline btn-error" @click="resetSelection()">Cancel</a>
       </div>
     </div>
@@ -87,6 +94,9 @@ const caseIsBlank = computed(() => {
 });
 
 const hideSubmit = ref(true);
+const reassignButton = computed(() => {
+  return message.value === "This case is already assigned. Reassign or use Search.";
+});
 
 watch([caseId, forced, cursor], async () => {
   message.value = "";
@@ -97,7 +107,7 @@ watch([caseId, forced, cursor], async () => {
     message.value = "Incorrect case ID format. Please recheck.";
     hideSubmit.value = true;
   } else if (await useCaseExists(caseId.value.trim())) {
-    message.value = "This case is already assigned. Please use search.";
+    message.value = "This case is already assigned. Reassign or use Search.";
     hideSubmit.value = true;
   } else if (selectedUser.value.status !== "Available" && !forced.value) {
     hideSubmit.value = true;
@@ -140,8 +150,36 @@ async function submitCase(caseId: string, userId: string, group: string) {
     details:
       `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)).toUpperCase(),
   };
-
   logActivity(logData);
+}
+
+async function reassignCase(caseId: string, newOwnerId: string) {
+  const currentTime = useFormatDate(new Date(Date.now()));
+  try {
+    const res = await useReassignCase(caseId, newOwnerId);
+    miniToast(res.status, res.message);
+    await useUpdateUserLastAssigned(newOwnerId);
+    if (res.status === "success") {
+      const user = await pb.collection("users").getOne(newOwnerId);
+      const email = {
+        to: user.email,
+        subject: "New case assigned to you",
+        body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been reassigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
+      };
+      const emailres: result = (await useSendEmail(email)) as result;
+      miniToast(emailres.status, emailres.message);
+      const logData: LogData = {
+        user: loggedInUser.value,
+        type: "assigned case",
+        details:
+          `reassigned ${caseId} to ` +
+          (await useGetUsernameFromId(newOwnerId)).toUpperCase(),
+      };
+      logActivity(logData);
+    }
+  } catch (e: any) {
+    miniToast("failed", "Reassign has failed");
+  }
 }
 
 const emit = defineEmits(["skip"]);
