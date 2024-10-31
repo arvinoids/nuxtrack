@@ -146,8 +146,8 @@ async function userIsBackFromLeave(userId: string, groupId: string) {
     pb.autoCancellation(false);
     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`);
     let casesToAdd: number = await getCasesToAdd(userId, groupId)
-    await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
     await pb.collection('leaves').update(userLeaveRecord.id, { active: false })
+    await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
     await useRefreshGroupCounter(groupId);
     return casesToAdd
 }
