@@ -1,7 +1,7 @@
 import type { notification } from "custom-types";
 import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
-import type { ArchiveRecord, BaseSystemFields, CasesRecord } from "~/pocketbase-types";
+import type { ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -734,7 +734,24 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
       console.log(e);
     }
   });
+  await addToTotalCases(quantity, groupId) // this adds to the total case count on all active leaves to account for dummy case computation after leave
   return { status: 'success', message: `${quantity} Cases created` }
+}
+
+/** Adds to case count in active leave record
+ * 
+ * @param quantity the amount to add
+ * @param groupId the group to add to
+ */
+async function addToTotalCases(quantity:number,groupId:string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+  const leaveRecords = await pb.collection('leaves').getList<LeavesRecord&BaseSystemFields>(1,1000,{filter:`group="${groupId}" && active=true`})
+  for (const record of leaveRecords.items) {
+    const total_cases = record.total_cases + quantity
+    const data = {total_cases}
+    await pb.collection('leaves').update(record.id, data)
+  }
 }
 
 /** Returns a pocketbase ListResult that contains the list of groups */

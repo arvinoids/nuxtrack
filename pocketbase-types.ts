@@ -15,7 +15,9 @@ export enum Collections {
 	Currentlist = "currentlist",
 	Currentposition = "currentposition",
 	Groups = "groups",
+	Images = "images",
 	Leaves = "leaves",
+	Links = "links",
 	Logs = "logs",
 	Posts = "posts",
 	Printers = "printers",
@@ -107,12 +109,24 @@ export type GroupsRecord = {
 	order?: number
 }
 
+export type ImagesRecord = {
+	file?: string
+}
+
 export type LeavesRecord = {
 	active?: boolean
 	difference?: number
 	group: RecordIdString
 	position?: number
+	total_cases: number
 	user: RecordIdString
+}
+
+export type LinksRecord = {
+	admin?: boolean
+	details?: string
+	title: string
+	url: string
 }
 
 export enum LogsTypeOptions {
@@ -151,6 +165,7 @@ export enum PostsStatusOptions {
 export enum PostsVisibilityOptions {
 	"public" = "public",
 	"draft" = "draft",
+	"admins" = "admins",
 	"admin" = "admin",
 }
 export type PostsRecord = {
@@ -220,8 +235,8 @@ export enum UsersStatusOptions {
 	"Busy" = "Busy",
 	"Outside shift" = "Outside shift",
 	"On leave" = "On leave",
-	"Rest day" = "Rest day",
 	"Not available" = "Not available",
+	"Rest day" = "Rest day",
 	"Unknown" = "Unknown",
 }
 export type UsersRecord = {
@@ -244,7 +259,9 @@ export type CoursesResponse<Texpand = unknown> = Required<CoursesRecord> & BaseS
 export type CurrentlistResponse<Texpand = unknown> = Required<CurrentlistRecord> & BaseSystemFields<Texpand>
 export type CurrentpositionResponse<Texpand = unknown> = Required<CurrentpositionRecord> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
+export type ImagesResponse<Texpand = unknown> = Required<ImagesRecord> & BaseSystemFields<Texpand>
 export type LeavesResponse<Texpand = unknown> = Required<LeavesRecord> & BaseSystemFields<Texpand>
+export type LinksResponse<Texpand = unknown> = Required<LinksRecord> & BaseSystemFields<Texpand>
 export type LogsResponse<Texpand = unknown> = Required<LogsRecord> & BaseSystemFields<Texpand>
 export type PostsResponse<Texpand = unknown> = Required<PostsRecord> & BaseSystemFields<Texpand>
 export type PrintersResponse<Texpand = unknown> = Required<PrintersRecord> & BaseSystemFields<Texpand>
@@ -266,7 +283,9 @@ export type CollectionRecords = {
 	currentlist: CurrentlistRecord
 	currentposition: CurrentpositionRecord
 	groups: GroupsRecord
+	images: ImagesRecord
 	leaves: LeavesRecord
+	links: LinksRecord
 	logs: LogsRecord
 	posts: PostsRecord
 	printers: PrintersRecord
@@ -287,7 +306,9 @@ export type CollectionResponses = {
 	currentlist: CurrentlistResponse
 	currentposition: CurrentpositionResponse
 	groups: GroupsResponse
+	images: ImagesResponse
 	leaves: LeavesResponse
+	links: LinksResponse
 	logs: LogsResponse
 	posts: PostsResponse
 	printers: PrintersResponse
@@ -311,7 +332,9 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'currentlist'): RecordService<CurrentlistResponse>
 	collection(idOrName: 'currentposition'): RecordService<CurrentpositionResponse>
 	collection(idOrName: 'groups'): RecordService<GroupsResponse>
+	collection(idOrName: 'images'): RecordService<ImagesResponse>
 	collection(idOrName: 'leaves'): RecordService<LeavesResponse>
+	collection(idOrName: 'links'): RecordService<LinksResponse>
 	collection(idOrName: 'logs'): RecordService<LogsResponse>
 	collection(idOrName: 'posts'): RecordService<PostsResponse>
 	collection(idOrName: 'printers'): RecordService<PrintersResponse>

@@ -50,7 +50,7 @@
           >
             <UserIcon :user="user.expand.user" />
             <span
-              class="hover:text-accent hover:font-semibold"
+              class="hover:text-accent hover:font-semibold transition-all duration-300"
               :class="id === selectedUser ? 'text-accent font-bold my-3' : 'text-sm'"
             >
               {{ user.expand.user.fullname }}
