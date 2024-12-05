@@ -1,6 +1,7 @@
 import type { notification, result } from "custom-types";
-import type { ListResult, Record } from "pocketbase";
+import type { BaseModel, ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
+import type { CasesRecord, UnassignedCasesRecord } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -352,7 +353,7 @@ export async function useSearchCase(id: string) {
   pb.autoCancellation(false);
   id = id.trim();
   let result = { message: "", status: "failed" };
-  let data: Record | undefined;
+  let data: RecordModel | undefined;
   try {
     data = await pb
       .collection("cases")
@@ -369,12 +370,10 @@ export async function useCaseExists(id: string) {
   const pb = useNuxtApp().$pb
   id.trim()
   pb.autoCancellation(false);
-  try {
-    let res = await pb.collection("cases").getFirstListItem(`case="${id}"`);
-    return true;
-  } catch (e) {
-    return false;
-  }
+  let res1 = await pb.collection("cases").getList(1,1,{filter:`case="${id}"`});
+  let res2 = await pb.collection("unassigned_cases").getList(1,1,{filter:`caseId="${id}"`});
+  if (res1.totalItems>0||res2.totalItems>0) return true
+  else return false
 }
 
 export async function useCaseIsEscalated(id: string) {
@@ -424,14 +423,14 @@ export async function useEscalateCase(
   return result;
 }
 
-async function getCase(id: string) {
+async function getCase(id: string):Promise<CasesRecord&BaseModel> {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const rec = await pb.collection("cases").getFirstListItem(`case="${id}"`);
+  const rec = await pb.collection("cases").getFirstListItem<CasesRecord&BaseModel>(`case="${id}"`);
   return rec;
 }
 
-async function renameOldCase(rec: Record) {
+async function renameOldCase(rec: CasesRecord&BaseModel) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   let newCaseId = rec.case + "-escalated";
@@ -663,7 +662,7 @@ export async function useFindCase(id: string) {
     message: "",
     status: "",
   };
-  let data: Record | null;
+  let data: RecordModel | null;
 
   try {
     data = await pb
@@ -844,3 +843,36 @@ async function incrementCaseCount(userId: string) {
   await pb.collection('users').update(userId, { cases: user.cases + 1 })
 }
 
+export async function useAdvanceAssign(caseId:string, userId:string,groupId:string):Promise<notification> {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+  const data = {
+    user:userId,
+    group:groupId,
+    caseId
+  }
+  const res:notification = {message:'', status:'failed'}
+  try {
+    await pb.collection('unassigned_cases').create(data)
+    res.message = 'Case has been added to advance assign'
+    res.status = 'success'
+  } catch (e:any) {
+    res.message = e.message
+    console.log(e)
+  }
+  return res
+}
+
+export async function useGetAdvancedCases():Promise<(UnassignedCasesRecord&BaseModel)[]>{
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+
+  const cases = await pb.collection('unassigned_cases').getFullList<UnassignedCasesRecord&BaseModel>()
+  return cases
+}
+
+export async function useDeleteAdvancedCase(caseId:string){
+  const pb = useNuxtApp().$pb
+  const caseRecord = await pb.collection('unassigned_cases').getFirstListItem(`caseId="${caseId}"`)
+  await pb.collection('unassigned_cases').delete(caseRecord.id)
+}

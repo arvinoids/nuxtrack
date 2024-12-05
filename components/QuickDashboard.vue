@@ -2,7 +2,7 @@
   <div class="flex gap-5">
     <div class="w-1/5 pt-2 px-4 min-w-60">
       <div class="w-full"><Links /></div>
-      <div class="w-full"><Notebox /></div>
+      <div class="w-full"><AdvancedCases /></div>
     </div>
     <div class="flex flex-col items-center w-full">
       <div class="self-center mt-1 flex flex-col items-center">
@@ -40,7 +40,8 @@
 <script setup lang="ts">
 import type { group, user, userSequence } from "pocketbase-types";
 import SWNewGroupCard from "./SWNewGroupCard.vue";
-import { useUserStore } from "~/composables/states";
+import { useAdvancedCasesStore, useUserStore } from "~/composables/states";
+import { useGetAdvancedCases } from "~/composables/casefunctions";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -48,6 +49,8 @@ const currentUser = useCurrentUser();
 const loading = ref(true);
 const userStore = useUserStore();
 const groupStore = useGroupStore();
+const advancedCasesStore = useAdvancedCasesStore();
+let advancedCases;
 let groups: group[];
 let users: user[];
 let userSequence: userSequence[];
@@ -58,6 +61,8 @@ onMounted(async () => {
   userStore.value = users;
   groups = await pb.collection("groups").getFullList({ sort: "+order" });
   groupStore.value = groups;
+  advancedCases = await useGetAdvancedCases();
+  advancedCasesStore.value = advancedCases;
   userSequence = await pb.collection("usersequence").getFullList();
   loading.value = false;
 });

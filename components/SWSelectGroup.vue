@@ -3,8 +3,17 @@
     <div class="modal-box">
       <h3 class="text-lg font">
         Assign case to
-        <span class="text-accent">{{ selectedUser ? selectedUser.fullname : null }}</span>
+        <span class="text-accent">{{ selectedUser.fullname }}</span>
       </h3>
+      <div
+        class="text-sm text-warning flex items-center justify-center gap-3"
+        title="Activate this to assign a case to you in advance"
+      >
+        <input type="checkbox" class="toggle toggle-sm" v-model="assignToSelf" /><label
+          for="assignToSelf"
+          >Advance assign to self</label
+        >
+      </div>
 
       <p class="py-4">
         <input
@@ -40,13 +49,28 @@
             hidden: hideSubmit,
           }"
           @click="submitCase(caseId, selectedUser.id, group)"
+          v-if="!assignToSelf"
           >Assign</a
         >
-        <div class="btn btn-outline btn-secondary" @click="skipCatch(selectedUser)">
+        <a
+          href="#"
+          v-if="assignToSelf"
+          class="btn btn-primary"
+          :class="{
+            hidden: hideSubmit,
+          }"
+          @click="advanceAssign(caseId, group)"
+          >Advance Assign</a
+        >
+        <div
+          class="btn btn-outline btn-secondary"
+          @click="skipCatch(selectedUser)"
+          v-if="!assignToSelf"
+        >
           Skip
         </div>
         <div
-          v-if="reassignButton"
+          v-if="reassignButton && !assignToSelf"
           class="btn btn-outline btn-warning"
           @click="reassignCase(caseId, selectedUser.id)"
         >
@@ -62,17 +86,20 @@
 import type { user } from "pocketbase-types";
 import type { LogData, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
-import { useUpdateUserLastAssigned } from "~/composables/userfunctions";
 const pb = useNuxtApp().$pb;
 let cursor = ref(0);
+const assignToSelf = ref(false);
 
 const props = defineProps<{
   group: string;
   users: user[];
 }>();
 
-let userlist = ref(props.users);
+const userList = computed(() => props.users);
 const selectedUser = computed(() => {
+  if (assignToSelf.value && pb.authStore.model) {
+    return pb.authStore.model as user;
+  }
   return props.users[cursor.value];
 });
 
@@ -83,6 +110,7 @@ const message = ref("");
 const forced = ref(false);
 const currentUser = pb.authStore.model!.fullname;
 const groupName: string = await useGetGroupName(props.group);
+const advancedCases = useAdvancedCasesStore();
 
 const invalidFormat = computed(() => {
   const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
@@ -97,6 +125,36 @@ const hideSubmit = ref(true);
 const reassignButton = computed(() => {
   return message.value === "This case is already assigned. Reassign or use Search.";
 });
+
+onMounted(async () => {
+  await checkForAdvancedCases();
+});
+
+async function checkForAdvancedCases() {
+  console.log("checking advanced cases...");
+  const firstUser = userList.value[0];
+  advancedCases.value.forEach(async (item) => {
+    if (firstUser.id === item.user) {
+      try {
+        await submitCase(item.caseId, firstUser.id, props.group).then(() =>
+          console.log("Case assigned.")
+        );
+        await useDeleteAdvancedCase(item.caseId).then(
+          async () => (advancedCases.value = await useGetAdvancedCases())
+        );
+        const logData: LogData = {
+          user: loggedInUser.value,
+          type: "assigned case",
+          details: `${item.caseId} assigned to ${firstUser.fullname} from advanced assign.`,
+        };
+        miniToast("success", `Auto assigned advance case to ${firstUser.fullname}`);
+        logActivity(logData);
+      } catch (e: any) {
+        miniToast("failed", `Error moving from advanced to assigned: ${e.message}`);
+      }
+    }
+  });
+}
 
 watch([caseId, forced, cursor], async () => {
   message.value = "";
@@ -118,8 +176,8 @@ watch([caseId, forced, cursor], async () => {
 
 async function resetSelection() {
   cursor.value = 0;
-  userlist.value = props.users;
   caseId.value = "";
+  assignToSelf.value = false;
   await pb.collection("logs").create({
     user: pb.authStore.model!.username,
     type: "canceled assign",
@@ -127,19 +185,19 @@ async function resetSelection() {
   });
 }
 
-async function submitCase(caseId: string, userId: string, group: string) {
-  const res: notification = await useSubmitCase(caseId, userId, group);
+async function submitCase(NewCaseId: string, userId: string, group: string) {
+  const res: notification = await useSubmitCase(NewCaseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
   await useUpdateUserLastAssigned(userId);
   miniToast(res.status, res.message);
   // await resetSelection();
-  useDataUpdated().value++;
+  // useDataUpdated().value++;
   if (res.status === "success") {
     const user = await pb.collection("users").getOne(userId);
     const email = {
       to: user.email,
       subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
+      body: `Hi ${user.fullname}, \n\n${NewCaseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres: result = (await useSendEmail(email)) as result;
     miniToast(emailres.status, emailres.message);
@@ -148,9 +206,11 @@ async function submitCase(caseId: string, userId: string, group: string) {
     user: loggedInUser.value,
     type: "assigned case",
     details:
-      `assigned ${caseId} to ` + (await useGetUsernameFromId(userId)).toUpperCase(),
+      `assigned ${NewCaseId} to ` + (await useGetUsernameFromId(userId)).toUpperCase(),
   };
   logActivity(logData);
+  caseId.value = "";
+  assignToSelf.value = false;
 }
 
 async function reassignCase(caseId: string, newOwnerId: string) {
@@ -203,6 +263,31 @@ function moveCursor() {
     cursor.value = 0;
   } else cursor.value++;
 }
-</script>
 
-<style></style>
+async function advanceAssign(newCaseId: string, groupId: string) {
+  const res: notification = await useAdvanceAssign(
+    newCaseId,
+    selectedUser.value.id,
+    groupId
+  );
+  miniToast(res.status, res.message);
+  if (res.status === "success") {
+    const user = selectedUser.value;
+    const email = {
+      to: user.email,
+      subject: "New advanced case assigned to you",
+      body: `Hi ${user.fullname},\nYou have assigned in advance ${newCaseId} in ${groupName} to yourself.\n\nRotation Tracker`,
+    };
+    const emailres: result = (await useSendEmail(email)) as result;
+    miniToast(emailres.status, emailres.message);
+  }
+  caseId.value = "";
+  assignToSelf.value = false;
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "advance assigned case",
+    details: `${newCaseId} to self`,
+  };
+  logActivity(logData);
+}
+</script>

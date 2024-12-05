@@ -30,7 +30,7 @@ export default defineNuxtConfig({
       title: "Software Team Rotation Tracker",    },
     pageTransition: { name: "page", mode: "out-in" },
   },
-  modules: ["@nuxtjs/color-mode",'nuxt-icon','@formkit/auto-animate','@vueuse/nuxt','nuxt-headlessui'],
+  modules: ["@nuxtjs/color-mode",'nuxt-icon','@formkit/auto-animate/nuxt','@vueuse/nuxt','nuxt-headlessui'],
   colorMode: {
     preference: "light",
     dataValue: "theme",

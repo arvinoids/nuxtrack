@@ -26,34 +26,38 @@
     </div>
 
     <div v-else>
-      <div v-if="activeUsers.length > 0">
-        <div :key="listUpdated" class="flex flex-col items-center" ref="userBox">
-          <div v-for="user in activeUsers" :key="user.id" class="hovered-user">
-            <nuxt-link
-              :to="`/${group.name}/${user.username}`"
-              class="tooltip tooltip-right"
-              :data-tip="
-                user.username.toUpperCase() +
-                ' is ' +
-                user.status +
-                ' - ' +
-                user.cases +
-                ' cases'
-              "
-            >
-              <Icon
-                name="ic:sharp-circle"
-                :class="`text-${getColor(user.status)}`"
-                class="mx-1"
-                size="0.7rem"
-              />
-              <span class="hover:text-accent">
-                {{ user.fullname }}
-              </span>
-            </nuxt-link>
-            <div class="text-[0.6rem] text-warning">
-              {{ useFormatDate(user.last_assigned) }}
-            </div>
+      <div
+        :key="listUpdated"
+        class="flex flex-col items-center"
+        ref="userBox"
+        v-if="activeUsers.length > 0"
+        v-auto-animate
+      >
+        <div v-for="user in activeUsers" :key="user.id" class="hovered-user">
+          <nuxt-link
+            :to="`/${group.name}/${user.username}`"
+            class="tooltip tooltip-right"
+            :data-tip="
+              user.username.toUpperCase() +
+              ' is ' +
+              user.status +
+              ' - ' +
+              user.cases +
+              ' cases'
+            "
+          >
+            <Icon
+              name="ic:sharp-circle"
+              :class="`text-${getColor(user.status)}`"
+              class="mx-1"
+              size="0.7rem"
+            />
+            <span class="hover:text-accent">
+              {{ user.fullname }}
+            </span>
+          </nuxt-link>
+          <div class="text-[0.6rem] text-warning">
+            {{ useFormatDate(user.last_assigned) }}
           </div>
         </div>
       </div>
@@ -93,8 +97,8 @@
     </div>
     <div
       class="flex flex-col flex-grow mt-3"
-      :key="listUpdated"
       v-if="activeUsers.length > 0"
+      :key="listUpdated"
     >
       <div class="flex justify-center mt-auto gap-1">
         <a :href="anchor"

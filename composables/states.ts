@@ -1,5 +1,7 @@
 import type { notification } from "custom-types"
+import type { BaseModel } from "pocketbase"
 import type { expandedCounter,user,group } from "pocketbase-types"
+import type { UnassignedCasesRecord } from "~/pocketbase-types"
 
 export const useAuth = ()=> 
 useState(() => ({ 
@@ -35,5 +37,6 @@ export const useCounters = ()=> useState<expandedCounter[]>(()=>([]))
 export const useNotifications = ()=> useState<notification[]>(()=>([]))
 export const useUserStore = ()=> useState<user[]>(()=>([]))
 export const useGroupStore = ()=> useState<group[]>(()=>([]))
+export const useAdvancedCasesStore = ()=> useState<(UnassignedCasesRecord&BaseModel)[]>(()=>([]))
 
  
