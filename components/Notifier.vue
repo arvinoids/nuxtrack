@@ -4,7 +4,7 @@
       name="ic:baseline-notifications-active"
       size="1.8rem"
       :class="newEvent ? 'text-error' : 'text-gray-200'"
-      @click="newEvent = false"
+      @click="newEvent.value = false"
     />
   </nuxt-link>
 </template>
@@ -27,8 +27,8 @@ pb.collection("logs").subscribe("*", async () => {
   newEvent.value = true;
 });
 
-watch(newEvent, (x = newEvent.value) => {
-  localStorage.setItem("newEvent-tracker", x ? "true" : "false");
+watch(newEvent, (x = newEvent) => {
+  localStorage.setItem("newEvent-tracker", x.value ? "true" : "false");
 });
 
 onMounted(() => {

@@ -305,18 +305,6 @@ export async function useRefreshAll() {
   const rec = await pb.collection("groups").getList(1, 100);
   const groups = rec.items;
 
-  // for (let i = 0; i < groupsLength; i++) {
-  //   const group = groups[i];
-  //   const userRec = await pb
-  //     .collection("users")
-  //     .getList(1, 100, { filter: `memberOf~"${group.id}"` });
-  //   const users = userRec.items;
-  //   const usersLength = users.length;
-  //   for (let j = 0; j < usersLength; j++) {
-  //     const user = users[j];
-  //     await updateCounter(group.id, user.id);
-  //   }
-  // }
   groups.forEach(async (group) => {
     const userRec = await pb
       .collection("users")
@@ -769,23 +757,6 @@ export async function useGetGroupStats(group: string, description?: string) {
     lowestCount
   }
 }
-
-// export async function useUpdateGroup(group: string) {
-//   const pb = useNuxtApp().$pb
-//   pb.autoCancellation(false);
-//   const res: notification = { message: '', status: 'failed' }
-//   let timestamp = Date.now();
-//   let currentTime = new Date(timestamp).toISOString();
-//   try {
-//     await pb.collection('groups').update(group, { updated: currentTime })
-//     res.message = 'Group timestamp updated'
-//     res.status = 'success'
-//   } catch (e: any) {
-//     res.message = e.message
-//     console.log(e)
-//   }
-//   return res
-// }
 
 //**Force-update the counters for all users in a group
 /**

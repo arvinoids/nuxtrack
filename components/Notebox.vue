@@ -7,7 +7,7 @@
         Notes
       </div>
       <div class="py-1 px-1">
-        <textarea rows="" cols="" class="w-full md:h-[60ch] textarea" v-model="content">{{
+        <textarea rows="" cols="" class="w-full md:h-[30ch] textarea" v-model="content">{{
           content
         }}</textarea>
         <div class="w-full flex justify-end">

@@ -6,6 +6,7 @@
         <span class="text-accent">{{ selectedUser.fullname }}</span>
       </h3>
       <div
+        v-if="!userIsTop"
         class="text-sm text-warning flex items-center justify-center gap-3"
         title="Activate this to assign a case to you in advance"
       >
@@ -95,7 +96,6 @@ const props = defineProps<{
   users: user[];
 }>();
 
-const userList = computed(() => props.users);
 const selectedUser = computed(() => {
   if (assignToSelf.value && pb.authStore.model) {
     return pb.authStore.model as user;
@@ -103,7 +103,6 @@ const selectedUser = computed(() => {
   return props.users[cursor.value];
 });
 
-// const emit = defineEmits(["shift", "reset", "update"]);
 const loggedInUser = useLoggedInUsername();
 let caseId = ref("");
 const message = ref("");
@@ -111,6 +110,10 @@ const forced = ref(false);
 const currentUser = pb.authStore.model!.fullname;
 const groupName: string = await useGetGroupName(props.group);
 const advancedCases = useAdvancedCasesStore();
+
+const userIsTop = computed(() => {
+  return loggedInUser.value === props.users[0].username;
+});
 
 const invalidFormat = computed(() => {
   const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
@@ -125,36 +128,6 @@ const hideSubmit = ref(true);
 const reassignButton = computed(() => {
   return message.value === "This case is already assigned. Reassign or use Search.";
 });
-
-onMounted(async () => {
-  await checkForAdvancedCases();
-});
-
-async function checkForAdvancedCases() {
-  console.log("checking advanced cases...");
-  const firstUser = userList.value[0];
-  advancedCases.value.forEach(async (item) => {
-    if (firstUser.id === item.user) {
-      try {
-        await submitCase(item.caseId, firstUser.id, props.group).then(() =>
-          console.log("Case assigned.")
-        );
-        await useDeleteAdvancedCase(item.caseId).then(
-          async () => (advancedCases.value = await useGetAdvancedCases())
-        );
-        const logData: LogData = {
-          user: loggedInUser.value,
-          type: "assigned case",
-          details: `${item.caseId} assigned to ${firstUser.fullname} from advanced assign.`,
-        };
-        miniToast("success", `Auto assigned advance case to ${firstUser.fullname}`);
-        logActivity(logData);
-      } catch (e: any) {
-        miniToast("failed", `Error moving from advanced to assigned: ${e.message}`);
-      }
-    }
-  });
-}
 
 watch([caseId, forced, cursor], async () => {
   message.value = "";
@@ -185,8 +158,8 @@ async function resetSelection() {
   });
 }
 
-async function submitCase(NewCaseId: string, userId: string, group: string) {
-  const res: notification = await useSubmitCase(NewCaseId, userId, group);
+async function submitCase(newCaseId: string, userId: string, group: string) {
+  const res: notification = await useSubmitCase(newCaseId, userId, group);
   const currentTime = useFormatDate(new Date(Date.now()));
   await useUpdateUserLastAssigned(userId);
   miniToast(res.status, res.message);
@@ -197,7 +170,7 @@ async function submitCase(NewCaseId: string, userId: string, group: string) {
     const email = {
       to: user.email,
       subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${NewCaseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
+      body: `Hi ${user.fullname}, \n\n${newCaseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`,
     };
     const emailres: result = (await useSendEmail(email)) as result;
     miniToast(emailres.status, emailres.message);
@@ -205,10 +178,10 @@ async function submitCase(NewCaseId: string, userId: string, group: string) {
   const logData: LogData = {
     user: loggedInUser.value,
     type: "assigned case",
-    details:
-      `assigned ${NewCaseId} to ` + (await useGetUsernameFromId(userId)).toUpperCase(),
+    details: `${newCaseId} to ` + (await useGetUsernameFromId(userId)).toUpperCase(),
   };
   logActivity(logData);
+  emit("assign");
   caseId.value = "";
   assignToSelf.value = false;
 }
@@ -242,7 +215,7 @@ async function reassignCase(caseId: string, newOwnerId: string) {
   }
 }
 
-const emit = defineEmits(["skip"]);
+const emit = defineEmits(["skip", "assign"]);
 
 async function skipCatch(user: user) {
   const message = `${user.fullname} was skipped.`;
@@ -280,6 +253,7 @@ async function advanceAssign(newCaseId: string, groupId: string) {
     };
     const emailres: result = (await useSendEmail(email)) as result;
     miniToast(emailres.status, emailres.message);
+    advancedCases.value = await useGetAdvancedCases();
   }
   caseId.value = "";
   assignToSelf.value = false;

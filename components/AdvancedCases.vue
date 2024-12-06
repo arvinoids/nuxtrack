@@ -10,7 +10,7 @@
         <div v-if="advancedExist">
           <ul v-for="user in users.items" :key="user.id" ref="cases">
             <div class="p-3 my-1 shadow rounded border" v-if="userCases(user.id).length">
-              <div class="font-bold mb-1">{{ user.fullname }}</div>
+              <div class="font-bold mb-1">{{ user.username.toUpperCase() }}</div>
               <div v-for="caseItem in userCases(user.id)">
                 <div>{{ caseItem.caseId }}</div>
               </div>

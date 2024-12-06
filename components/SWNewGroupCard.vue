@@ -10,9 +10,10 @@
           }}</NuxtLink>
         </h2>
         <div class="flex items-center mx-2">
-          <div class="tooltip tooltip-top tooltip-accent" data-tip="Update count">
+          <div>
             <button
               class="btn btn-sm btn-circle btn-secondary text-white btn-ghost"
+              title="Update counts"
               @click="updateUserCount"
             >
               <Icon name="ic:round-refresh" size="1.6rem" />
@@ -110,12 +111,17 @@
           </button></a
         >
       </div>
-      <SWSelectGroup :group="group.id" :users="activeUsers" />
+      <SWSelectGroup
+        :group="group.id"
+        :users="activeUsers"
+        @assign="checkForAdvancedCases()"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { LogData, notification, result } from "custom-types";
 import type { group, user } from "pocketbase-types";
 const props = defineProps<{
   group: group;
@@ -140,7 +146,8 @@ const activeUsers: Ref<user[]> = ref(
 const usersOnLeave: Ref<user[]> = ref(
   props.users.filter((user) => user.status === "On leave")
 );
-// const sequenceData = ref(await getOrCreateSequence(props.group.id));
+const advancedCases = useAdvancedCasesStore();
+const loggedInUser = useLoggedInUsername();
 
 onMounted(() => {
   loading.value = false;
@@ -170,8 +177,58 @@ async function refreshCard() {
 
 pb.collection("users").subscribe("*", async () => {
   await refreshCard();
-  listUpdated.value++;
 });
+
+async function checkForAdvancedCases() {
+  console.log("checking advanced cases...");
+  const firstUser = activeUsers.value[0];
+  console.log("user", firstUser.id, firstUser.username);
+  console.log("cases", advancedCases.value);
+
+  const userCases = advancedCases.value.filter((item) => item.user === firstUser.id);
+  console.log(userCases);
+  if (userCases.length) {
+    try {
+      await submitCase(userCases[0].caseId, firstUser.id, props.group.id).then(() =>
+        console.log("Case assigned.")
+      );
+      await useDeleteAdvancedCase(userCases[0].caseId);
+      const logData: LogData = {
+        user: loggedInUser.value,
+        type: "assigned case",
+        details: `${userCases[0].caseId} assigned to ${firstUser.fullname} from advanced assign.`,
+      };
+      miniToast("success", `Auto assigned advance case to ${firstUser.fullname}`);
+      logActivity(logData);
+      await checkForAdvancedCases();
+    } catch (e: any) {
+      miniToast("failed", `Error moving from advanced to assigned: ${e.message}`);
+    }
+  }
+}
+
+async function submitCase(newCaseId: string, userId: string, group: string) {
+  const res: notification = await useSubmitCase(newCaseId, userId, group);
+  const currentTime = useFormatDate(new Date(Date.now()));
+  await useUpdateUserLastAssigned(userId);
+  miniToast(res.status, res.message);
+  if (res.status === "success") {
+    const user = await pb.collection("users").getOne(userId);
+    const email = {
+      to: user.email,
+      subject: "New case assigned to you",
+      body: `Hi ${user.fullname}, \n\n${newCaseId} in ${props.group.description} has been assigned to you from advanced cases on ${currentTime}.\n\nRotation Tracker`,
+    };
+    const emailres: result = (await useSendEmail(email)) as result;
+    miniToast(emailres.status, emailres.message);
+  }
+  const logData: LogData = {
+    user: loggedInUser.value,
+    type: "assigned case",
+    details: `${newCaseId} to ` + (await useGetUsernameFromId(userId)).toUpperCase(),
+  };
+  logActivity(logData);
+}
 
 watch(userBox, () => {
   if (userBox.value) userBoxHeight.value = userBox.value.clientHeight;
