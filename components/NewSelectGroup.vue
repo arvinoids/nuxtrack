@@ -67,6 +67,11 @@ function moveCursor() {
   } else cursor.value++;
 }
 
+const invalidFormat = computed(() => {
+  const pattern = /CAS-\d{7}-[A-Z]\d[A-Z]\d[A-Z]\d/;
+  return !pattern.test(caseId.value.trim());
+});
+
 async function skipCatch(user: user) {
   const message = `${user.username.toLowerCase()} was skipped.`;
   // useShowToast(message, "success");
@@ -143,6 +148,10 @@ watch(caseId, async (caseId) => {
     message.value = errorMessage(caseExists.value, caseIsEscalated.value, caseId);
   }
   if (caseId === '') { message.value = 'Please enter a value.'; caseIsBlank.value = true }
+  else if(invalidFormat.value) {
+        disableEscalate.value = true
+        message.value = "Incorrect case ID format. Please recheck."
+    }
 });
 
 pb.collection('users').subscribe('*', async () => {
