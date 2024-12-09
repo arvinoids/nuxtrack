@@ -16,7 +16,7 @@
       <div class="modal-action justify-center">
         <a class="btn btn-outline btn-secondary" @click="skipCatch(taggedUser)">Skip</a>
         <a href="#" class="btn btn-primary"
-          :class="{ hidden: (caseExists || caseId === '') || ((taggedUser.status !== 'Available') && !forced) }"
+          :class="{ hidden: (caseExists || caseId === ''||!validateCASNumber(caseId)) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="submitCase(caseId, taggedUser.id, group)">Assign</a>
         <a href="#" class="btn btn-warning btn-primary" v-if="groupName!=='l1_na'"
           :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') && !forced) }"

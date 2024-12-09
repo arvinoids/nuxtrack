@@ -25,7 +25,7 @@
             </select>
           </div>
         </div>
-        <div class="border my-2 py-2 px-3 text-sm text-warning" v-if="message">
+        <div class="border my-2 py-2 px-3 text-sm text-error" v-if="message">
           <p>{{ message }}</p>
         </div>
 
