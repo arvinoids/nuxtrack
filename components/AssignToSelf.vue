@@ -5,7 +5,7 @@
     /></label>
     <input type="checkbox" id="assignToSelf" class="modal-toggle" />
     <div class="modal">
-      <div class="modal-box w-min max-w-5xl rounded-none">
+      <div class="modal-box w-min md:max-w-5xl rounded-none">
         <h3 class="font-bold text-lg text-center">Assign case to myself</h3>
         <div class="flex gap-4 my-2">
           <div class="form-control w-full max-w-xs">
@@ -33,7 +33,7 @@
           <label
             for="assignToSelf"
             class="btn btn-primary"
-            :class="{ hidden: caseExists || caseId === '' }"
+            :class="{ hidden: caseExists || caseId === '' || !validateCASNumber(caseId) }"
             @click="submitCase(caseId, user.id, selectedGroupId)"
             >Assign</label
           >
@@ -135,6 +135,9 @@ watch(caseId, async (caseId) => {
 });
 
 function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
+  if (!validateCASNumber(caseId)) {
+    return "Incorrect case ID format. Please recheck.";
+  }
   if (caseExists && caseIsEscalated) {
     disableEscalate.value = true;
     return "Already escalated. Please check case number.";

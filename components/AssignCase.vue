@@ -111,6 +111,9 @@ watch(caseId, async (caseId) => {
 });
 
 function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
+    if (!validateCASNumber(caseId)) {
+    return "Incorrect case ID format. Please recheck.";
+  }
     if (caseExists && caseIsEscalated) {
         disableEscalate.value = true;
         return "Already escalated. Please check case number.";
