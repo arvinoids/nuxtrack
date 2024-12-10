@@ -2,7 +2,7 @@
   <div class="flex flex-col justify-start w-full">
     <p class="mb-2 font-bold text-center">Create dummy cases for user</p>
     <div class="flex justify-center items-center gap-2">
-      <HeadlessListbox v-model="selectedUser">
+      <HeadlessListbox v-model="selectedUser" :disabled="creating">
         <div class="relative">
           <HeadlessListboxButton
             class="border relative w-[200px] cursor-default bg-white py-2 pl-3 pr-10 text-left shadow-md sm:text-sm"
@@ -52,7 +52,7 @@
         </div>
       </HeadlessListbox>
 
-      <HeadlessListbox v-model="selectedGroup">
+      <HeadlessListbox v-model="selectedGroup" :disabled="creating">
         <div class="relative">
           <HeadlessListboxButton
             class="border relative w-[200px] cursor-default bg-white py-2 pl-3 pr-10 text-left shadow-md sm:text-sm"
@@ -107,13 +107,15 @@
         max="100000"
         class="input input-bordered h-[38px] w-20"
         v-model="tickets"
+        :class="creating ? 'input-disabled' : ''"
       />
 
       <div
-        class="btn shadow-md btn-outline btn-warning btn-sm h-[38px] max-w-min border cursor-default"
-        @click.prevent="AddDummyCases"
+        class="btn shadow-md btn-secondary btn-sm w-[15ch] h-[38px] borderf"
+        :class="creating ? 'btn-disabled cursor-wait' : 'cursor-default'"
+        @click.prevent="AddDummyCases()"
       >
-        Create
+        {{ creating ? "Creating..." : "Create" }}
       </div>
     </div>
   </div>
@@ -129,6 +131,7 @@ const users: ListResult<user> = await useGetAllUsers();
 const tickets = ref(1);
 const validUsers = getValidUsers();
 const currentuser = useCurrentUser();
+const creating = ref(false);
 type userExpandedMemberOf = user & {
   expand: {
     memberOf: group[];
@@ -156,6 +159,7 @@ watch(selectedUser, () => {
 });
 
 async function AddDummyCases() {
+  creating.value = true;
   const result = { status: "failed", message: "" };
   try {
     const res = await useAddDummyCases(
@@ -176,7 +180,8 @@ async function AddDummyCases() {
     type: "assigned case",
     details: `${tickets.value} cases assigned to ${selectedUser.value.username} in ${selectedGroup.value.description}`,
   };
-  logActivity(data);
+  await logActivity(data);
+  creating.value = false;
   casesChanged.value++;
 }
 </script>
