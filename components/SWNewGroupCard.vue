@@ -13,7 +13,14 @@
           <div>
             <button
               class="btn btn-sm btn-circle btn-secondary text-white btn-ghost"
-              title="Update counts"
+              title="Force check advanced cases"
+              @click="checkForAdvancedCases()"
+            >
+              <Icon name="ic:round-check-circle-outline" size="1.6rem" />
+            </button>
+            <button
+              class="btn btn-sm btn-circle btn-secondary text-white btn-ghost"
+              title="Check for advanced cases"
               @click="updateUserCount"
             >
               <Icon name="ic:round-refresh" size="1.6rem" />

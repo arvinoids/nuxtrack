@@ -3,7 +3,6 @@
     <div class="w-1/5 pt-2 px-4 min-w-60">
       <div class="w-full"><Links /></div>
       <div class="w-full"><AdvancedCases /></div>
-      <div class="w-full"><Notebox /></div>
     </div>
     <div class="flex flex-col items-center w-full">
       <div class="self-center mt-1 flex flex-col items-center">
