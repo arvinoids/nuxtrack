@@ -187,7 +187,7 @@ pb.collection("users").subscribe("*", async () => {
 });
 
 async function checkForAdvancedCases() {
-  console.log("checking advanced cases...");
+  miniToast("success", "Checking for advanced cases...");
   const firstUser = activeUsers.value[0];
   console.log("user", firstUser.id, firstUser.username);
   console.log("cases", advancedCases.value);

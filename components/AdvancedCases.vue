@@ -16,6 +16,14 @@
               </div>
             </div>
           </ul>
+          <div class="bg-warning p-4 bg-opacity-30 border border-warning">
+            <p>
+              Please click on
+              <Icon name="ic:round-check-circle-outline" size="1.6rem" />
+              if the next user has an advanced case but the system did not auto-assign.
+              This will force checking of advanced cases. This is a temporary workaround.
+            </p>
+          </div>
         </div>
         <div v-else class="text-center">None for now</div>
       </div>
