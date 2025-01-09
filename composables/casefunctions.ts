@@ -718,6 +718,7 @@ function createDummyCases(quantity: number, prefix: string) {
  * @returns a success or fail status, and a message. Used for notifications.
  */
 export async function useAddDummyCases(quantity: number, userId: string, groupId: string, prefix: string) {
+  let createdCasesCount = 0
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const cases = createDummyCases(quantity, prefix)
@@ -730,12 +731,16 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
     };
     try {
       const rec = await pb.collection("cases").create(data);
+      if (rec) {
+        createdCasesCount++
+      }
     } catch (e) {
       console.log(e);
     }
   });
   await addToTotalCases(quantity, groupId) // this adds to the total case count on all active leaves to account for dummy case computation after leave
-  return { status: 'success', message: `${quantity} Cases created` }
+  if(createdCasesCount === quantity) return { status: 'success', message: `${quantity} Cases created` }
+  return { status: 'failed', message: 'Some errors were encountered creating the cases' }
 }
 
 /** Adds to case count in active leave record
