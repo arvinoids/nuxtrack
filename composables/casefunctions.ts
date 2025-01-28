@@ -844,6 +844,9 @@ export async function useGetAdvancedCases():Promise<(UnassignedCasesRecord&BaseM
 
 export async function useDeleteAdvancedCase(caseId:string){
   const pb = useNuxtApp().$pb
-  const caseRecord = await pb.collection('unassigned_cases').getFirstListItem(`caseId="${caseId}"`)
-  await pb.collection('unassigned_cases').delete(caseRecord.id)
+  try{
+    const caseRecord = await pb.collection('unassigned_cases').getFirstListItem(`caseId="${caseId}"`)
+    await pb.collection('unassigned_cases').delete(caseRecord.id)
+    return { message:'Advanced Case deleted', status:'success'} as notification
+  } catch (e:any) { return { message: e.message, status: 'failed' } as notification }
 }
