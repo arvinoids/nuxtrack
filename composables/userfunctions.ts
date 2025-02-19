@@ -170,6 +170,7 @@ export async function useUserIsBackFromLeave(userId: string): Promise<{ status: 
         });
         return { status: 'success', message: 'updated user case count after leave' }
     } catch (e: any) {
+        await logActivity({ user:'system',type:'changed status',details:`Error in updating cases - ${e.message}`})
         return {
             status: 'failed',
             message: e.message
