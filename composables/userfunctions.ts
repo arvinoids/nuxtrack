@@ -2,6 +2,7 @@ import type { AuthModel, ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice, notification, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
 import type { UsersResponse } from "~/pocketbase-types";
+import { useCreateCounter } from "./casefunctions";
 
 
 export async function useDeleteUser(userId: string) {
@@ -28,7 +29,8 @@ export async function useCreateUser(userData: userEntry) {
     pb.autoCancellation(false);
     const result = { status: "failed", message: "" };
     try {
-        const res = await pb.collection("users").create(userData);
+        const res = await pb.collection<UsersResponse>("users").create(userData);
+        for (const teamId of res.memberOf) await useCreateCounter(res.id, teamId)        
         result.status = "success";
         result.message = `User ${userData.fullname.toUpperCase()} has been created.`;
     } catch (e: any) {

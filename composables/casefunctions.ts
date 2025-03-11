@@ -106,7 +106,7 @@ export async function useSkipOut(userId: string, groupId: string) {
     await updateCounter(groupId, userId);
     // await createCurrentList(groupId)
     const user = await pb.collection("users").getOne(userId);
-    result.message = `${user.username.toLowerCase() } is out of the office and was skipped.`;
+    result.message = `${user.username.toLowerCase()} is out of the office and was skipped.`;
     result.status = "success";
   } catch (e: any) {
     result.message = e.message;
@@ -459,7 +459,7 @@ export async function useReassignCases(oldUserId: string, newUserId: string) {
   if (userCases.totalItems > 0) {
     userCases.items.forEach(async (item) => {
       try {
-        await pb.collection("cases").update(item.id, {user:newUserId});
+        await pb.collection("cases").update(item.id, { user: newUserId });
         res.message = `Cases assigned to user ${newUserName}.`;
         res.status = "success";
       } catch (e) {
@@ -677,10 +677,10 @@ export async function useFindCase(id: string) {
   return { res, data };
 }
 
-export async function useFindCases(caseId:string){
+export async function useFindCases(caseId: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const res = await pb.collection('cases').getList(1, 100, { filter: `case~"${caseId}"`,expand:'user,group',sort:'-created' })
+  const res = await pb.collection('cases').getList(1, 100, { filter: `case~"${caseId}"`, expand: 'user,group', sort: '-created' })
   return res
 }
 
@@ -739,7 +739,7 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
     }
   });
   await addToTotalCases(quantity, groupId) // this adds to the total case count on all active leaves to account for dummy case computation after leave
-  if(createdCasesCount === quantity) return { status: 'success', message: `${quantity} Cases created` }
+  if (createdCasesCount === quantity) return { status: 'success', message: `${quantity} Cases created` }
   return { status: 'failed', message: 'Some errors were encountered creating the cases' }
 }
 
@@ -748,13 +748,13 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
  * @param quantity the amount to add
  * @param groupId the group to add to
  */
-async function addToTotalCases(quantity:number,groupId:string) {
+async function addToTotalCases(quantity: number, groupId: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const leaveRecords = await pb.collection('leaves').getList<LeavesRecord&BaseSystemFields>(1,1000,{filter:`group="${groupId}" && active=true`})
+  const leaveRecords = await pb.collection('leaves').getList<LeavesRecord & BaseSystemFields>(1, 1000, { filter: `group="${groupId}" && active=true` })
   for (const record of leaveRecords.items) {
     const total_cases = record.total_cases + quantity
-    const data = {total_cases}
+    const data = { total_cases }
     await pb.collection('leaves').update(record.id, data)
   }
 }
@@ -907,9 +907,9 @@ export async function useGetAllCases() {
   return res
 }
 
-export async function useGetFullCases(){
+export async function useGetFullCases() {
   const pb = useNuxtApp().$pb
-  const res:(BaseSystemFields & CasesRecord)[]= await pb.collection('cases').getFullList()
+  const res: (BaseSystemFields & CasesRecord)[] = await pb.collection('cases').getFullList()
   return res
 }
 
@@ -963,28 +963,38 @@ export async function useSaveFileToDb(csvData: string) {
       status: 'success', message: 'File archived',
       filename: 'filename',
       data: { url: pb.files.getUrl(upload, filename) }
-    } as notification& { filename: string; data: { url: string }}
+    } as notification & { filename: string; data: { url: string } }
   } catch (e: any) {
     console.log('Error uploading file')
     return { status: 'failed', message: e.message } as notification
   }
 }
 
-export async function useGetGroupCaseCount(groupId:string) {
+export async function useGetGroupCaseCount(groupId: string) {
   const pb = useNuxtApp().$pb
-  const res = await pb.collection('cases').getList(1,10000,{filter:`group="${groupId}"`, fields: ''})
+  const res = await pb.collection('cases').getList(1, 10000, { filter: `group="${groupId}"`, fields: '' })
   return res.totalItems
 }
 
-export async function useGetGroupMemberCount(groupId:string) {
+export async function useGetGroupMemberCount(groupId: string) {
   const pb = useNuxtApp().$pb
   const res = await pb.collection('users').getList(1, 10000, { filter: `memberOf~"${groupId}"`, fields: '' })
   const totalMembers = res.totalItems
   return totalMembers
 }
 
-export async function useGetCaseReport(userId:string, groupId:string, from:Date,to:Date){
+export async function useGetCaseReport(userId: string, groupId: string, from: Date, to: Date) {
   const pb = useNuxtApp().$pb
-  const res = await pb.collection('cases').getList(1, 10000, {filter:`user="${userId}"&&group="${groupId}"&&created >= "${from}"&&created<="${to}"`, expand: 'user,group'})
+  const res = await pb.collection('cases').getList(1, 10000, { filter: `user="${userId}"&&group="${groupId}"&&created >= "${from}"&&created<="${to}"`, expand: 'user,group' })
   return res
+}
+
+export async function useCreateCounter(userId: string, groupId: string) {
+  const pb = useNuxtApp().$pb
+  const oldRecord = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${groupId}"`)
+  if (!oldRecord) {
+    const res = await pb.collection('counter').create({ user: userId, group: groupId, count: 0 });
+    return res
+  }
+  return null
 }

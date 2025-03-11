@@ -30,7 +30,7 @@ export async function useSendEmail(email: emailContent) {
   ).value;
   const res = await $fetch(emailurl, {
     method: "POST",
-    body: email,
+    body: {...email,from_name: APP_NAME},
     headers: {
       Authorization: token,
     },
