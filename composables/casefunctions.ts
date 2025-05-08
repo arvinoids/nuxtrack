@@ -874,8 +874,8 @@ export async function useForceUpdateCounters(groupId: string) {
     try {
       const oldCounter = await pb.collection('counter').getFirstListItem(`user="${user.id}"&&group="${groupId}"`, { fields: '' })
       await pb.collection('counter').update(oldCounter.id, data)
-    } catch (e) {
-      if (users.totalItems > 0) await pb.collection('counter').create(data)
+    } catch {
+      await useCreateCounter(data.user,data.group)
     }
   }
 }
@@ -990,11 +990,15 @@ export async function useGetCaseReport(userId: string, groupId: string, from: Da
 }
 
 export async function useCreateCounter(userId: string, groupId: string) {
+  const res:notification = { message: '', status: 'failed' }
   const pb = useNuxtApp().$pb
-  const oldRecord = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${groupId}"`)
-  if (!oldRecord) {
+  const oldRecordList = await pb.collection('counter').getList(1,10,{filter:`user="${userId}"&&group="${groupId}"`})
+  if (oldRecordList.totalItems===0) {
     const res = await pb.collection('counter').create({ user: userId, group: groupId, count: 0 });
-    return res
+    res.message = 'Counter created'
+    res.status = 'success'
+  } else { 
+    res.message = 'User already exists in this group!'
   }
-  return null
+  return res
 }
