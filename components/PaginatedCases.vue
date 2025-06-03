@@ -149,7 +149,7 @@ const caseToCopy: Ref<HTMLSpanElement[]> = ref([]);
 function copyToClipboard(caseId: string) {
   navigator.clipboard
     .writeText(caseId)
-    .then(() => useShowToast("Copied to clipboard", "success"));
+    .then(() => miniToast("success", "Copied to clipboard"));
 }
 
 watch(updated, async () => {

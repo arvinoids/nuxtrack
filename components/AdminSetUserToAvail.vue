@@ -20,7 +20,7 @@ async function setToAvail(userId: string) {
     await useChangeUserStatus(userId, "Available");
     const res = await useUserIsBackFromLeave(userId);
   } catch (e: any) {
-    miniToast("failed", e.message);
+    useShowToast(e.message, "failed");
   }
   const message = `${props.user.username} status was changed to Available`;
   useShowToast(message, "success");

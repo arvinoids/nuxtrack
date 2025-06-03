@@ -5,9 +5,12 @@
         v-for="notification in useNotifications().value"
         :key="notification.toString()"
         :class="{
-          success: notification.status === 'success',
-          failed: notification.status === 'failed',
-          warning: notification.status === 'warning',
+          'z-50 my-1 relative alert alert-success alert-outline w-auto shadow-lg backdrop-blur-sm':
+            notification.status === 'success',
+          'z-50 my-1 relative alert alert-error alert-outline w-auto shadow-lg backdrop-blur-sm':
+            notification.status === 'failed',
+          'z-50 my-1 relative alert alert-warning alert-outline w-auto shadow-lg backdrop-blur-sm':
+            notification.status === 'warning',
         }"
       >
         <span class="px-2">{{ notification.message }}</span>
@@ -25,19 +28,6 @@
 <script setup lang="ts"></script>
 
 <style lang="postcss" scoped>
-@reference '~assets/css/main.css';
-.success {
-  @apply z-50 my-1 relative alert alert-success border-info border w-auto bg-opacity-30 backdrop-blur-lg;
-}
-
-.warning {
-  @apply z-50 my-1 relative alert alert-warning border-warning border w-auto bg-opacity-30 backdrop-blur-lg;
-}
-
-.failed {
-  @apply z-50 my-1 relative alert alert-error border-error text-black border w-auto bg-opacity-30 backdrop-blur-lg;
-}
-
 .v-enter-active,
 .v-leave-active {
   transition: opacity 0.5s ease;
