@@ -11,7 +11,11 @@
         <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />
       </button>
     </div>
-    <div class="flex items-center btn btn-ghost btn-square p-2" ref="menubutton" v-else>
+    <div
+      class="flex items-center btn btn-ghost bg-accent/50 btn-square p-2"
+      ref="menubutton"
+      v-else
+    >
       <button class="text-gray-200 hover:text-gray-50">
         <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />
       </button>
