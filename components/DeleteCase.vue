@@ -2,7 +2,7 @@
   <!-- Put this part before </body> tag -->
   <input type="checkbox" :id="props.id + 'del'" class="modal-toggle" />
   <div class="modal">
-    <div class="modal-box w-min max-w-5xl rounded-none">
+    <div class="modal-box w-[400px]">
       <h3 class="font-bold text-lg mb-2">Deleting case...</h3>
       <p>Are you sure you want to delete this case?</p>
       <p class="font-bold text-error text-center">{{ caseId }}</p>

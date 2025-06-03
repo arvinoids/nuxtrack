@@ -2,7 +2,7 @@
   <div>
     <Navbar />
     <UserLeaveNotification />
-    <div class="flex flex-col items-center py-3">
+    <div class="flex flex-col items-center">
       <slot />
     </div>
     <Footer />
@@ -24,6 +24,10 @@ body {
 .page-leave-to {
   opacity: 0;
   filter: blur(1rem);
+}
+
+html {
+  overflow-y: scroll;
 }
 </style>
 

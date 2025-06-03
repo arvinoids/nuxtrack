@@ -1,6 +1,6 @@
 <template>
-  <div class="border p-4">
-    <label class="label font-bold">Reorder groups</label>
+  <div class="border border-neutral-200 shadow-md p-4">
+    <label class="font-bold">Reorder groups</label>
     <draggable
       v-model="items"
       handle=".handle"
@@ -8,7 +8,7 @@
       class="flex flex-col gap-2 mb-2"
     >
       <template #item="{ element: item }">
-        <div class="px-3 py-2 border hover:bg-accent hover:bg-opacity-10">
+        <div class="px-3 py-2 border border-neutral-200 bg-warning/10 hover:bg-accent/10">
           <div class="flex items-between w-auto">
             <div class="handle">
               <Icon

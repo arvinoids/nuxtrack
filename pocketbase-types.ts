@@ -14,6 +14,7 @@ export enum Collections {
 	Courses = "courses",
 	Currentlist = "currentlist",
 	Currentposition = "currentposition",
+	Discovery = "discovery",
 	Groups = "groups",
 	Images = "images",
 	Leaves = "leaves",
@@ -103,6 +104,11 @@ export type CurrentpositionRecord = {
 	position: number
 }
 
+export type DiscoveryRecord = {
+	endIp: string
+	startIp: string
+}
+
 export type GroupsRecord = {
 	description?: string
 	name: string
@@ -173,6 +179,8 @@ export type PostsRecord = {
 	content?: HTMLString
 	document_id: string
 	link?: string
+	pdf_file?: string
+	pdf_text?: string
 	product: RecordIdString
 	status: PostsStatusOptions
 	title: string
@@ -208,7 +216,7 @@ export enum ServersTypeOptions {
 	"other" = "other",
 }
 export type ServersRecord = {
-	address?: string
+	address: string
 	apps?: string
 	status?: string
 	type?: ServersTypeOptions
@@ -258,6 +266,7 @@ export type CounterResponse<Texpand = unknown> = Required<CounterRecord> & BaseS
 export type CoursesResponse<Texpand = unknown> = Required<CoursesRecord> & BaseSystemFields<Texpand>
 export type CurrentlistResponse<Texpand = unknown> = Required<CurrentlistRecord> & BaseSystemFields<Texpand>
 export type CurrentpositionResponse<Texpand = unknown> = Required<CurrentpositionRecord> & BaseSystemFields<Texpand>
+export type DiscoveryResponse<Texpand = unknown> = Required<DiscoveryRecord> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type ImagesResponse<Texpand = unknown> = Required<ImagesRecord> & BaseSystemFields<Texpand>
 export type LeavesResponse<Texpand = unknown> = Required<LeavesRecord> & BaseSystemFields<Texpand>
@@ -282,6 +291,7 @@ export type CollectionRecords = {
 	courses: CoursesRecord
 	currentlist: CurrentlistRecord
 	currentposition: CurrentpositionRecord
+	discovery: DiscoveryRecord
 	groups: GroupsRecord
 	images: ImagesRecord
 	leaves: LeavesRecord
@@ -305,6 +315,7 @@ export type CollectionResponses = {
 	courses: CoursesResponse
 	currentlist: CurrentlistResponse
 	currentposition: CurrentpositionResponse
+	discovery: DiscoveryResponse
 	groups: GroupsResponse
 	images: ImagesResponse
 	leaves: LeavesResponse
@@ -331,6 +342,7 @@ export type TypedPocketBase = PocketBase & {
 	collection(idOrName: 'courses'): RecordService<CoursesResponse>
 	collection(idOrName: 'currentlist'): RecordService<CurrentlistResponse>
 	collection(idOrName: 'currentposition'): RecordService<CurrentpositionResponse>
+	collection(idOrName: 'discovery'): RecordService<DiscoveryResponse>
 	collection(idOrName: 'groups'): RecordService<GroupsResponse>
 	collection(idOrName: 'images'): RecordService<ImagesResponse>
 	collection(idOrName: 'leaves'): RecordService<LeavesResponse>

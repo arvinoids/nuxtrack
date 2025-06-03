@@ -1,7 +1,9 @@
 <template>
-  <div class="flex flex-col items-center gap-2">
-    <h1 class="text-lg text-center">Change Password</h1>
-    <div class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap">
+  <div class="flex flex-col items-center gap-2 mt-2">
+    <h1 class="text-lg text-center font-bold">Change Password</h1>
+    <div
+      class="flex flex-row border border-base-200 bg-warning/40 m-2 p-5 shadow-md w-full gap-10 flex-wrap"
+    >
       <VForm action="submit" class="flex flex-col gap-4 w-[300px]">
         <div class="flex flex-col">
           <label for="username" class="label">Username: </label>

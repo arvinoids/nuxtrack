@@ -1,6 +1,6 @@
 <template>
   <div class="indicator">
-    <nuxt-link to="/Logs" class="btn btn-circle btn-ghost">
+    <nuxt-link to="/Logs" class="btn btn-circle btn-primary btn-ghost">
       <Icon
         name="ic:baseline-notifications-active"
         size="1.8rem"

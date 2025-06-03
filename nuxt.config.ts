@@ -1,3 +1,5 @@
+import tailwindcss from "@tailwindcss/vite";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: false },
@@ -8,13 +10,6 @@ export default defineNuxtConfig({
 
   // https://tailwindcss.com/docs/guides/nuxtjs#3
   css: ["~/assets/css/main.css"],
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
-  },
-
   runtimeConfig: {
     emailToken: process.env.EMAIL_TOKEN,
     public: {
@@ -30,10 +25,13 @@ export default defineNuxtConfig({
       title: "Solutions Team Rotation Tracker",    },
     pageTransition: { name: "page", mode: "out-in" },
   },
-  modules: ["@nuxtjs/color-mode",'nuxt-icon','@formkit/auto-animate/nuxt','@vueuse/nuxt','nuxt-headlessui'],
-  colorMode: {
-    preference: "light",
-    dataValue: "theme",
-    classSuffix: "",
+  modules: [
+    'nuxt-icon',
+    '@formkit/auto-animate/nuxt',
+    '@vueuse/nuxt',
+    'nuxt-headlessui'
+    ],
+  vite: {
+    plugins: [tailwindcss()],
   }
 });

@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="w-full">
     <div class="font-semibold py-1 text-center">Reporter</div>
-    <div class="border p-3 bg-base-200">
+    <div class="border border-neutral-200 p-3 bg-base-200">
       <div>
         <div class="flex gap-4">
           <div>
             <div class="flex items-center gap-3">
-              <label for="agent" class="w-[7ch]">Agent</label
+              <label for="agent" class="w-[7ch] label text-sm">Agent</label
               ><select
                 class="select select-bordered select-sm w-[25ch]"
                 v-model="agentId"
@@ -17,7 +17,7 @@
               </select>
             </div>
             <div class="flex items-center gap-3">
-              <label for="group" class="w-[7ch]">Group</label
+              <label for="group" class="w-[7ch] label text-sm">Group</label
               ><select
                 class="select select-bordered select-sm w-[25ch]"
                 v-model="groupId"
@@ -30,7 +30,7 @@
           </div>
           <div>
             <div class="flex gap-3 items-center">
-              <label for="start" class="w-[7ch]">Start time</label
+              <label for="start" class="w-[7ch] label text-sm">From</label
               ><input
                 type="datetime-local"
                 class="input input-sm input-bordered"
@@ -38,7 +38,7 @@
               />
             </div>
             <div class="flex gap-3 items-center">
-              <label for="end" class="w-[7ch]">End time</label
+              <label for="end" class="w-[7ch] label text-sm">To</label
               ><input
                 type="datetime-local"
                 class="input input-bordered input-sm"
@@ -46,11 +46,7 @@
               />
             </div>
           </div>
-          <button
-            class="btn btn-sm btn-secondary"
-            @click="generate"
-            :disabled="isDisabled"
-          >
+          <button class="btn btn-sm btn-warning" @click="generate" :disabled="isDisabled">
             Generate
           </button>
         </div>
@@ -79,8 +75,8 @@
           </tr>
         </tbody>
       </table>
-      <div v-else class="text-center border m-2 p-1">
-        Please specify the filters above to genrate a report.
+      <div v-else class="alert w-auto bg-warning/20 m-2 p-1">
+        Please specify the filters above to generate a report.
       </div>
       <div class="flex justify-between mt-2">
         <div class="text-center my-2" v-if="cases">

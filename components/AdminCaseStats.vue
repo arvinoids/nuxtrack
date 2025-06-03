@@ -1,14 +1,14 @@
 <template>
   <div class="flex flex-col justify-center items-center gap-2 w-auto">
     <p class="font-bold text-center">Case Stats</p>
-    <div v-if="!loading" class="h-auto w-[450px]">
-      <table class="border table table-compact table-zebra rounded-none">
-        <thead>
+    <div v-if="!loading" class="h-auto w-[500px]">
+      <table class="border border-neutral-200 table rounded-none">
+        <thead class="bg-base-200">
           <th class="rounded-none">Group</th>
           <th>Total</th>
           <th>Highest</th>
           <th>Lowest</th>
-          <th class="rounded-none">Actions</th>
+          <th class="rounded-none w-[100px]">Actions</th>
         </thead>
         <tbody>
           <tr v-for="stat in stats">
@@ -20,6 +20,7 @@
               <label
                 for="deleteCases"
                 class="btn btn-outline btn-warning btn-xs"
+                title="Delete all cases in this group"
                 @click="
                   selectedGroup = stat.group;
                   selectedGroupDescription = stat.description;
@@ -32,11 +33,8 @@
       </table>
     </div>
 
-    <div
-      v-else
-      class="border h-auto w-[450px] flex flex-col justify-center items-center py-20"
-    >
-      <Spinner />
+    <div v-else class="h-auto w-[450px] flex flex-col justify-center items-center py-20">
+      <LoadingMessage>Computing case stats...</LoadingMessage>
     </div>
     <div class="btn btn-sm btn-warning" @click="refresh">Refresh</div>
     <div>

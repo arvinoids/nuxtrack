@@ -24,7 +24,8 @@
 
 <script setup lang="ts"></script>
 
-<style scoped>
+<style lang="postcss" scoped>
+@reference '~assets/css/main.css';
 .success {
   @apply z-50 my-1 relative alert alert-success border-info border w-auto bg-opacity-30 backdrop-blur-lg;
 }

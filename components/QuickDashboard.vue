@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center my-2">
     <div class="self-center flex flex-col items-center">
       <p class="text-lg text-secondary mx-10">
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span

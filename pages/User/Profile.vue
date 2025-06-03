@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center items-start flex-wrap">
+  <div class="flex justify-center items-start flex-wrap mt-4">
     <UserCard :user="userData" class="mb-3 mx-3" />
     <div class="flex flex-col items-center gap-3">
       <PaginatedCases :userId="userData.id" />
@@ -9,9 +9,11 @@
 
 <script setup lang="ts">
 const pb = useNuxtApp().$pb;
-import type { user } from "pocketbase-types";
+import type { UsersResponse } from "~/pocketbase-types";
 
-const userData: user = await pb.collection("users").getOne(pb.authStore.model!.id);
+const userData = await pb
+  .collection("users")
+  .getOne<UsersResponse>(pb.authStore.model!.id);
 </script>
 
 <style></style>

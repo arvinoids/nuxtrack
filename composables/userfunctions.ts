@@ -272,6 +272,16 @@ async function getCasesToAdd(userId: string, groupId: string) {
     return casesToAdd
 }
 
+export async function useComputeDummyCases(groupId:string,startOfLeaveDateTime:Date,endOfLeaveDateTime:Date,){
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
+    // compute the number of cases that were created since the user went on leave until end of leave, excluding dummy case
+    const casesCreatedDuringLeave = await pb.collection('cases').getList(1, 10000, { filter: `group="${groupId}"&&created >= "${startOfLeaveDateTime}"&&created<="${endOfLeaveDateTime}"&&case!~"Leave"&&case!~"Dummy"`, fields: 'id' }).then((res) => res.totalItems)
+    const groupMemberCount = await useGetGroupMemberCount(groupId)
+    let casesToAdd = Math.floor(casesCreatedDuringLeave / groupMemberCount) 
+    return {casesCreatedDuringLeave, groupMemberCount, casesToAdd}
+}
+
 
 export async function useRemoveLeaveRecords(userId: string) {
     const pb = useNuxtApp().$pb

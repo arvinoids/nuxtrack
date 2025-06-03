@@ -2,7 +2,7 @@
   <div class="flex flex-col justify-center items-center gap-2 w-[400px]">
     <p class="text-sm font-bold self-start">Case Stats</p>
     <div v-if="!loading">
-      <table class="border table table-compact table-zebra rounded-none">
+      <table class="table table-compact table-zebra rounded-none">
         <thead>
           <th class="rounded-none">Group</th>
           <th>Total</th>
@@ -20,7 +20,7 @@
       </table>
     </div>
 
-    <div v-else><Spinner /></div>
+    <div v-else></div>
     <div class="btn btn-sm btn-warning" @click="refresh">Refresh</div>
   </div>
 </template>
@@ -29,7 +29,7 @@
 const loading = ref(true);
 const groups = (await useGetAllGroups()).items;
 interface groupStat {
-  group: string;
+  group: string | undefined;
   description: string;
   totalCases: number;
   highestCount: number;
@@ -48,7 +48,7 @@ async function getGroupStats() {
   for (let i = 0; i < groups.length; i++) {
     let group = groups[i];
     let res = await useGetGroupStats(group.id, group.description);
-    data.push(res);
+    data.push(res as groupStat);
   }
 
   return data;

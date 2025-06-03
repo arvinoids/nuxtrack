@@ -1,11 +1,55 @@
 <template>
   <div class="flex flex-col justify-start w-full">
     <p class="mb-2 font-bold text-center">Create dummy cases for user</p>
+    <div class="border border-neutral-200 shadow py-8 w-[50ch] self-center mb-5">
+      <div class="flex flex-col items-center gap-1">
+        <div class="text-sm text-center w-3/4 mb-2">
+          Use this calculator to compute the dummy cases that need to be assigned if a
+          user was not set to <strong>Leave</strong> or <strong>Rest day</strong> .
+        </div>
+        <div class="flex items-center join">
+          <label for="fromDate" class="btn join-item label w-[10rem]"
+            >Leave date/time:</label
+          ><input class="input join-item" type="datetime-local" v-model="leaveFrom" />
+        </div>
+        <div class="flex items-center join">
+          <label for="toDate" class="btn join-item label w-[10rem]"
+            >Return date/time:</label
+          ><input class="input join-item" type="datetime-local" v-model="leaveTo" />
+        </div>
+        <div class="flex items-center join w-[360px] mb-2">
+          <label for="team" class="btn join-item label w-[7rem]">Team</label
+          ><select class="select max-w-xs join-item select-bordered" v-model="teamCalc">
+            <option v-for="team in allGroups.items" :value="team.id">
+              {{ team.description }}
+            </option>
+          </select>
+        </div>
+        <div class="flex flex-row gap-3 w-[360px] items-center justify-between">
+          <div
+            class="btn btn-info"
+            @click="getCalculations"
+            :class="[{ 'btn-disabled': disableCalculate }]"
+          >
+            Calculate
+          </div>
+          <div
+            class="flex items-center bg-warning/20 alert h-[40px]"
+            v-if="calculatedCases"
+          >
+            <label for="team" class="label"
+              >Created while on leave: {{ rawData.casesCreatedDuringLeave }}, Dummy:
+              {{ calculatedCases }}</label
+            >
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="flex justify-center items-center gap-2">
       <HeadlessListbox v-model="selectedUser" :disabled="creating">
         <div class="relative">
           <HeadlessListboxButton
-            class="border relative w-[200px] cursor-default bg-white py-2 pl-3 pr-10 text-left shadow-md sm:text-sm"
+            class="relative w-[200px] cursor-default bg-white py-2 pl-3 pr-10 border border-neutral-200 text-left shadow-md sm:text-sm"
           >
             <span class="block truncate">{{ selectedUser.fullname }}</span>
             <span
@@ -26,7 +70,7 @@
             leave-to-class="opacity-0"
           >
             <HeadlessListboxOptions
-              class="absolute mt-1 max-h-60 w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 sm:text-sm z-10"
+              class="absolute mt-1 max-h-60 w-full overflow-auto bg-white py-1 text-base shadow-lg sm:text-sm z-10"
             >
               <HeadlessListboxOption
                 v-for="user in validUsers"
@@ -55,7 +99,7 @@
       <HeadlessListbox v-model="selectedGroup" :disabled="creating">
         <div class="relative">
           <HeadlessListboxButton
-            class="border relative w-[200px] cursor-default bg-white py-2 pl-3 pr-10 text-left shadow-md sm:text-sm"
+            class="relative w-[200px] cursor-default border border-neutral-200 bg-white py-2 pl-3 pr-10 text-left shadow-md sm:text-sm"
           >
             <span class="block truncate">{{ selectedGroup.description }}</span>
             <span
@@ -105,13 +149,13 @@
         type="number"
         min="1"
         max="100000"
-        class="input input-bordered h-[38px] w-20"
+        class="input h-[38px] w-20 shadow-md"
         v-model="tickets"
         :class="creating ? 'input-disabled' : ''"
       />
 
       <div
-        class="btn shadow-md btn-secondary btn-sm w-[15ch] h-[38px] borderf"
+        class="btn shadow-md btn-secondary text-white btn-sm w-[15ch] h-[38px]"
         :class="creating ? 'btn-disabled cursor-wait' : 'cursor-default'"
         @click.prevent="AddDummyCases()"
       >
@@ -132,6 +176,25 @@ const tickets = ref(1);
 const validUsers = getValidUsers();
 const currentuser = useCurrentUser();
 const creating = ref(false);
+const allGroups = await useGetAllGroups();
+const teamCalc = ref();
+const calculatedCases = ref(0);
+const leaveFrom = ref();
+const leaveTo = ref();
+const rawData = ref();
+
+async function getCalculations() {
+  rawData.value = await useComputeDummyCases(
+    teamCalc.value,
+    leaveFrom.value,
+    leaveTo.value
+  );
+  calculatedCases.value = rawData.value.casesToAdd;
+  tickets.value = rawData.value.casesToAdd;
+  console.log("rawData", rawData.value);
+}
+
+console.log("allGroups", allGroups);
 type userExpandedMemberOf = user & {
   expand: {
     memberOf: group[];
@@ -184,6 +247,10 @@ async function AddDummyCases() {
   creating.value = false;
   casesChanged.value++;
 }
+
+const disableCalculate = computed(() => {
+  return !leaveFrom.value || !leaveTo.value || !teamCalc.value;
+});
 </script>
 
 <style></style>

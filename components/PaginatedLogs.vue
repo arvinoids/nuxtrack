@@ -1,13 +1,13 @@
 <template>
-  <div>
+  <div class="mt-4">
     <div :key="updateTable" class="flex flex-col gap-3">
       <div
-        class="overflow-x-auto shadow-md flex flex-col w-[1080px] h-[590px]"
+        class="overflow-x-auto shadow-md flex flex-col w-[1080px] h-[650px]"
         v-if="logs!.totalItems !== 0"
       >
         <table class="table table-compact" v-if="!loading">
           <thead class="sticky top-0 z-20">
-            <tr>
+            <tr class="bg-base-200">
               <th class="rounded-none">User</th>
               <th>Transaction</th>
               <th>Details</th>
@@ -15,7 +15,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="log in logs!.items" :key="log.id" class="hover">
+            <tr v-for="log in logs!.items" :key="log.id" class="hover:bg-base-200">
               <td class="rounded-none">{{ log.user }}</td>
               <td>{{ log.type }}</td>
               <td>{{ log.details }}</td>

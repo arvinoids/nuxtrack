@@ -74,7 +74,7 @@ async function login() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 *:before,
 *:after {
   padding: 0;

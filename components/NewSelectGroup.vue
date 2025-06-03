@@ -1,6 +1,7 @@
 <template>
   <div class="modal" :id="`${group}select`">
-    <div class="modal-box">
+    <div class="modal-box bg-neutral
+    ">
       <h3 class="text-lg font">
         Assign case to
         <span class="text-accent">{{ taggedUser.fullname }}</span>

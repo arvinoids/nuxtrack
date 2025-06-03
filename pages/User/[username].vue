@@ -10,12 +10,14 @@
 </template>
 
 <script setup lang="ts">
+import type { UsersResponse } from "~/pocketbase-types";
+
 const pb = useNuxtApp().$pb;
 const route = useRoute();
 
 const user = await pb
   .collection("users")
-  .getFirstListItem(`username="${route.params.username}"`);
+  .getFirstListItem<UsersResponse>(`username="${route.params.username}"`);
 </script>
 
 <style></style>

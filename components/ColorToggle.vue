@@ -1,38 +1,50 @@
 <template>
-  <div class="btn btn-ghost btn-circle group relative">
+  <div class="btn btn-ghost btn-circle btn-primary group relative">
     <label class="swap swap-rotate">
       <!-- this hidden checkbox controls the state -->
-      <input type="checkbox" v-model="checked" />
-      <!-- moon icon -->
+      <input type="checkbox" v-model="isDarkMode" @change="toggleTheme" />
+      <!-- sun icon (shows in dark mode) -->
       <Icon name="ph:sun-duotone" class="swap-on text-gray-200" size="1.6rem" />
-      <!-- sun icon -->
+      <!-- moon icon (shows in light mode) -->
       <Icon
         name="ph:moon-stars-duotone"
         class="swap-off text-gray-200"
         size="1.6rem"
       /> </label
-    ><Tooltip position="bottom">Toogle dark/light mode</Tooltip>
+    ><Tooltip position="bottom">Toggle dark/light mode</Tooltip>
   </div>
 </template>
 
 <script setup lang="ts">
-const colorMode = useColorMode();
+// Check if user prefers dark mode or has previously selected it
+const isDarkMode = ref(false);
 
-function getMode() {
-  return localStorage.getItem("dark") === "1" ? true : false;
-}
-
-const checked = ref(getMode());
-
-watch(checked, (checked) => {
-  if (checked === true) {
-    colorMode.preference = "dark";
-    localStorage.setItem("dark", "1");
+// Initialize theme based on localStorage or system preference
+onMounted(() => {
+  // Check localStorage first
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) {
+    isDarkMode.value = savedTheme === "lex-dark";
+    applyTheme(savedTheme);
   } else {
-    colorMode.preference = "light";
-    localStorage.setItem("dark", "0");
+    // Check system preference
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    isDarkMode.value = prefersDark;
+    applyTheme(prefersDark ? "lex-dark" : "lex");
   }
 });
+
+// Toggle between themes
+function toggleTheme() {
+  const newTheme = isDarkMode.value ? "lex-dark" : "lex";
+  applyTheme(newTheme);
+  localStorage.setItem("theme", newTheme);
+}
+
+// Apply theme to document
+function applyTheme(theme: string) {
+  document.documentElement.setAttribute("data-theme", theme);
+}
 </script>
 
 <style scoped>

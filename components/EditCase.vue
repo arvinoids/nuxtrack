@@ -2,20 +2,23 @@
   <!-- Put this part before </body> tag -->
   <input type="checkbox" :id="props.id + 'edit'" class="modal-toggle" />
   <div class="modal">
-    <div class="modal-box w-min max-w-5xl rounded-none">
+    <div class="modal-box w-[400px]">
       <h3 class="font-bold text-lg text-center">Edit case...</h3>
-      <div class="flex gap-4 my-2">
-        <div class="form-control w-full max-w-xs">
+      <div class="flex flex-col gap-3 my-2">
+        <div class="flex items-center gap-2 justify-between">
           <label class="label">
             <span class="label-text">Case ID</span>
           </label>
-          <input type="text" v-model="newCase" class="input input-bordered" />
+          <input type="text" v-model="newCase" class="input input-bordered w-[20ch]" />
         </div>
-        <div class="form-control w-full max-w-xs">
+        <div class="flex gap-2 justify-between">
           <label class="label">
             <span class="label-text">Owner</span>
           </label>
-          <select class="select select-bordered w-[30ch]" v-model="newUser">
+          <select
+            class="select select-bordered w-[20ch] justify-self-end"
+            v-model="newUser"
+          >
             <option
               v-for="user in users"
               :key="user.expand.user.id"
@@ -25,7 +28,7 @@
             </option>
           </select>
         </div>
-        <div class="form-control w-full max-w-xs">
+        <div class="flex gap-2 justify-between">
           <label class="label">
             <span class="label-text">Product Set</span>
           </label>
@@ -42,7 +45,7 @@
 
       <div class="modal-action">
         <label :for="props.id + 'edit'" class="btn">Cancel</label>
-        <label :for="props.id + 'edit'" class="btn btn-warning" @click="doUpdate"
+        <label :for="props.id + 'edit'" class="btn btn-primary" @click="doUpdate"
           >Update</label
         >
       </div>

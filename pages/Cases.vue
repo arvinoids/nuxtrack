@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center gap-2">
+  <div class="flex flex-col items-center gap-2 my-2">
     <h2 class="text-xl text-secondary mb-2 font-semibold">All Cases</h2>
     <PaginatedCases />
   </div>

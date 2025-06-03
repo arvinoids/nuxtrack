@@ -1,26 +1,25 @@
 <template>
   <div class="flex flex-col items-center gap-2">
-    <h1 class="text-lg text-center">Email Settings</h1>
     <div
       v-if="!loading"
-      class="flex flex-row border m-2 p-10 shadow-md w-full gap-10 flex-wrap"
+      class="flex flex-row border border-neutral-200 m-1 p-8 shadow-md w-full gap-10 flex-wrap"
     >
       <VForm action="submit" class="flex flex-col gap-4 w-[400px]">
-        <p class="form-control flex-row justify-between">
+        <p class="form-control flex justify-between gap-2">
           <label for="enable">Enable email notifications </label
           ><input
             name="notifications"
             type="checkbox"
             v-model="enabled"
-            class="checkbox checkbox-sm checkbox-secondary focus:border-2"
+            class="checkbox checkbox-sm checkbox-secondary text-white focus:border-2 rounded-none"
           />
         </p>
         <div class="flex flex-row gap-3 justify-between items-center">
-          <label for="token" class="">Email Token</label>
+          <label for="token" class="label w-[12ch]">Email Token</label>
           <VField
             type="text"
             name="token"
-            class="input input-bordered input-sm"
+            class="input input-bordered"
             placeholder="16-digit token"
             v-model="token"
             :rules="{ required: true, min: 16 }"
@@ -28,11 +27,11 @@
           <VErrorMessage name="name" class="alert alert-error" />
         </div>
         <div class="flex flex-row gap-3 justify-between items-center">
-          <label for="token" class="">Email API URL</label>
+          <label for="token" class="label w-[12ch]">Email API URL</label>
           <VField
             type="text"
             name="api"
-            class="input input-bordered input-sm"
+            class="input input-bordered"
             placeholder="https://path/to/api"
             v-model="api"
             :rules="{ required: true }"
@@ -40,7 +39,7 @@
           <VErrorMessage name="name" class="alert alert-error" />
         </div>
         <div
-          class="btn w-min self-center bg-neutral-500 text-neutral"
+          class="btn w-min self-center btn-secondary text-neutral"
           @click.prevent="updateEmailSettings()"
         >
           Save
@@ -92,7 +91,7 @@ async function updateEmailSettings() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 label {
   @apply text-sm;
 }

@@ -1,12 +1,12 @@
 <template>
   <div :key="updateTable" class="flex flex-col gap-3">
     <div
-      class="overflow-x-auto flex flex-col w-[1080px] h-[525px] shadow-md"
+      class="overflow-x-auto flex flex-col w-[1080px] h-[600px] shadow-md"
       v-if="cases.totalItems !== 0"
     >
-      <table class="table table-compact" v-if="!loading">
+      <table class="table table-compact border-base-200 border" v-if="!loading">
         <thead class="sticky top-0 z-20">
-          <tr>
+          <tr class="bg-base-200">
             <th class="rounded-none">Owner</th>
             <th>Case ID</th>
             <th>Product Set</th>
@@ -149,7 +149,7 @@ const caseToCopy: Ref<HTMLSpanElement[]> = ref([]);
 function copyToClipboard(caseId: string) {
   navigator.clipboard
     .writeText(caseId)
-    .then(() => miniToast("success", "Copied to clipboard"));
+    .then(() => useShowToast("Copied to clipboard", "success"));
 }
 
 watch(updated, async () => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-2 border justify-between w-[40ch] items-center px-3 py-2">
+  <div class="flex gap-2 shadow justify-between w-[40ch] items-center px-3 py-2">
     <span>{{ user.fullname }}</span>
     <button class="btn btn-sm btn-secondary" @click="setToAvail(user.id)">
       Set to Available

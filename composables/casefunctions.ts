@@ -1,7 +1,7 @@
 import type { notification } from "custom-types";
 import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
-import type { ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord } from "~/pocketbase-types";
+import type {  GroupsResponse,   ArchiveRecord,   BaseSystemFields,   CasesRecord,   LeavesRecord,  CounterResponse } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -763,7 +763,7 @@ async function addToTotalCases(quantity: number, groupId: string) {
 export async function useGetAllGroups() {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const res = await pb.collection('groups').getList()
+  const res = await pb.collection<GroupsResponse>('groups').getList()
   return res
 }
 
@@ -796,7 +796,7 @@ export async function useGetGroupStats(group: string, description?: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
 
-  const res = await pb.collection('counter').getList(1, 10000, { filter: `group="${group}"`, order: '+order' })
+  const res = await pb.collection('counter').getList<CounterResponse>(1, 10000, { filter: `group="${group}"`, order: '+order' })
   // totalCases = sum of all 'count' in items
   const totalCases = res.items.reduce((acc, item) => {
     return acc + item.count

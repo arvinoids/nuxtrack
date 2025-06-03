@@ -2,7 +2,7 @@
   <div class="relative">
     <!-- Dropdown toggle button -->
     <div
-      class="flex items-center btn btn-ghost btn-square p-2"
+      class="flex items-center btn btn-ghost btn-accent btn-square p-2"
       ref="menubutton"
       @click.stop="show = !show"
       v-if="!show"
@@ -21,7 +21,7 @@
     <transition>
       <div
         v-show="show"
-        class="absolute right-0 mt-3 py-2 bg-base-100 shadow-xl min-w-[400px] border z-40 flex flex-row"
+        class="absolute right-0 mt-3 py-2 bg-base-100 shadow-xl min-w-[400px] z-40 flex flex-row"
         ref="menu"
       >
         <UserStatusCard />

@@ -1,5 +1,7 @@
 <template>
-  <div class="p-3 shadow-lg border w-[300px] justify-center flex flex-col">
+  <div
+    class="p-3 shadow-lg border border-base-200 w-[300px] justify-center flex flex-col"
+  >
     <div class="flex flex-row w-full justify-center p-5" v-if="avatar">
       <NuxtLink to="/ChangeAvatar" v-if="user.id === currentUser?.id"
         ><img :src="avatar" alt="" class="" title="Change Avatar"
@@ -40,12 +42,12 @@
 </template>
 
 <script setup lang="ts">
-import type { user } from "pocketbase-types";
+import type { UsersResponse } from "~/pocketbase-types";
 const route = useRoute();
 const currentUser = useCurrentUser();
 
 const props = defineProps<{
-  user: user;
+  user: UsersResponse;
 }>();
 const avatar = await useGetAvatarUrl(props.user);
 

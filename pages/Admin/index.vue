@@ -1,5 +1,5 @@
 <template>
-  <div class="border p-3 text-sm">
+  <div class="border-base-200 shadow border p-3 text-sm">
     <AdminLeaveNotification />
   </div>
 </template>

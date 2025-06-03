@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col items-center gap-3" v-if="userIsAdmin()">
-    <AdminTabs />
+  <div class="flex flex-col items-center gap-3 w-full" v-if="userIsAdmin()">
+    <div class="w-full"><AdminTabs /></div>
     <NuxtPage />
   </div>
   <div v-else class="p-5 border flex flex-col gap-3 items-center">

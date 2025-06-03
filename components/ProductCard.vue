@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col text-center m-1 w-[250px] shadow-lg border bg-base-100">
+  <div
+    class="flex flex-col text-center m-1 w-[250px] shadow-lg border-neutral-200 border"
+  >
     <div class="bg-secondary">
       <div class="flex items-center justify-between">
         <h2
@@ -11,23 +13,22 @@
         </h2>
         <div class="flex items-center">
           <button
-            class="btn btn-sm btn-ghost btn-circle"
+            class="btn btn-sm btn-secondary btn-ghost btn-circle"
             @click="updateCounter()"
             :disabled="loading"
+            title="Update counters for this group"
           >
             <Icon name="ic:twotone-refresh" size="1.2rem" class="text-slate-50" />
           </button>
-          <div
-            class="tooltip tooltip-bottom tooltip-accent"
-            data-tip="Click this if you checked for new cases."
+
+          <button
+            class="btn btn-secondary btn-ghost btn-circle btn-sm mr-1"
+            @click="updatedTimestamp(group.id)"
+            title="Mark this group as updated now"
+            :disabled="loading"
           >
-            <button
-              class="btn btn-ghost btn-circle btn-sm mr-1"
-              @click="updatedTimestamp(group.id)"
-            >
-              <Icon name="mdi:alarm-check" size="1.2rem" class="text-neutral-100" />
-            </button>
-          </div>
+            <Icon name="mdi:alarm-check" size="1.2rem" class="text-neutral-100" />
+          </button>
         </div>
       </div>
     </div>

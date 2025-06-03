@@ -1,11 +1,11 @@
 <template>
     <div class="relative">
       <label
-        class="flex items-center btn btn-ghost btn-circle p-2"
+        class="flex items-center btn btn-ghost btn-circle btn-primary p-2"
         @click.stop="show = true"
         for="finder"
       >
-        <Icon name="ic:baseline-search" size="1.8rem" class="text-gray-200" />
+        <Icon name="ic:baseline-search" size="2rem" class="text-gray-200" />
       </label>
       <input type="checkbox" id="finder" class="modal-toggle" />
   
@@ -20,7 +20,9 @@
               v-model="caseId"
               placeholder="CAS-XXXXXXX-XXXXXX"
               id="caseInput"
-            /><label for="caseInput" class='label'><span class="label-text-alt text-warning">Please note that search is case-sensitve and must be 18 characters or longer.</span></label>
+            /><div class="text-center alert alert-warning">
+              Please note that search is case-sensitve and must be 18 characters or longer.              
+            </div>
   
           <div v-if="caseFound">
           <div v-for="caseRecord in records.items">

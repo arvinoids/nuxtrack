@@ -1,10 +1,10 @@
 <template>
-  <div class="rounded-md bg-base-100 text-xs shadow-sm border mx-2 w-[200px]">
+  <div class="rounded-md bg-base-100 text-xs shadow-sm mx-2 w-[200px]">
     <div class="flex flex-col items-center p-3 gap-1">
       <div class="indicator">
         <span
-          class="indicator-item badge badge-xs"
-          :class="{ [`bg-${badgeColor}`]: true }"
+          class="indicator-item status"
+          :class="{ [`status-${badgeColor}`]: true }"
         ></span>
         <img
           v-if="avatarUrl"
@@ -24,7 +24,7 @@
         user.fullname
       }}</nuxt-link>
       <div
-        class="badge badge-sm min-w-max cursor-pointer"
+        class="badge badge-sm min-w-max cursor-pointer rounded-full"
         :class="{ [`badge-${badgeColor}`]: true }"
         @click="show = true"
         v-if="currentPath.fullPath !== '/Admin/Users'"
