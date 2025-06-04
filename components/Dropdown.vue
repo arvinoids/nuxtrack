@@ -7,7 +7,7 @@
       @click.stop="show = !show"
       v-if="!show"
     >
-      <button class="text-gray-200 hover:text-gray-50">
+      <button class="text-gray-200 hover:text-gray-50 cursor-pointer">
         <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />
       </button>
     </div>
@@ -17,7 +17,11 @@
       v-else
     >
       <button class="text-gray-200 hover:text-gray-50">
-        <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />
+        <Icon
+          name="ic:round-menu"
+          class="fill-gray-200 hover:fill-gray-50 cursor-pointer"
+          size="2rem"
+        />
       </button>
     </div>
 

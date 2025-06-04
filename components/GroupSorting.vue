@@ -1,6 +1,6 @@
 <template>
-  <div class="border border-neutral-200 shadow-md p-4">
-    <label class="font-bold">Reorder groups</label>
+  <div class="border border-neutral-200 shadow-md p-6 flex flex-col gap-2">
+    <div class="font-bold">Reorder groups</div>
     <draggable
       v-model="items"
       handle=".handle"
@@ -8,8 +8,10 @@
       class="flex flex-col gap-2 mb-2"
     >
       <template #item="{ element: item }">
-        <div class="px-3 py-2 border border-neutral-200 bg-warning/10 hover:bg-accent/10">
-          <div class="flex items-between w-auto">
+        <div
+          class="px-3 py-2 border border-base-300 bg-base-200 shadow rounded-sm hover:bg-accent/10"
+        >
+          <div class="flex w-auto items-center">
             <div class="handle">
               <Icon
                 name="ic:twotone-drag-handle"
@@ -17,13 +19,13 @@
                 class="mr-2 text-lex-neutral-4 cursor-move"
               />
             </div>
-            <div class="title">{{ item.description }}</div>
+            <div class="title text-sm">{{ item.description }}</div>
           </div>
         </div>
       </template>
     </draggable>
     <button
-      class="btn btn-secondary"
+      class="btn btn-secondary w-fit"
       @click="setOrder()"
       :class="[hasChanged() ? 'btn-outline' : 'btn-disabled']"
     >

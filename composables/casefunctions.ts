@@ -1,7 +1,7 @@
 import type { notification } from "custom-types";
 import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
-import type {  GroupsResponse,   ArchiveRecord,   BaseSystemFields,   CasesRecord,   LeavesRecord,  CounterResponse } from "~/pocketbase-types";
+import type { GroupsResponse, ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord, CounterResponse } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -718,11 +718,13 @@ function createDummyCases(quantity: number, prefix: string) {
  * @returns a success or fail status, and a message. Used for notifications.
  */
 export async function useAddDummyCases(quantity: number, userId: string, groupId: string, prefix: string) {
-  let createdCasesCount = 0
+  const percent = usePercentComplete('dummy')
+  percent.value = 0
+  let createdCasesCount = ref(0)
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const cases = createDummyCases(quantity, prefix)
-  cases.forEach(async (caseId) => {
+  for (let caseId in cases) {
     let data = {
       user: userId,
       group: groupId,
@@ -730,16 +732,19 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
       assignedBy: useCurrentUser().value?.username,
     };
     try {
-      const rec = await pb.collection("cases").create(data);
-      if (rec) {
-        createdCasesCount++
-      }
+      await pb.collection("cases").create(data)
+      .then(() => { 
+        createdCasesCount.value++; 
+        percent.value = Math.floor((createdCasesCount.value / quantity) * 100) 
+      });
     } catch (e) {
       console.log(e);
     }
-  });
+  }
+  
   await addToTotalCases(quantity, groupId) // this adds to the total case count on all active leaves to account for dummy case computation after leave
-  if (createdCasesCount === quantity) return { status: 'success', message: `${quantity} Cases created` }
+  console.log('created =', createdCasesCount.value, 'quantity=', quantity)
+  if (createdCasesCount.value === quantity) return { status: 'success', message: `${quantity} Cases created` }
   return { status: 'failed', message: 'Some errors were encountered creating the cases' }
 }
 
@@ -875,7 +880,7 @@ export async function useForceUpdateCounters(groupId: string) {
       const oldCounter = await pb.collection('counter').getFirstListItem(`user="${user.id}"&&group="${groupId}"`, { fields: '' })
       await pb.collection('counter').update(oldCounter.id, data)
     } catch {
-      await useCreateCounter(data.user,data.group)
+      await useCreateCounter(data.user, data.group)
     }
   }
 }
@@ -990,14 +995,14 @@ export async function useGetCaseReport(userId: string, groupId: string, from: Da
 }
 
 export async function useCreateCounter(userId: string, groupId: string) {
-  const res:notification = { message: '', status: 'failed' }
+  const res: notification = { message: '', status: 'failed' }
   const pb = useNuxtApp().$pb
-  const oldRecordList = await pb.collection('counter').getList(1,10,{filter:`user="${userId}"&&group="${groupId}"`})
-  if (oldRecordList.totalItems===0) {
+  const oldRecordList = await pb.collection('counter').getList(1, 10, { filter: `user="${userId}"&&group="${groupId}"` })
+  if (oldRecordList.totalItems === 0) {
     const res = await pb.collection('counter').create({ user: userId, group: groupId, count: 0 });
     res.message = 'Counter created'
     res.status = 'success'
-  } else { 
+  } else {
     res.message = 'User already exists in this group!'
   }
   return res

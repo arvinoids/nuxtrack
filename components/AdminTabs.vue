@@ -26,8 +26,4 @@
 
 <script setup lang="ts"></script>
 
-<style lang="postcss" scoped>
-.tab-active {
-  @apply font-bold;
-}
-</style>
+<style lang="postcss" scoped></style>
