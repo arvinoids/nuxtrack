@@ -1,6 +1,6 @@
 <template>
   <div class="modal" :id="`${group}select`">
-    <div class="modal-box bg-neutral
+    <div class="modal-box
     ">
       <h3 class="text-lg font">
         Assign case to

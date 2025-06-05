@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md bg-base-100 text-xs shadow-sm mx-2 w-[200px]">
+  <div class="rounded-md bg-base-100 text-xs shadow-sm mx-2 w-[160px]">
     <div class="flex flex-col items-center p-3 gap-1">
       <div class="indicator">
         <span
@@ -74,7 +74,7 @@
         </div>
       </transition>
       <div
-        class="btn btn-xs btn-warning btn-outline rounded font-medium shadow-sm mt-3"
+        class="btn btn-sm btn-warning rounded font-medium shadow-sm mt-3"
         @click="logout()"
       >
         Log Out

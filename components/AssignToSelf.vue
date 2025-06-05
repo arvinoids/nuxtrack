@@ -5,7 +5,7 @@
     /></label>
     <input type="checkbox" id="assignToSelf" class="modal-toggle" />
     <div class="modal">
-      <div class="modal-box w-min md:max-w-5xl rounded-none">
+      <div class="modal-box w-[600px] md:max-w-5xl rounded-none">
         <h3 class="font-bold text-lg text-center">Assign case to myself</h3>
         <div class="flex gap-4 my-2">
           <div class="form-control w-full max-w-xs">
@@ -44,7 +44,7 @@
             @click="escalateCase(caseId, user.id, selectedGroupId)"
             >Escalate</label
           >
-          <label for="assignToSelf" class="btn btn-outline btn-warning">Cancel</label>
+          <label for="assignToSelf" class="btn btn-warning">Cancel</label>
         </div>
       </div>
     </div>
