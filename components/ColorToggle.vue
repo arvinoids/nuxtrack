@@ -1,17 +1,16 @@
 <template>
-  <div class="btn btn-ghost btn-circle btn-primary group relative">
+  <div
+    class="btn btn-ghost btn-circle btn-primary group relative"
+    title="Toggle dark/light mode"
+  >
     <label class="swap swap-rotate">
       <!-- this hidden checkbox controls the state -->
       <input type="checkbox" v-model="isDarkMode" @change="toggleTheme" />
       <!-- sun icon (shows in dark mode) -->
       <Icon name="ph:sun-duotone" class="swap-on text-gray-200" size="1.6rem" />
       <!-- moon icon (shows in light mode) -->
-      <Icon
-        name="ph:moon-stars-duotone"
-        class="swap-off text-gray-200"
-        size="1.6rem"
-      /> </label
-    ><Tooltip position="bottom">Toggle dark/light mode</Tooltip>
+      <Icon name="ph:moon-stars-duotone" class="swap-off text-gray-200" size="1.6rem" />
+    </label>
   </div>
 </template>
 

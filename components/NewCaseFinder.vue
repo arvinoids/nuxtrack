@@ -4,6 +4,7 @@
         class="flex items-center btn btn-ghost btn-circle btn-primary p-2"
         @click.stop="show = true"
         for="finder"
+        title="Find a case"
       >
         <Icon name="ic:baseline-search" size="2rem" class="text-gray-200" />
       </label>

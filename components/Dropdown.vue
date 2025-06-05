@@ -6,6 +6,7 @@
       ref="menubutton"
       @click.stop="show = !show"
       v-if="!show"
+      title="Menu"
     >
       <button class="text-gray-200 hover:text-gray-50 cursor-pointer">
         <Icon name="ic:round-menu" class="fill-gray-200 hover:fill-gray-50" size="2rem" />

@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   },
 
   app: {
-    baseURL: process.env.NODE_ENV === 'development' ? '/Tracker' : '/Tracker2',
+    baseURL: process.env.VITE_APP_ENV === 'development' ? '/Tracker2' : '/Tracker',
     head: {
       title: "Solutions Team Rotation Tracker",    },
     pageTransition: { name: "page", mode: "out-in" },

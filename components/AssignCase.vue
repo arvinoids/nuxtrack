@@ -33,10 +33,10 @@
 
 <script setup lang="ts">
 import type { LogData } from 'custom-types';
-import type { user } from 'pocketbase-types';
+import type { UsersResponse } from '~/pocketbase-types';
 const pb = useNuxtApp().$pb
 const props = defineProps<{
-    user: user,
+    user: UsersResponse,
     group: string
 }>()
 
