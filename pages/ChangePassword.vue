@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center gap-2 mt-2">
     <h1 class="text-lg text-center font-bold">Change Password</h1>
     <div
-      class="flex flex-row border border-base-200 bg-warning/40 m-2 p-5 shadow-md w-full gap-10 flex-wrap"
+      class="flex flex-row border border-base-200 m-2 p-5 shadow-md w-full gap-10 flex-wrap"
     >
       <VForm action="submit" class="flex flex-col gap-4 w-[300px]">
         <div class="flex flex-col">
@@ -50,9 +50,11 @@
         </div>
       </VForm>
       <div class="flex flex-col items-stretch">
-        <div class="border p-5 w-[300px] flex-grow bg-base-100">
+        <div
+          class="border border-neutral-200 bg-warning/10 p-5 w-[300px] flex-grow bg-base-100"
+        >
           <h5 class="font-semibold">Please note:</h5>
-          <ul class="text-accent mt-2">
+          <ul class="text-sm mt-2">
             <li>Password must be 8 characters or longer.</li>
             <li>
               It is recommended to use a strong password with a combination of uppercase
@@ -92,19 +94,38 @@ async function changePassword() {
   try {
     await pb.collection("users").update(userId, data);
     message.value = "Password has been successfully changed.";
-    status.value = "true";
+    status.value = "success";
   } catch (error: any) {
     status.value = "failed";
-    message.value = error.message;
+    console.log(error.response);
+
+    // Extract detailed error message from the response
+    if (error.response && error.response.data) {
+      const responseData = error.response.data;
+      console.log("response data: ", responseData);
+
+      if (responseData) {
+        // Check for specific field errors
+
+        if (responseData.oldPassword) {
+          message.value = responseData.oldPassword.message;
+        } else if (responseData.password) {
+          message.value = responseData.password.message;
+        } else if (responseData.passwordConfirm) {
+          message.value = responseData.passwordConfirm.message;
+        } else {
+          message.value = responseData.message || error.message;
+        }
+      } else {
+        message.value = responseData.message || error.message;
+      }
+    } else {
+      message.value = error.message;
+    }
+
     console.log(error);
   }
   useShowToast(message.value, status.value);
-}
-
-async function getErrorMessage(error: any) {
-  let message;
-  message = await error.data.oldPassword.message;
-  return message;
 }
 </script>
 

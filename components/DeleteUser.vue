@@ -2,8 +2,8 @@
   <!-- Put this part before </body> tag -->
   <input type="checkbox" :id="`delete-${id}`" class="modal-toggle" />
   <div class="modal">
-    <div class="modal-box w-min max-w-5xl rounded-none">
-      <h3 class="font-bold text-lg mb-2">Deleting user...</h3>
+    <div class="modal-box rounded-none">
+      <h3 class="font-bold text-lg mb-2 w-full text-center">Deleting user...</h3>
       <!-- <p class="py-4"> {{ message }}</p> -->
       <p class="mb-2">
         User
@@ -11,7 +11,7 @@
         will be deleted.
       </p>
       <p class="mb-2">Another user needs to own the cases from this user.</p>
-      <div class="form-control w-full max-w-xs">
+      <div class="form-control text-center">
         <select class="select select-bordered" v-model="newUser">
           <option value="Select a user below:">Select a user below:</option>
           <option v-for="user in users" :key="user.id" :value="user.id">

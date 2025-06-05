@@ -1,7 +1,9 @@
 <template>
   <div class="flex flex-col items-center gap-2">
     <h1 class="text-lg text-center">Add User</h1>
-    <div class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap">
+    <div
+      class="flex flex-row border border-neutral-200 m-2 p-5 shadow-md w-full gap-10 flex-wrap"
+    >
       <VForm action="submit" class="flex flex-col gap-4 w-[300px]">
         <div class="flex flex-col">
           <label for="name" class="label">Name: </label>
@@ -65,7 +67,7 @@
           <label for="group" class="label">Choose the group(s) for user:</label>
           <select
             name="group"
-            class="select select-bordered grow"
+            class="border p-1 grow h-[6rem]"
             v-model="memberOf"
             multiple
           >
@@ -91,7 +93,7 @@
         </div>
       </VForm>
       <div class="flex flex-col items-stretch">
-        <div class="border p-5 w-[300px] flex-grow bg-base-100">
+        <div class="border border-neutral-200 p-5 w-[300px] flex-grow bg-base-100">
           <h5 class="font-semibold">Please note:</h5>
           <ul class="text-accent mt-2">
             <li>Username should match the user's corporate shortname.</li>
@@ -121,12 +123,12 @@ definePageMeta({
 const pb = useNuxtApp().$pb;
 const groups = await pb.collection("groups").getFullList(100, { sort: "+description" });
 const message = ref("");
-let username: string;
-let email: string;
+let username = "";
+let email = "";
 let emailVisibility: boolean = true;
-let password: string;
-let passwordConfirm: string;
-let fullname: string;
+let password = "";
+let passwordConfirm = "";
+let fullname = "";
 let memberOf: string[] = [];
 let role: "user" | "admin" = "user";
 

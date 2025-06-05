@@ -38,7 +38,7 @@
           <NuxtLink
             to="/Admin"
             v-if="userIsAdmin()"
-            class="block px-4 py-2 text-sm hover:bg-primary/70 hover:rounded hover:text-white"
+            class="block px-4 py-2 text-sm hover:bg-secondary transition-colors duration-300 hover:text-white"
             @click="show = !show"
           >
             Admin</NuxtLink
@@ -46,14 +46,14 @@
           <NuxtLink
             to="/Cases"
             v-if="auth.isAuthenticated"
-            class="block px-4 py-2 text-sm hover:bg-primary/70 hover:rounded hover:text-white"
+            class="block px-4 py-2 text-sm hover:bg-secondary transition-colors duration-300 hover:text-white"
             @click="show = !show"
           >
             All Cases
           </NuxtLink>
           <NuxtLink
             to="/User/Profile"
-            class="block px-4 py-2 text-sm hover:bg-primary/70 hover:rounded hover:text-white"
+            class="block px-4 py-2 text-sm hover:bg-secondary transition-colors duration-300 hover:text-white"
             @click="show = !show"
           >
             My Page
@@ -61,7 +61,7 @@
 
           <NuxtLink
             to="/ChangePassword"
-            class="block px-4 py-2 text-sm hover:bg-primary/70 hover:rounded hover:text-white"
+            class="block px-4 py-2 text-sm hover:bg-secondary transition-colors duration-300 hover:text-white"
             @click="show = !show"
             >Change Password</NuxtLink
           >

@@ -1,7 +1,9 @@
 <template>
   <div class="flex flex-col items-center gap-2">
     <h1 class="text-lg text-center">Editing user {{}}</h1>
-    <div class="flex flex-row border m-2 p-5 shadow-md w-full gap-10 flex-wrap">
+    <div
+      class="flex flex-row border border-neutral-200 m-2 p-5 shadow-md w-full gap-10 flex-wrap"
+    >
       <VForm action="submit" class="flex flex-col gap-4 w-[300px]">
         <div class="flex flex-col">
           <label for="username" class="label">Username: </label>
@@ -62,7 +64,7 @@
           </select>
         </div>
         <div class="flex justify-center gap-3">
-          <button @click.prevent="$router.back()" class="btn btn-warning w-min">
+          <button @click.prevent="$router.back()" class="btn btn-warning">
             Discard Changes
           </button>
           <button @click.prevent="updateUser" class="btn btn-primary w-min">
@@ -71,7 +73,7 @@
         </div>
       </VForm>
       <div class="flex flex-col items-stretch">
-        <div class="border p-5 w-[300px] flex-grow bg-base-100">
+        <div class="border border-neutral-200 p-5 w-[300px] flex-grow bg-base-100">
           <h5 class="font-semibold">Please note:</h5>
           <ul class="text-accent mt-2">
             <li>Username should match the user's corporate shortname.</li>
