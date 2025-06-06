@@ -6,7 +6,7 @@
     >
       <VForm action="submit" class="flex flex-col gap-4 w-[400px]">
         <p class="form-control flex justify-between gap-2">
-          <label for="enable">Enable email notifications </label
+          <label for="enable" class="text-sm label">Enable email notifications </label
           ><input
             name="notifications"
             type="checkbox"
@@ -15,7 +15,7 @@
           />
         </p>
         <div class="flex flex-row gap-3 justify-between items-center">
-          <label for="token" class="label w-[12ch]">Email Token</label>
+          <label for="token" class="label w-[12ch] text-sm">Email Token</label>
           <VField
             type="text"
             name="token"
@@ -27,7 +27,7 @@
           <VErrorMessage name="name" class="alert alert-error" />
         </div>
         <div class="flex flex-row gap-3 justify-between items-center">
-          <label for="token" class="label w-[12ch]">Email API URL</label>
+          <label for="token" class="label w-[12ch] text-sm">Email API URL</label>
           <VField
             type="text"
             name="api"

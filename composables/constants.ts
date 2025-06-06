@@ -9,8 +9,8 @@ export const STATUS_CHOICES = [
 
 export const STATUS_CHOICES_USER = [
   { status: "Available",color: "secondary" },
-  { status: "Outside shift", color: "neutral" },
-  { status: "Rest day", color: "neutral" }
+  { status: "On leave", color: "neutral-100" },
+  { status: "Rest day", color: "neutral-100" }
 ];
 
 export const APP_NAME = "Rotation Tracker"

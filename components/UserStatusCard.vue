@@ -20,7 +20,7 @@
           class="h-10 w-10 flex-none rounded-full bg-gray-200"
         />
       </div>
-      <nuxt-link :to="`/user/${user.username}`" class="text-sm">{{
+      <nuxt-link :to="`/user/${user.username}`" class="text-sm text-center">{{
         user.fullname
       }}</nuxt-link>
       <div
@@ -73,11 +73,8 @@
           </p>
         </div>
       </transition>
-      <div
-        class="btn btn-sm btn-warning rounded font-medium shadow-sm mt-3"
-        @click="logout()"
-      >
-        Log Out
+      <div class="btn btn-xs btn-circle uppercase mt-2" @click="logout()" title="Logout">
+        <Icon name="ic:round-log-out" size="1rem" />
       </div>
     </div>
     <div :v-if="false" name="for tailwind to prevent treeshake of these classes">
