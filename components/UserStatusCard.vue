@@ -146,9 +146,11 @@ const badgeColor = computed(() => {
 });
 
 async function logout() {
-  const outStatus = user.value.role === "user" ? "Outside shift" : "Not available";
-
-  useChangeUserStatus(user.value.id, outStatus, null);
+  let outStatus = user.value.role === "user" ? "Outside shift" : "Not available";
+  user.value.status === "On leave" || user.value.status === "Rest day"
+    ? (outStatus = user.value.status)
+    : null;
+  useChangeUserStatus(user.value.id, outStatus as statuschoice, null);
 
   logActivity({
     user: user.value.username,
