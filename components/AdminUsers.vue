@@ -1,16 +1,13 @@
 <template>
   <div class="flex flex-col items-center" :key="updateTable">
     <div class="flex flex-row justify-start gap-2 items-center my-3">
-      <div class="tooltip tooltip-top tooltip-accent" data-tip="Refresh View">
-        <button class="btn" @click="updated++">
-          <Icon name="mdi:refresh" size="1.2rem" />
-        </button>
-      </div>
-      <div class="tooltip tooltip-top tooltip-accent" data-tip="Add User">
-        <nuxt-link to="/Admin/AddUser" for="adduser" class="btn">
-          <Icon name="mdi:account-plus-outline" size="1.2rem"
-        /></nuxt-link>
-      </div>
+      <button class="btn" @click="updated++" title="Refresh view">
+        <Icon name="mdi:refresh" size="1.2rem" />
+      </button>
+
+      <nuxt-link to="/Admin/AddUser" for="adduser" class="btn" title="Add new user">
+        <Icon name="mdi:account-plus-outline" size="1.2rem"
+      /></nuxt-link>
     </div>
     <div
       v-if="!loading"
@@ -45,10 +42,14 @@
             <td>
               <NuxtLink
                 :to="`/Admin/User/${user.username}/Edit`"
-                class="btn btn-sm btn-warning mx-1"
+                class="btn btn-sm btn-square btn-warning mx-1"
+                title="Edit user details"
                 ><Icon name="mdi:account-edit-outline" size="1.2rem"
               /></NuxtLink>
-              <label :for="`delete-${user.id}`" class="btn btn-sm btn-error mx-1"
+              <label
+                :for="`delete-${user.id}`"
+                class="btn btn-sm btn-square btn-error mx-1"
+                title="Delete user"
                 ><Icon name="mdi:account-remove-outline" size="1.2rem"
               /></label>
               <DeleteUser :id="user.id" :username="user.username" />
