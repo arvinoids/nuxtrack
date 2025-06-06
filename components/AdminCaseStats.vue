@@ -19,7 +19,7 @@
             <td>
               <label
                 for="deleteCases"
-                class="btn btn-outline btn-warning btn-xs"
+                class="btn btn-warning btn-xs"
                 title="Delete all cases in this group"
                 @click="
                   selectedGroup = stat.group;
@@ -55,11 +55,11 @@
           <div class="modal-action center">
             <label
               for="deleteCases"
-              class="btn btn-sm btn-error btn-outline"
+              class="btn btn-sm btn-error"
               @click="deleteGroupCases(selectedGroup)"
               >Yes</label
             >
-            <label for="deleteCases" class="btn btn-warning btn-outline btn-sm">No</label>
+            <label for="deleteCases" class="btn btn-warning btn-sm">No</label>
           </div>
         </div>
       </div>

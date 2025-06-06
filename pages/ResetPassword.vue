@@ -10,12 +10,8 @@
       </div>
       <div class="text-center py-2 text-sm h-[8rem]" v-if="message">
         <div class="mb-2">{{ message }}</div>
-        <div class="btn btn-sm btn-outline btn-accent mx-1" @click="message = ''">
-          Try again
-        </div>
-        <div class="btn btn-sm btn-outline btn-accent mx-1" @click="navigateTo('/Login')">
-          Log In
-        </div>
+        <div class="btn btn-sm btn-accent mx-1" @click="message = ''">Try again</div>
+        <div class="btn btn-sm btn-accent mx-1" @click="navigateTo('/Login')">Log In</div>
       </div>
       <form v-else class="flex flex-col gap-3 px-20 h-[8rem]">
         <input

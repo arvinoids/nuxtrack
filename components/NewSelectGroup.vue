@@ -15,7 +15,7 @@
       <div class="text-xs text-error pt-2">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
-        <a class="btn btn-outline btn-secondary" @click="skipCatch(taggedUser)">Skip</a>
+        <a class="btn btn-secondary" @click="skipCatch(taggedUser)">Skip</a>
         <a href="#" class="btn btn-primary"
           :class="{ hidden: (caseExists || caseId === ''||!validateCASNumber(caseId)) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="submitCase(caseId, taggedUser.id, group)">Assign</a>
