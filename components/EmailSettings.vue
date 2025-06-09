@@ -90,9 +90,3 @@ async function updateEmailSettings() {
   }
 }
 </script>
-
-<style scoped lang="postcss">
-label {
-  @apply text-sm;
-}
-</style>

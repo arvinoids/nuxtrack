@@ -98,7 +98,6 @@ form {
 
 .formlabel {
   font-family: "Inter", sans-serif;
-  @apply text-gray-50;
 }
 
 form h3 {
