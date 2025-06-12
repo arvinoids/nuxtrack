@@ -8,15 +8,16 @@
       <div class="flex flex-col items-stretch gap-10">
         <div class="flex flex-col items-center">
           <div class="font-semibold">Current Avatar</div>
-          <div v-if="avatarUrl" class="size-auto">
+          <div v-if="avatarUrl" class="relative">
             <img :src="avatarUrl" alt="avatar" />
+            <div class="absolute inset-0 bg-white opacity-50 mask mask-circle-fade"></div>
           </div>
           <div v-else>None</div>
         </div>
         <div class="flex flex-col items-center bg-neutral p-8">
           <div class="font-semibold mb-2">Upload new avatar</div>
           <div class="alert alert-warning p-3 m-2">
-            Please keep your avatar to 300x300px or smaller
+            Please keep your avatar to 300x300px or smaller.
           </div>
           <div class="form-control gap-3 flex flex-col items-center">
             <input
@@ -24,6 +25,9 @@
               @change="onFileChange"
               class="file-input file-input-bordered file-input-sm file-input-accent"
             />
+            <p class="text-xs text-accent font-bold">
+              WARNING: Uploading a new image will replace the old image immediately.
+            </p>
             <button
               class="btn btn-sm btn-secondary w-fit"
               @click="uploadAvatar"
@@ -68,4 +72,8 @@ const uploadAvatar = async () => {
 };
 </script>
 
-<style></style>
+<style>
+.mask-circle-fade {
+  mask-image: radial-gradient(circle, transparent 70%, white 0%);
+}
+</style>

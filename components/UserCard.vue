@@ -4,7 +4,7 @@
   >
     <div class="flex flex-row w-full justify-center p-5" v-if="avatar">
       <NuxtLink to="/ChangeAvatar" v-if="user.id === currentUser?.id"
-        ><img :src="avatar" alt="" class="" title="Change Avatar"
+        ><img :src="avatar" alt="" class="" title="Click here to change your avatar"
       /></NuxtLink>
       <img v-else :src="avatar" alt="" class="" />
     </div>
