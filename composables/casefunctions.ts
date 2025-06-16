@@ -724,7 +724,7 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const cases = createDummyCases(quantity, prefix)
-  for (let caseId in cases) {
+  for (let caseId of cases) {
     let data = {
       user: userId,
       group: groupId,
