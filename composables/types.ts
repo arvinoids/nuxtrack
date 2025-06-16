@@ -129,8 +129,10 @@ declare module 'custom-types' {
         message:string
     }
 
-    type notification = {
-        status:'success'|'failed'|'warning',
-        message:string,
-    }
+export type notification = {
+    status: 'success' | 'failed' | 'warning',
+    message: string,
+    data?: Record<string, any>
+}
+
 }

@@ -15,7 +15,7 @@ export async function archiveGroupCases(groupId: string, toDate: Date): Promise<
         return res;
     }
     for (const user of users) {
-        const archiveRes = await archiveUserCases(user.id, groupId, toDate);
+        const archiveRes = await archiveUserCasesInGroup(user.id, groupId, toDate);
         if (archiveRes.status === 'failed') {
             res.status = 'failed';
             res.message = archiveRes.message;
@@ -27,7 +27,7 @@ export async function archiveGroupCases(groupId: string, toDate: Date): Promise<
     return res;
 }
 
-async function archiveUserCases(userId: string, groupId: string, toDate: Date): Promise<notification> {
+async function archiveUserCasesInGroup(userId: string, groupId: string, toDate: Date): Promise<notification> {
     const pb = useNuxtApp().$pb;
     const res: notification = { status: 'failed', message: '' };
 
@@ -39,35 +39,38 @@ async function archiveUserCases(userId: string, groupId: string, toDate: Date): 
         res.message = 'No cases to archive';
         return res;
     } else try {
-        const csv = useNuxtApp().$csv as (data: any[], options?: any) => string;
-        const csvData = csv(cases, {
-            headers: ['id', 'created', 'updated', 'user', 'group', 'title', 'description', 'status', 'priority', 'dueDate', 'assignee', 'tags'],
-        });
-        const fileName = `${userId}-${groupId}-${toDate}.csv`;
-        const file = new File([csvData], fileName, { type: 'text/csv' });
-        // store in pocketbase archive collection
-        const status = await pb.collection('archive').create<ArchiveResponse>({
-            file,
-            name: fileName,
-            description: `Archived cases for user ${userId} in group ${groupId} up to ${toDate.toISOString()}`,
-        }).then(() => {
-            deleteCasesForUserInGroup(userId, groupId, toDate).then(() => {
-                addToArchiveCounter(userId, groupId, cases.length);
-                res.status = 'success';
-                res.message = `Archived ${cases.length} cases for user ${userId} in group ${groupId} up to ${toDate.toISOString()}`;
-            });
-        });
-    }
-    catch (e: any) {
-        res.status = 'failed';
-        res.message = e.message;
-    }
+    const csv = useNuxtApp().$csv as (data: any[], options?: any) => string;
+    const csvData = csv(cases, {
+        headers: ['id', 'created', 'updated', 'user', 'group', 'title', 'description', 'status', 'priority', 'dueDate', 'assignee', 'tags'],
+    });
+    const fileName = `${userId}-${groupId}-${toDate}.csv`;
+    const file = new File([csvData], fileName, { type: 'text/csv' });
+    
+    // Create archive entry
+    await pb.collection('archive').create<ArchiveResponse>({
+        file,
+        name: fileName,
+        description: `Archived cases for user ${userId} in group ${groupId} up to ${toDate.toISOString()}`,
+    });
+    
+    // Delete cases and get count
+    const deleteResult = await deleteCasesForUserInGroup(userId, groupId, toDate);
+    
+    // Update archive counter
+    await addToArchiveCounter(userId, groupId, deleteResult.data?.deletedCount);
+    
+    res.status = 'success';
+    res.message = `Archived ${cases.length} cases for user ${userId} in group ${groupId} up to ${toDate.toISOString()}`;
+} catch (e: any) {
+    res.status = 'failed';
+    res.message = e.message;
+}
     return res
 }
 
 async function deleteCasesForUserInGroup(userId: string, groupId: string, toDate: Date) {
     const pb = useNuxtApp().$pb;
-    const res: notification = { status: 'failed', message: '' };
+    const res: notification = { status: 'failed', message: '', data: { deletedCount: 0}};
     let count = 0
     let deletedCount = 0;
     try {
@@ -85,6 +88,7 @@ async function deleteCasesForUserInGroup(userId: string, groupId: string, toDate
         }
         res.status = 'success';
         res.message = `Deleted ${deletedCount} cases for user ${userId} in group ${groupId} up to ${toDate.toISOString()}`;
+        res.data = { deletedCount };
     } catch (e: any) {
         res.status = 'failed';
         res.message = e.message;

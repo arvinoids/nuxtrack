@@ -81,8 +81,10 @@ export type CompletionRecord = {
 }
 
 export type CounterRecord = {
+	archived?: number
 	count?: number
 	group: RecordIdString
+	total_count?: number
 	user: RecordIdString
 }
 

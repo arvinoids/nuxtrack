@@ -475,6 +475,34 @@
                     "max": null,
                     "noDecimal": false
                 }
+            },
+            {
+                "system": false,
+                "id": "cpubf67o",
+                "name": "archived",
+                "type": "number",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "noDecimal": true
+                }
+            },
+            {
+                "system": false,
+                "id": "mihqecm5",
+                "name": "total_count",
+                "type": "number",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "noDecimal": true
+                }
             }
         ],
         "indexes": [],
