@@ -714,7 +714,7 @@ function createDummyCases(quantity: number, prefix: string) {
  * @param quantity 
  * @param userId 
  * @param groupId 
- * @param prefix 
+ * @param prefix of the case ID to generate, e.g. DummyXxXxx or LeaveXxxxx, etc 
  * @returns a success or fail status, and a message. Used for notifications.
  */
 export async function useAddDummyCases(quantity: number, userId: string, groupId: string, prefix: string) {
