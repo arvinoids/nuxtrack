@@ -6,12 +6,12 @@
         <input type="checkbox" id="assignCase" class="modal-toggle" />
         <div class="modal">
             <div class="modal-box text-center">
-                <h3 class="text-lg font">
+                <h3 class="font-semibold">
                     Assign case to
-                    <span class="text-accent">{{ user.fullname }}</span>
+                    <span class="text-accent">{{ user.fullname }}</span> in <span class="text-accent">{{ group.description }}</span>
                 </h3>
-                <p class="text-sm">Status: <span class="font-semibold"
-                        :class="{ [`text-${getColor(user.status)}`]: true }">{{ user.status }}</span></p>
+                <div class="badge" v-if="user.status"
+                        :class="{ [`badge-${getColor(user.status)}`]: true }">{{ user.status }}</div>
                 <p class="py-4">
                     <input type="text" placeholder="CAS-XXXXXXXXXXX" class="input input-bordered my-2 w-[300px]"
                         v-model="caseId" />
@@ -20,10 +20,10 @@
                 </p>
                 <div class="modal-action justify-center">
                     <label for="assignCase" class="btn btn-primary" :class="{ hidden: (caseExists || caseId === '') }"
-                        @click="submitCase(caseId, user.id, group)">Assign</label>
-                    <label for="assignCase" class="btn btn-warning btn-primary"
+                        @click="submitCase(caseId, user.id, group.id)">Assign</label>
+                    <label for="assignCase" class="btn btn-primary"
                         :class="{ hidden: (!caseExists || disableEscalate) }"
-                        @click="escalateCase(caseId, user.id, group)">Escalate</label>
+                        @click="escalateCase(caseId, user.id, group.id)">Escalate</label>
                     <label for="assignCase" class="btn btn-accent">Cancel</label>
                 </div>
             </div>
@@ -33,11 +33,11 @@
 
 <script setup lang="ts">
 import type { LogData } from 'custom-types';
-import type { UsersResponse } from '~/pocketbase-types';
+import type { GroupsResponse, UsersResponse } from '~/pocketbase-types';
 const pb = useNuxtApp().$pb
 const props = defineProps<{
     user: UsersResponse,
-    group: string
+    group: GroupsResponse
 }>()
 
 const caseExists = ref(false);
@@ -45,7 +45,6 @@ const caseIsEscalated = ref(false);
 const disableEscalate = ref(false);
 const caseIsBlank = ref(false)
 
-const groupName = await useGetGroupName(props.group)
 let caseId = ref('')
 let message = ref('')
 const currentUser = useCurrentUser()
@@ -59,7 +58,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
         const email = {
             to: user.email,
             subject: "New case assigned to you",
-            body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser.value!.fullname} on ${currentTime}.\n\nRotation Tracker`
+            body: `Hi ${user.fullname}, \n\n${caseId} in ${props.group.description} has been assigned to you by ${currentUser.value!.fullname} on ${currentTime}.\n\nRotation Tracker`
         }
         const emailres = (await useSendEmail(email))
         miniToast(emailres.status, emailres.message)
@@ -84,7 +83,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
         const email = {
             to: user.email,
             subject: "New case assigned to you",
-            body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
+            body: `Hi ${user.fullname}, \n\n${caseId} in ${props.group.description} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
         }
         const emailres = (await useSendEmail(email))
         miniToast(emailres.status, emailres.message)

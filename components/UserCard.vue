@@ -21,13 +21,14 @@
       Shortname: <span class="text-accent">{{ user.username }}</span>
     </h5>
     <h5>
-      Status: <span :class="`text-${getColor(user.status)}`">{{ user.status }}</span>
+      Status:
+      <span :class="`badge badge-${getColor(user.status)}`">{{ user.status }}</span>
     </h5>
     <h5>
       Role: <span class="text-accent">{{ user.role }}</span>
     </h5>
     <h5>
-      Email: <span class="text-accent">{{ user.email }}</span>
+      Email: <span class="text-accent">{{ user.email ?? "Unavailable" }}</span>
     </h5>
 
     <div class="flex justify-center mt-1">
