@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-col items-center gap-5">
-    <AdminCreateDummyCases v-if="currentUser && currentUser.role === 'lead'" />
-    <AdminCaseStats />
     <AdminCasesReporter />
+    <AdminCreateDummyCases v-if="currentUser && currentUser.role === 'lead'" />
   </div>
 </template>
 
@@ -12,7 +11,6 @@ definePageMeta({
 });
 
 const currentUser = useCurrentUser();
-console.log(currentUser.value);
 </script>
 
 <style></style>

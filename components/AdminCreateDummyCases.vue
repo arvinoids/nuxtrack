@@ -1,7 +1,7 @@
 <template>
   <div class="collapse bg-base-100 border-neutral-200 border shadow-md">
     <input type="checkbox" />
-    <div class="collapse-title font-semibold">Create dummy cases for user</div>
+    <div class="collapse-title font-semibold">Create Dummy Cases</div>
     <div class="collapse-content">
       <div v-if="creating" class="flex flex-col justify-start w-full">
         <LoadingBlockPage
@@ -15,11 +15,11 @@
         </LoadingBlockPage>
       </div>
       <div class="flex flex-col justify-start w-full">
-        <div class="bg-base-200/50 py-6 w-[50ch] self-center mb-5">
+        <div class="bg-base-200/50 py-6 w-[50ch] self-center mb-2">
           <div class="flex flex-col items-center gap-1">
             <div class="text-sm text-center w-3/4 mb-2">
               Use this calculator to compute the dummy cases that need to be assigned if a
-              user was not set to <strong>Leave</strong> or <strong>Rest day</strong> .
+              user was not set to <strong>Leave</strong> or <strong>Rest day</strong>.
             </div>
             <div class="flex items-center join">
               <label for="fromDate" class="btn join-item label w-[10rem]"
@@ -31,14 +31,26 @@
                 >Return date/time:</label
               ><input class="input join-item" type="datetime-local" v-model="leaveTo" />
             </div>
+            <div class="flex items-center join w-[360px]">
+              <label for="team" class="btn join-item label w-[7rem]">User</label
+              ><select
+                class="select max-w-xs join-item select-bordered"
+                v-model="selectedUser"
+              >
+                <option v-for="user in validUsers" :key="user.id" :value="user">
+                  {{ user.fullname }}
+                </option>
+              </select>
+            </div>
             <div class="flex items-center join w-[360px] mb-2">
               <label for="team" class="btn join-item label w-[7rem]">Team</label
               ><select
-                class="select max-w-xs join-item select-bordered"
-                v-model="teamCalc"
+                class="select max-w-xs select-bordered join-item"
+                v-model="selectedGroup"
+                :disabled="creating"
               >
-                <option v-for="team in allGroups.items" :value="team.id">
-                  {{ team.description }}
+                <option v-for="group in availableGroups" :key="group.id" :value="group">
+                  {{ group.description }}
                 </option>
               </select>
             </div>
@@ -50,15 +62,12 @@
               >
                 Calculate
               </div>
-              <div
-                class="flex items-center bg-warning/20 alert h-[40px]"
-                v-if="calculatedCases"
-              >
-                <label for="team" class="label"
-                  >Created while on leave: {{ rawData.casesCreatedDuringLeave }}, Dummy:
-                  {{ calculatedCases }}</label
-                >
+              <div class="flex items-center bg-warning/20 alert h-[40px]">
+                <label for="team" class="label">{{ message }}</label>
               </div>
+            </div>
+            <div class="text-sm text-warning pt-1">
+              *You may also simply enter the number of cases.
             </div>
           </div>
         </div>
@@ -73,7 +82,9 @@
           />
           <div
             class="btn btn-secondary text-white btn-sm w-[15ch] h-[38px]"
-            :class="creating ? 'btn-disabled cursor-wait' : 'cursor-default'"
+            :class="
+              creating || tickets < 1 ? 'btn-disabled cursor-wait' : 'cursor-default'
+            "
             @click.prevent="AddDummyCases()"
           >
             {{ creating ? "Creating..." : "Create" }}
@@ -85,46 +96,49 @@
 </template>
 
 <script setup lang="ts">
-import type { ListResult } from "pocketbase";
-import type { user, group } from "pocketbase-types";
 import type { LogData } from "custom-types";
 
 const casesChanged = useCaseCountChanged();
-const users: ListResult<user> = await useGetAllUsers();
-const tickets = ref(1);
+const users = await useGetAllUsers();
+const tickets = ref(0);
 const validUsers = getValidUsers();
 const currentuser = useCurrentUser();
 const creating = ref(false);
-const allGroups = await useGetAllGroups();
-const teamCalc = ref();
 const calculatedCases = ref(0);
 const leaveFrom = ref();
 const leaveTo = ref();
 const rawData = ref();
 const percentComplete = usePercentComplete("dummy");
+const calculated = ref(false);
+const message = computed(() => {
+  return calculatedCases.value > 0
+    ? `Created while on leave: ${rawData.value.casesCreatedDuringLeave}, Dummy:
+                  ${calculatedCases.value}`
+    : noCasesMessage.value;
+});
+
+const noCasesMessage = ref("Enter details and click calculate");
+
+watch(calculated, () => {
+  if (calculated.value) {
+    noCasesMessage.value = "O cases to create.";
+  }
+});
 
 async function getCalculations() {
   rawData.value = await useComputeDummyCases(
-    teamCalc.value,
+    selectedGroup.value.id,
     leaveFrom.value,
     leaveTo.value
   );
+  calculated.value = true;
   calculatedCases.value = rawData.value.casesToAdd;
   tickets.value = rawData.value.casesToAdd;
-  console.log("rawData", rawData.value);
 }
 
-console.log("allGroups", allGroups);
-type userExpandedMemberOf = user & {
-  expand: {
-    memberOf: group[];
-  };
-};
-const selectedUser: Ref<userExpandedMemberOf> = ref(
-  validUsers[0] as userExpandedMemberOf
-);
+const selectedUser = ref(validUsers[0]);
 const availableGroups = computed(() => {
-  return selectedUser.value.expand.memberOf;
+  return selectedUser.value.expand?.memberOf;
 });
 
 // show only users with elements inside memberOf[]
@@ -133,12 +147,12 @@ function getValidUsers() {
   return filtered;
 }
 
-const firstGroup = ref(selectedUser.value.expand.memberOf[0]);
+const firstGroup = ref(selectedUser.value.expand!.memberOf[0]);
 
 const selectedGroup = ref(firstGroup);
 
 watch(selectedUser, () => {
-  firstGroup.value = selectedUser.value.expand.memberOf[0];
+  firstGroup.value = selectedUser.value.expand!.memberOf[0];
 });
 
 async function AddDummyCases() {
@@ -165,11 +179,16 @@ async function AddDummyCases() {
   };
   await logActivity(data);
   creating.value = false;
+  leaveFrom.value = "";
+  leaveTo.value = "";
+  tickets.value = 0;
   casesChanged.value++;
 }
 
 const disableCalculate = computed(() => {
-  return !leaveFrom.value || !leaveTo.value || !teamCalc.value;
+  return (
+    !leaveFrom.value || !leaveTo.value || !selectedUser.value || !selectedGroup.value
+  );
 });
 </script>
 
