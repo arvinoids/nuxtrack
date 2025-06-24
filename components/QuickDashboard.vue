@@ -22,6 +22,7 @@
               :group="group"
               :users="getGroupUsers(group.id)"
               class="flex-grow"
+              :class="{'hidden': currentUser!.role!=='admin'&&group.name==='eol'}"
             />
           </div>
         </div>
