@@ -1,7 +1,7 @@
 import type { AuthModel, ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice, notification, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
-import type { UsersResponse } from "~/pocketbase-types";
+import type { GroupsRecord, UsersResponse } from "~/pocketbase-types";
 import { useCreateCounter } from "./casefunctions";
 
 
@@ -119,10 +119,12 @@ export async function useChangeUserStatus(id: string, newStatus: statuschoice, n
 }
 
 export async function useGetAllUsers() {
+    type Texpand = {
+        memberOf:GroupsRecord[]
+    }
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    let users: ListResult<user>;
-    users = await pb.collection("users").getList(1, 1000, { expand: 'memberOf', sort: 'fullname' })
+    const users = await pb.collection("users").getList<UsersResponse<Texpand>>(1, 1000, { expand: 'memberOf', sort: 'fullname' })
     return users
 }
 

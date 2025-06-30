@@ -1,8 +1,11 @@
 @import "tailwindcss";
 @plugin "daisyui" {
     themes: lex-dark , lex;
+    darkTheme: lex-dark;
+    lightTheme: lex;
+    base: "lex";
+    exclude: rootscrollgutter;
 }
-
 
 @plugin "daisyui/theme" {
   name: "lex-dark";

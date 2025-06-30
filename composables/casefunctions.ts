@@ -1,7 +1,7 @@
 import type { notification } from "custom-types";
 import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
-import type { GroupsResponse, ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord, CounterResponse } from "~/pocketbase-types";
+import type { GroupsResponse, ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord, CounterResponse, CasesResponse, UsersResponse } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -678,9 +678,13 @@ export async function useFindCase(id: string) {
 }
 
 export async function useFindCases(caseId: string) {
+  type Texpand = {
+  user:UsersResponse,
+  group:GroupsResponse
+};
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const res = await pb.collection('cases').getList(1, 100, { filter: `case~"${caseId}"`, expand: 'user,group', sort: '-created' })
+  const res = await pb.collection('cases').getList<CasesResponse<Texpand>>(1, 100, { filter: `case~"${caseId}"`, expand: 'user,group', sort: '-created' })
   return res
 }
 
@@ -768,7 +772,7 @@ async function addToTotalCases(quantity: number, groupId: string) {
 export async function useGetAllGroups() {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const res = await pb.collection<GroupsResponse>('groups').getList()
+  const res = await pb.collection<GroupsResponse>('groups').getList(1,100,{sort:'+order'})
   return res
 }
 

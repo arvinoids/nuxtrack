@@ -19,7 +19,7 @@
         <a href="#" class="btn btn-primary"
           :class="{ hidden: (caseExists || caseId === ''||!validateCASNumber(caseId)) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="submitCase(caseId, taggedUser.id, group)">Assign</a>
-        <a href="#" class="btn btn-warning btn-primary" v-if="groupName!=='l1_na'"
+        <a href="#" class="btn btn-warning" v-if="groupName!=='l1_na'"
           :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
         <a href="#" class="btn btn-outline btn-error" @click=" resetSelection(); showCanceledToast();">Cancel</a>

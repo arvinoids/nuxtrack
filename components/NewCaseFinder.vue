@@ -1,5 +1,5 @@
 <template>
-    <div class="relative">
+  <div class="relative">
       <label
         class="flex items-center btn btn-ghost btn-circle btn-primary p-2"
         @click.stop="show = true"
@@ -11,21 +11,21 @@
       <input type="checkbox" id="finder" class="modal-toggle" />
   
       <!-- Dialog -->
-      <label for="finder" class="modal cursor-pointer">
-        <label class="modal-box relative w-[22rem] flex flex-col gap-2">
+    <label for="finder" class="modal cursor-pointer">
+        <label class="modal-box relative w-[27rem] flex flex-col gap-2">
           <h3 class="text-lg font-bold">Find a case</h3>
-          <label for="finder" class="btn w-min self-center absolute right-3 top-3 btn-ghost hover:btn-error">✖</label>
+          <label for="finder" class="btn w-min self-center absolute right-3 top-3 btn-ghost hover:btn-error" @click="caseId = ''">✖</label>
           <input
-              class="input mt-3 bg-base-200 text-center w-[19rem]"
+              class="input my-2 bg-base-200 text-center self-center"
               type="search"
               v-model="caseId"
               placeholder="CAS-XXXXXXX-XXXXXX"
               id="caseInput"
-            /><div class="text-center alert alert-warning">
+            /><div class="text-center alert alert-warning bg-warning/70 text-black" v-if="caseId.length<18">
               Please note that search is case-sensitve and must be 18 characters or longer.              
             </div>
   
-          <div v-if="caseFound">
+          <div v-if="caseFound && records && records.totalItems > 0">
           <div v-for="caseRecord in records.items">
             <CaseCard :case-record="caseRecord" class="py-2"/>
           </div>
@@ -38,25 +38,31 @@
             </p>
           </div>
         </label>
-      </label>
-    </div>
-  </template>
+    </label>
+  </div>
+</template>
   
-  <script setup lang="ts">
-  const show = ref(false);
-  const caseFound = ref(false);
-  const caseId = ref("");
-  const loading = ref(true);
-  
-  let records = ref();
-  
-  watch(caseId, async (caseId) => {
+<script setup lang="ts">
+import type { ListResult } from 'pocketbase';
+import type { CasesResponse, GroupsResponse, UsersResponse } from '~/pocketbase-types';
+
+const show = ref(false);
+const caseFound = ref(false);
+const caseId = ref("");
+const loading = ref(true);
+type Texpand = {
+user:UsersResponse,
+group:GroupsResponse
+};
+
+let records = ref<ListResult<CasesResponse<Texpand>>>();
+
+watch(caseId, async (caseId) => {
     loading.value = true;
     if(caseId.length>=18) {
         records.value = await useFindCases(caseId.trim());
-        console.log(records.value)
     }
-    if (records.value.totalItems>0&&caseId.length>=18) {
+    if (records.value && records.value.totalItems > 0 && caseId.length >= 18) {
        caseFound.value = true;
     }
     else caseFound.value = false;
@@ -64,9 +70,9 @@
     if (caseId === "") caseFound.value = false;
   });
   
-  </script>
-  
-  <style scoped>
+</script>
+
+<style scoped>
   .v-enter-active,
   .v-leave-active {
     transition: opacity 0.2s ease;
@@ -81,5 +87,5 @@
     position: fixed;
     top: 5rem;
   }
-  </style>
+</style>
   

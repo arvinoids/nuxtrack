@@ -9,14 +9,19 @@
           <label class="label">
             <span class="label-text">Case ID</span>
           </label>
-          <input type="text" v-model="newCase" class="input input-bordered w-[20ch]" />
+          <input
+            type="text"
+            v-model="newCase"
+            class="input input-bordered w-[205h]"
+            :disabled="caseEditDisabled"
+          />
         </div>
         <div class="flex gap-2 justify-between">
           <label class="label">
             <span class="label-text">Owner</span>
           </label>
           <select
-            class="select select-bordered w-[20ch] justify-self-end"
+            class="select select-bordered w-[25ch] justify-self-end"
             v-model="newUser"
           >
             <option
@@ -32,7 +37,7 @@
           <label class="label">
             <span class="label-text">Product Set</span>
           </label>
-          <select class="select select-bordered" v-model="newGroup">
+          <select class="select select-bordered w-[25ch]" v-model="newGroup">
             <option v-for="group in groups" :key="group.id" :value="group.id">
               {{ group.description }}
             </option>
@@ -63,6 +68,7 @@ const props = defineProps<{
   caseId: string;
   owner: string;
   product: string;
+  caseEditDisabled?: boolean;
 }>();
 
 let newUser = ref(props.owner);
