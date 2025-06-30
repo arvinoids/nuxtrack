@@ -55,9 +55,7 @@
             class="btn btn-primary"
             @click="doEscalate"
             :class="{
-              'btn-disabled':
-                selectedGroup ===
-                groups.items.filter((g) => g.description === L1name)[0].id,
+              'btn-disabled': isL1Group,
             }"
           >
             Escalate</label
@@ -69,12 +67,21 @@
 </template>
 
 <script setup lang="ts">
-const groups = await useGetAllGroups();
-const L1name = "NA Solutions L1"; // cannot escalate to this group
+import { useGetL1Groups } from "~/composables/generics";
 
+const groups = await useGetAllGroups();
+// const L1name = "NA Solutions L1"; // cannot escalate to this group
+// const L1groups = [
+//   "NA Solutions L1",
+//   "EMEA Solutions L1",
+//   "AP Solutions L1",
+//   "Cloud EMEA"
+// ]
 const props = defineProps<{
   caseId: string;
 }>();
+
+const L1groups = await useGetL1Groups();
 
 const selectedGroup = ref(groups.items[0].id);
 
@@ -109,9 +116,13 @@ async function doEscalate() {
   } finally {
     selectedUser.value = "";
     selectedGroup.value = "";
-    document.getElementById(props.caseId + "escalate")?.click();
   }
 }
+
+const isL1Group = computed(() => {
+  const selectedGroupObj = groups.items.find((g) => g.id === selectedGroup.value);
+  return selectedGroupObj ? L1groups.includes(selectedGroupObj.description) : false;
+});
 </script>
 
 <style></style>

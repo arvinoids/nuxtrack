@@ -1,6 +1,6 @@
 import type { emailContent, LogData } from "custom-types";
-import type { BaseModel, ListResult } from "pocketbase";
-import type { CasesRecord, LogsRecord, LogsResponse, LogsTypeOptions } from "~/pocketbase-types";
+import type { ListResult } from "pocketbase";
+import type { CasesRecord, LogsRecord, LogsResponse, SettingsResponse } from "~/pocketbase-types";
 
 //const 
 
@@ -144,4 +144,13 @@ export async function useUploadCsvLogsToPocketBase(csv:string, quantity:number) 
   } catch (error) {
       console.error('Error uploading file:', error);
   }
+}
+
+export async function useGetL1Groups() {
+  const pb = useNuxtApp().$pb;
+  const groups = await pb.collection("settings").getFirstListItem<SettingsResponse>(`field="l1groups"`);
+  if (!groups) {
+    throw new Error("L1 groups not found in settings");
+  }
+  return JSON.parse(groups.value) as string[];
 }
