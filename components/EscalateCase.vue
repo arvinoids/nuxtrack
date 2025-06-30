@@ -54,7 +54,11 @@
             :for="caseId + 'escalate'"
             class="btn btn-primary"
             @click="doEscalate"
-            :disabled="!selectedUser || !selectedGroup"
+            :class="{
+              'btn-disabled':
+                selectedGroup ===
+                groups.items.filter((g) => g.description === L1name)[0].id,
+            }"
           >
             Escalate</label
           >
@@ -66,6 +70,7 @@
 
 <script setup lang="ts">
 const groups = await useGetAllGroups();
+const L1name = "NA Solutions L1"; // cannot escalate to this group
 
 const props = defineProps<{
   caseId: string;
@@ -84,6 +89,8 @@ watch(selectedGroup, () => {
   selectedUser.value = displayUsers.value[0]?.expand.user.id || "";
 });
 
+const user = useCurrentUser();
+
 async function doEscalate() {
   try {
     const res = await useEscalateCase(
@@ -91,6 +98,11 @@ async function doEscalate() {
       selectedUser.value,
       selectedGroup.value
     );
+    await logActivity({
+      user: user.value!.username || "unknown",
+      type: "assigned case",
+      details: `Escalated case ${props.caseId}`,
+    });
     miniToast(res.status, res.message);
   } catch (error) {
     miniToast("failed", "Failed to escalate case");
