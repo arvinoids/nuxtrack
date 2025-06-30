@@ -2,6 +2,7 @@
   <div class="flex flex-col items-center gap-5">
     <AdminCasesReporter />
     <AdminCreateDummyCases v-if="currentUser && currentUser.role === 'lead'" />
+    <AdminArchiveCases />
   </div>
 </template>
 
