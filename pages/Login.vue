@@ -3,9 +3,9 @@
     <form @submit.prevent="login()">
       <div class="flex flex-row justify-center">
         <h3 class="justify-center">
-          <a href="https://solutionsteam.lrdc.lexmark.com">
-            <img src="/lxk-logo-2x.svg" alt="Lexmark" class="w-[300px]" />
-          </a>
+          <div>
+            <img src="/x-l-vertical.png" alt="Xerox Lexmark" class="w-[300px]" />
+          </div>
         </h3>
       </div>
 
@@ -75,6 +75,7 @@ async function login() {
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap");
 *:before,
 *:after {
   padding: 0;
@@ -85,7 +86,7 @@ async function login() {
 form {
   height: 100%;
   width: 400px;
-  background-color: rgba(126, 126, 126, 0.13);
+  background-color: rgba(141, 140, 140, 0.377);
   position: absolute;
   transform: translate(-50%, -50%);
   top: 50%;
@@ -97,7 +98,7 @@ form {
 }
 
 .formlabel {
-  font-family: "Inter", sans-serif;
+  font-family: "Urbanist", sans-serif;
   @apply text-gray-50;
 }
 

@@ -3,9 +3,9 @@
     <div class="navbar-start">
       <a href="https://solutionsteam.lrdc.lexmark.com">
         <img
-          src="~/assets/img/logo_darkmode.svg"
+          src="~/assets/img/xerox-lexmark-logo-white.svg"
           alt="Logo"
-          class="h-[25px] md:ml-[5rem] mr-5"
+          class="h-[26px] md:ml-[5rem] mr-5"
         />
       </a>
       <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
