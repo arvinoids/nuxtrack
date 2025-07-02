@@ -4,7 +4,7 @@
       <div class="flex flex-row justify-center">
         <h3 class="justify-center">
           <a href="https://www.lexmark.com" target="_blank">
-            <img src="/lxk-logo-2x.svg" alt="Lexmark" class="w-[300px]" />
+            <img src="/x-l-vertical.png" alt="Lexmark" class="w-[300px]" />
           </a>
         </h3>
       </div>
@@ -85,7 +85,7 @@ async function login() {
 form {
   height: 100%;
   width: 400px;
-  background-color: rgba(126, 126, 126, 0.13);
+  background-color: rgba(184, 184, 184, 0.336);
   position: absolute;
   transform: translate(-50%, -50%);
   top: 50%;

@@ -2,9 +2,9 @@
   <div class="navbar bg-[#44434e]">
     <div class="navbar-start">
       <img
-        src="~/assets/img/logo_darkmode.svg"
+        src="/xerox-lexmark-logo-mono.svg"
         alt="Logo"
-        class="h-[25px] md:ml-[5rem] mr-5"
+        class="mb-1 h-[26px] md:ml-[5rem] mr-5"
       />
       <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
         <NuxtLink to="/">{{ APP_NAME }}</NuxtLink>
@@ -24,6 +24,8 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const logo = "~";
+</script>
 
 <style></style>
