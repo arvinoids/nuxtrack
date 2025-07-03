@@ -39,7 +39,7 @@
           <VErrorMessage name="name" class="alert alert-error" />
         </div>
         <div
-          class="btn w-min self-center btn-secondary text-neutral"
+          class="btn w-min self-center btn-secondary"
           @click.prevent="updateEmailSettings()"
         >
           Save

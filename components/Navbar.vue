@@ -8,7 +8,7 @@
       />
       <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
         <NuxtLink to="/">{{ APP_NAME }}</NuxtLink>
-        <DevOnly><span class="text-red-600 px-10 bg-base-200">DEV MODE</span></DevOnly>
+        <DevOnly><span class="text-red-600 px-2 m-2 bg-base-200">DEV</span></DevOnly>
       </h1>
     </div>
     <div class="navbar-center"></div>

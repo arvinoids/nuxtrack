@@ -22,7 +22,7 @@
         <a href="#" class="btn btn-warning" v-if="groupName!=='l1_na'"
           :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
-        <a href="#" class="btn btn-outline btn-error" @click=" resetSelection(); showCanceledToast();">Cancel</a>
+        <a href="#" class="btn btn-outline btn-error hover:text-primary-content" @click=" resetSelection(); showCanceledToast();">Cancel</a>
       </div>
     </div>
   </div>

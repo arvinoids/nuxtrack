@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center my-2">
     <div class="self-center flex flex-col items-center">
-      <p class="text-secondary mx-10">
+      <p class="mx-10 border border-neutral-200 px-4 py-3 font-[Roboto_Condensed]">
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
         >. To assign or escalate a case, please select a group below.
 

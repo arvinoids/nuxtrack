@@ -38,18 +38,22 @@
             <td>{{ item.assignedBy }}</td>
             <td>{{ useFormatDate(new Date(item.created)) }}</td>
             <td v-if="userIsAdmin()" class="rounded-none">
-              <label :for="item.id + 'edit'" class="btn btn-sm btn-warning mx-1"
-                >Edit</label
-              >
+              <label
+                :for="item.id + 'edit'"
+                class="btn btn-sm text-primary-content btn-square btn-warning mx-1"
+                ><Icon name="ic:twotone-edit" size="1.3rem"
+              /></label>
               <EditCase
                 :id="item.id"
                 :caseId="item.case"
                 :owner="item.user"
                 :product="item.group"
               />
-              <label :for="item.id + 'del'" class="btn btn-sm btn-error mx-1"
-                >Delete</label
-              >
+              <label
+                :for="item.id + 'del'"
+                class="btn btn-sm btn-square text-primary-content btn-error mx-1"
+                ><Icon name="ic:round-delete-forever" size="1.3rem"
+              /></label>
               <DeleteCase :id="item.id" :caseId="item.case" :caseOwner="item.user" />
             </td>
           </tr>

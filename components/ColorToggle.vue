@@ -29,13 +29,13 @@ onMounted(() => {
     // Check system preference
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     isDarkMode.value = prefersDark;
-    applyTheme(prefersDark ? "lex-dark" : "lex");
+    applyTheme(prefersDark ? "lex-dark" : "xrx");
   }
 });
 
 // Toggle between themes
 function toggleTheme() {
-  const newTheme = isDarkMode.value ? "lex-dark" : "lex";
+  const newTheme = isDarkMode.value ? "lex-dark" : "xrx";
   applyTheme(newTheme);
   localStorage.setItem("theme", newTheme);
 }

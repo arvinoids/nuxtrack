@@ -36,7 +36,11 @@
 
     <div v-else>
       <div v-if="displayUsers.length > 0" :key="updateCard" v-auto-animate>
-        <div v-for="(user, id) in displayUsers" :key="user.id" class="my-[0.1rem]">
+        <div
+          v-for="(user, id) in displayUsers"
+          :key="user.id"
+          class="my-[0.1rem] hover:scale-125 transition-transform duration-300"
+        >
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
             class="mx-1 w-full flex flex-row h-auto justify-center items-center gap-1"
@@ -51,8 +55,8 @@
           >
             <UserIcon :user="user.expand.user" />
             <span
-              class="hover:text-accent hover:font-semibold transition-all duration-300"
-              :class="id === selectedUser ? 'text-accent font-bold my-3' : 'text-sm'"
+              class="hover:font-semibold"
+              :class="id === selectedUser ? 'font-bold my-3' : 'text-sm'"
             >
               {{ user.expand.user.fullname }}
             </span>
