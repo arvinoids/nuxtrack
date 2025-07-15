@@ -1,55 +1,83 @@
 <template>
-  <div
-    class="w-[400px] rounded-lg p-8 text-center border border-white/50 backdrop-blur-[45px] shadow-[0_0_80px_#111111]"
-  >
-    <form @submit.prevent="login" class="flex flex-col">
-      <h2 class="text-2xl mb-5 text-white">
-        <img
-          src="/img/x-l-vertical.png"
-          alt="Xerox"
-          class="justify-self-center logo-img"
-        />
-      </h2>
-
-      <div
-        v-if="message"
-        class="bg-red-500/20 border border-red-500/50 text-red-100 px-4 py-2 rounded mb-4 text-sm"
-      >
-        {{ message }}
-      </div>
-
-      <div class="input-field">
-        <input type="text" required v-model="username" />
-        <label>Enter your email</label>
-      </div>
-
-      <div class="input-field">
-        <input type="password" required v-model="password" />
-        <label>Enter your password</label>
-      </div>
-
-      <div class="flex items-center justify-between my-[25px] mb-[35px] text-white">
-        <NuxtLink to="#" class="text-[#efefef] no-underline hover:underline">
-          Forgot password?
-        </NuxtLink>
-      </div>
-
-      <button
-        type="submit"
-        class="bg-[#d40e2a] text-white font-medium py-3 px-5 cursor-pointer rounded-[1px] text-base border border-transparent transition-all duration-300 ease-in-out hover:text-white hover:border-white hover:bg-white/15"
-      >
-        Log In
-      </button>
-
-      <div class="text-center mt-8 text-white">
-        <p class="text-[70%]">© 2025 Xerox | Solutions Team</p>
-      </div>
-    </form>
+  <div>
+    <div
+      class="w-[400px] rounded-lg p-8 text-center border border-white/50 backdrop-blur-[45px] shadow-[0_0_80px_#111111]"
+    >
+      <form @submit.prevent="login" class="flex flex-col">
+        <h2 class="text-2xl mb-5 text-white">
+          <img
+            src="/img/x-l-vertical.png"
+            alt="Xerox"
+            class="justify-self-center logo-img"
+          />
+        </h2>
+        <div
+          v-if="message"
+          class="bg-red-500/20 border border-red-500/50 text-red-100 px-4 py-2 rounded mb-4 text-sm"
+        >
+          {{ message }}
+        </div>
+        <div class="input-field">
+          <input type="text" required v-model="username" />
+          <label>Enter your email</label>
+        </div>
+        <div class="input-field">
+          <input type="password" required v-model="password" />
+          <label>Enter your password</label>
+        </div>
+        <div class="flex items-center justify-between my-[25px] mb-[35px] text-white">
+          <NuxtLink
+            to="/forgot-password"
+            class="text-[#efefef] no-underline hover:underline"
+          >
+            Forgot password?
+          </NuxtLink>
+        </div>
+        <button
+          type="submit"
+          class="bg-[#d40e2a] text-white font-medium py-3 px-5 cursor-pointer rounded-[1px] text-base border border-transparent transition-all duration-300 ease-in-out hover:text-white hover:border-white hover:bg-white/15"
+        >
+          Log In
+        </button>
+        <div class="text-center mt-8 text-white">
+          <a
+            class="text-xs text-gray-300"
+            href="https://solutionsteam.lrdc.lexmark.com"
+            target="_blank"
+            >© 2025 Xerox | Solutions Team</a
+          >
+        </div>
+      </form>
+    </div>
+    <div
+      class="py-3 px-2 absolute right-5 top-5 border border-white/50 backdrop-blur-[45px] shadow-lg"
+    >
+      <span class="label">Animate</span>
+      <input type="checkbox" v-model="animate" class="toggle-error toggle" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-useMouseParallax();
+const animate = ref(true);
+let parallaxCleanup: (() => void) | null = null;
+
+watch(
+  animate,
+  (enabled) => {
+    if (enabled) {
+      parallaxCleanup = useMouseParallax();
+    } else {
+      if (parallaxCleanup) {
+        parallaxCleanup();
+        parallaxCleanup = null;
+      }
+      document.documentElement.style.setProperty("--shift-x", "0px");
+      document.documentElement.style.setProperty("--shift-y", "0px");
+    }
+  },
+  { immediate: true }
+);
 
 definePageMeta({
   layout: "login",
