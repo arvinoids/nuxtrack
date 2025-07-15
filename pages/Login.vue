@@ -19,7 +19,7 @@
         </div>
         <div class="input-field">
           <input type="text" required v-model="username" />
-          <label>Enter your email</label>
+          <label>Enter your username or email</label>
         </div>
         <div class="input-field">
           <input type="password" required v-model="password" />
