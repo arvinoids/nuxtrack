@@ -2,16 +2,13 @@
   <div class="rounded-md bg-base-100 text-xs shadow-sm mx-2 w-[160px]">
     <div class="flex flex-col items-center p-3 gap-1">
       <div class="indicator">
-        <span
-          class="indicator-item status"
-          :class="{ [`status-${badgeColor}`]: true }"
-        ></span>
+        <span class="indicator-item status" :class="`status-${badgeColor}`"></span>
         <img
           v-if="avatarUrl"
           :src="avatarUrl"
           alt=""
           class="h-10 w-10 flex-none rounded-full border-2"
-          :class="{ [`border-${badgeColor}`]: true }"
+          :class="`border-${badgeColor}`"
         />
         <Icon
           v-else
@@ -25,7 +22,7 @@
       }}</nuxt-link>
       <div
         class="badge badge-sm min-w-max cursor-pointer rounded-full"
-        :class="{ [`badge-${badgeColor}`]: true }"
+        :class="`badge-${badgeColor}`"
         @click="show = true"
         v-if="currentPath.fullPath !== '/Admin/Users'"
       >
@@ -34,7 +31,7 @@
       <div
         v-else
         class="badge badge-sm min-w-max cursor-pointer"
-        :class="{ [`badge-${badgeColor}`]: true }"
+        :class="`badge-${badgeColor}`"
       >
         {{ status.status }}
       </div>

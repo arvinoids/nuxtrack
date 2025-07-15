@@ -1011,3 +1011,8 @@ export async function useCreateCounter(userId: string, groupId: string) {
   }
   return res
 }
+
+function isValidCaseId(caseId:string) {
+  const regex = /^CAS-\d{7}-[A-Z0-9]{6}$/;
+  return regex.test(caseId);
+}

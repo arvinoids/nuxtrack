@@ -33,6 +33,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "default",
+});
+
 import { useCounters } from "~/composables/states";
 import type { group, user } from "pocketbase-types";
 
@@ -72,6 +76,14 @@ pb.collection("users").subscribe("*", async () => {
     .getFullList({ sort: "+count", expand: "user" });
   loading.value = false;
   pb.collection("users").authRefresh();
+});
+
+pb.collection("counter").subscribe("*", async () => {
+  loading.value = true;
+  allCounters.value = await pb
+    .collection("counter")
+    .getFullList({ sort: "+count", expand: "user" });
+  loading.value = false;
 });
 </script>
 

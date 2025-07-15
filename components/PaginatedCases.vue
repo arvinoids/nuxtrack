@@ -4,7 +4,10 @@
       class="overflow-x-auto flex flex-col w-[1080px] h-[600px] shadow-md"
       v-if="cases.totalItems !== 0"
     >
-      <table class="table table-compact border-base-200 border" v-if="!loading">
+      <table
+        class="table font-condensed table-compact border-base-200 border"
+        v-if="!loading"
+      >
         <thead class="sticky top-0 z-20">
           <tr class="bg-base-200">
             <th class="rounded-none">Owner</th>

@@ -9,10 +9,15 @@
     <Updater />
   </div>
 </template>
-<style>
+<style lang="postcss">
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 body {
   font-family: "Roboto", "Roboto Condensed", Arial, sans-serif;
+}
+
+body::before {
+  content: none;
+  background: none;
 }
 
 .page-enter-active,
