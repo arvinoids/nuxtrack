@@ -13,7 +13,10 @@
       v-if="!loading"
       class="flex flex-col items-center overflow-x-auto w-[900px] h-[680px]"
     >
-      <table class="table shadow-md border-base-200 border" :key="updateTable">
+      <table
+        class="table shadow-md border-base-200 border font-condensed"
+        :key="updateTable"
+      >
         <thead class="sticky top-0 z-20">
           <tr class="bg-base-200">
             <th class="rounded-none">Name</th>

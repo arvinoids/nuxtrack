@@ -2,7 +2,7 @@
   <div class="flex flex-col justify-center items-center gap-2 w-[400px]">
     <p class="text-sm font-bold self-start">Case Stats</p>
     <div v-if="!loading">
-      <table class="table table-compact table-zebra rounded-none">
+      <table class="table font-condensed table-compact table-zebra rounded-none">
         <thead>
           <th class="rounded-none">Group</th>
           <th>Total</th>

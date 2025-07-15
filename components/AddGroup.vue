@@ -3,7 +3,7 @@
     <p class="font-semibold">Add a Group</p>
     <div class="flex flex-col gap-2 py-2">
       <div class="flex flex-col">
-        <label for="name" class="label"
+        <label for="name" class="label text-sm"
           >Name (This should be the short name, e.g. na_l3_software)</label
         ><input
           type="text"
@@ -14,7 +14,7 @@
         />
       </div>
       <div class="flex flex-col">
-        <label for="description" class="label"
+        <label for="description" class="label text-sm"
           >Description (This is the user-friendly name, e.g. NA L3 Software )</label
         ><input
           type="text"

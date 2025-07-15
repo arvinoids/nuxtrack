@@ -9,7 +9,7 @@
     >
       <template #item="{ element: item }">
         <div
-          class="px-3 py-2 border border-base-300 bg-base-200 shadow rounded-sm hover:bg-accent/10"
+          class="px-3 font-condensed py-2 border border-base-300 bg-base-200 shadow rounded-sm hover:bg-accent/10"
         >
           <div class="flex w-auto items-center">
             <div class="handle">

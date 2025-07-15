@@ -53,7 +53,11 @@
       </div>
     </div>
     <div class="overflow-x-auto">
-      <table v-if="cases" class="table table-xs table-compact my-2 w-full" id="tableData">
+      <table
+        v-if="cases"
+        class="table table-sm table-compact font-condensed my-2 w-full"
+        id="tableData"
+      >
         <thead v-if="cases.totalItems > 0">
           <tr>
             <th></th>

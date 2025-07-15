@@ -1,13 +1,10 @@
 <template>
   <div :key="updateTable" class="flex flex-col gap-3">
     <div
-      class="overflow-x-auto flex flex-col w-[1080px] h-[600px] shadow-md"
+      class="overflow-x-auto flex flex-col w-[1080px] h-[608px] shadow-md"
       v-if="cases.totalItems !== 0"
     >
-      <table
-        class="table font-condensed table-compact border-base-200 border"
-        v-if="!loading"
-      >
+      <table class="table font-condensed border-base-200 border" v-if="!loading">
         <thead class="sticky top-0 z-20">
           <tr class="bg-base-200">
             <th class="rounded-none">Owner</th>
@@ -28,7 +25,7 @@
               <div class="flex flex-row items-center">
                 <span ref="caseToCopy">{{ item.case }}</span>
                 <button
-                  class="hover:bg-gray-300 mx-1 px-[3px] py-[2px] rounded w-fit group relative"
+                  class="hover:bg-gray-300 mx-1 px-[3px] rounded w-fit group relative"
                   @click="copyToClipboard(item.case)"
                 >
                   <Icon name="ic:twotone-content-copy" size="1rem" /><Tooltip
@@ -43,8 +40,9 @@
             <td v-if="userIsAdmin()" class="rounded-none">
               <label
                 :for="item.id + 'edit'"
-                class="btn btn-sm text-primary-content btn-square btn-warning mx-1"
-                ><Icon name="ic:twotone-edit" size="1.3rem"
+                class="btn btn-xs text-primary-content btn-square btn-warning mx-1"
+                title="Edit this entry"
+                ><Icon name="ic:twotone-edit" size="1rem"
               /></label>
               <EditCase
                 :id="item.id"
@@ -54,8 +52,9 @@
               />
               <label
                 :for="item.id + 'del'"
-                class="btn btn-sm btn-square text-primary-content btn-error mx-1"
-                ><Icon name="ic:round-delete-forever" size="1.3rem"
+                class="btn btn-xs btn-square text-primary-content btn-error mx-1"
+                title="Delete case"
+                ><Icon name="ic:round-delete-forever" size="1rem"
               /></label>
               <DeleteCase :id="item.id" :caseId="item.case" :caseOwner="item.user" />
             </td>

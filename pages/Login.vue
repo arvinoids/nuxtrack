@@ -50,10 +50,14 @@
       </form>
     </div>
     <div
-      class="py-3 px-2 absolute right-5 top-5 border border-white/50 backdrop-blur-[45px] shadow-lg"
+      class="py-3 px-2 absolute right-5 top-5 border rounded border-white/50 backdrop-blur-[45px] shadow-lg flex gap-2"
     >
-      <span class="label">Animate</span>
-      <input type="checkbox" v-model="animate" class="toggle-error toggle" />
+      <span class="label text-xs">Parallax</span>
+      <input
+        type="checkbox"
+        v-model="animate"
+        class="toggle-error toggle-xs toggle rounded"
+      />
     </div>
   </div>
 </template>
