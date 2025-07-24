@@ -33,10 +33,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: "default",
-});
-
 import { useCounters } from "~/composables/states";
 import type { group, user } from "pocketbase-types";
 

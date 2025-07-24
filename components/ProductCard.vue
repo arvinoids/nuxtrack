@@ -1,17 +1,17 @@
 <template>
   <div
-    class="flex flex-col text-center m-1 w-[250px] shadow-lg border-neutral-200 border"
+    class="flex flex-col text-center m-1 w-[250px] shadow-lg transition-shadow hover:shadow-primary/30 border-neutral-200 border group relative"
   >
     <div class="bg-secondary">
       <div class="flex items-center justify-between">
         <h2
           class="ml-3 my-2 text-secondary max-w-[200px] overflow-hidden whitespace-nowrap"
         >
-          <NuxtLink :to="`/${group.name}`" class="text-white">{{
+          <NuxtLink :to="`/${group.name}`" class="text-white font-[Roboto_Condensed]">{{
             group.description
           }}</NuxtLink>
         </h2>
-        <div class="flex items-center">
+        <div class="items-center group-hover:flex hidden">
           <button
             class="btn btn-sm btn-secondary btn-ghost btn-circle"
             @click="updateCounter()"
@@ -39,7 +39,7 @@
         <div
           v-for="(user, id) in displayUsers"
           :key="user.id"
-          class="my-[0.1rem] hover:scale-125 transition-transform duration-300"
+          class="my-[0.1rem] hover:scale-110 transition-transform duration-200"
         >
           <nuxt-link
             :to="`/${group.name}/${user.expand.user.username}`"
@@ -55,8 +55,8 @@
           >
             <UserIcon :user="user.expand.user" />
             <span
-              class="hover:font-semibold"
-              :class="id === selectedUser ? 'font-bold my-3' : 'text-sm'"
+              class="hover:font-semibold hover:text-primary"
+              :class="id === selectedUser ? 'font-bold my-3 text-primary' : 'text-sm'"
             >
               {{ user.expand.user.fullname }}
             </span>
@@ -74,10 +74,15 @@
       </div>
     </div>
     <div class="flex flex-col flex-grow mt-3" :key="dataUpdated">
-      <div class="flex justify-center mt-auto gap-2">
+      <div
+        class="justify-center mt-auto gap-2 group-hover:flex hidden absolute right-1/2 left-1/2 bottom-2"
+      >
         <a :href="anchor"
-          ><button v-if="users.length" class="btn w-24 self-center mb-3">
-            Select
+          ><button
+            v-if="users.length"
+            class="btn btn-sm w-24 self-center mb-3 bg-neutral-300/20 backdrop-blur-sm shadow-lg"
+          >
+            Assign
           </button></a
         >
       </div>
