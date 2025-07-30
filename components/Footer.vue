@@ -7,9 +7,11 @@
       >
     </p>
     <DevOnly>
-      <p class="text-xs text-center text-black/40">Database URL {{ db }}</p>
+      <p class="text-xs text-center text-base-content/30">Database URL {{ db }}</p>
     </DevOnly>
-    <p class="text-xs text-center text-black/40 italic">Rotation Tracker v{{ value }}</p>
+    <p class="text-xs text-center text-base-content/30 italic">
+      Rotation Tracker v{{ value }}
+    </p>
   </div>
 </template>
 

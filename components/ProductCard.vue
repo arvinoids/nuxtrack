@@ -74,13 +74,11 @@
       </div>
     </div>
     <div class="flex flex-col flex-grow mt-3" :key="dataUpdated">
-      <div
-        class="justify-center mt-auto gap-2 group-hover:flex hidden absolute right-1/2 left-1/2 bottom-2"
-      >
+      <div class="justify-center mt-auto gap-2 flex absolute right-1/2 left-1/2 bottom-2">
         <a :href="anchor"
           ><button
             v-if="users.length"
-            class="btn btn-sm w-24 self-center mb-3 bg-neutral-300/20 backdrop-blur-sm shadow-lg"
+            class="btn btn-sm btn-secondary w-24 invisible opacity-0 scale-25 transform transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 group-hover:visible self-center mb-3 shadow-secondary shadow-lg"
           >
             Assign
           </button></a
