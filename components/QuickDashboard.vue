@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col items-center my-2">
-    <div class="self-center flex flex-col items-center">
-      <p class="mx-10 border border-neutral-200 px-4 py-3 font-[Roboto_Condensed]">
+  <div class="flex flex-col items-center">
+    <div class="self-center bg-base-200 w-full flex flex-col items-center">
+      <p class="mx-10 px-4 py-3 font-[Roboto_Condensed]">
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
         >. To assign or escalate a case, please hover over group below and assign.
 
@@ -82,5 +82,3 @@ pb.collection("counter").subscribe("*", async () => {
   loading.value = false;
 });
 </script>
-
-<style></style>
