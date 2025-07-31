@@ -6,7 +6,7 @@
         for="finder"
         title="Find a case"
       >
-        <Icon name="ic:baseline-search" size="2rem" class="text-gray-200" />
+        <Icon name="ic:baseline-search" size="2rem" />
       </label>
       <input type="checkbox" id="finder" class="modal-toggle" />
   

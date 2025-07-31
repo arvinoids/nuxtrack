@@ -2,9 +2,9 @@
   <div class="indicator" title="Notifications">
     <nuxt-link to="/Logs" class="btn btn-circle btn-primary btn-ghost">
       <Icon
-        name="ic:baseline-notifications-active"
+        name="ic:twotone-notifications-active"
         size="1.8rem"
-        :class="newEvent ? 'text-error' : 'text-gray-200'"
+        :class="newEvent ? 'text-error hover:text-base-100' : ''"
         @click="newEvent = false"
       />
     </nuxt-link>

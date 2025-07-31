@@ -1,14 +1,22 @@
 <template>
-  <div class="navbar bg-[#44434e]">
+  <div class="navbar bg-base-100 border-b border-base-300">
     <div class="navbar-start">
       <img
-        src="/xerox-lexmark-logo-mono.svg"
+        src="/xerox-lexmark-logo-white.svg"
         alt="Logo"
         class="mb-1 h-[26px] md:ml-[5rem] mr-5"
+        v-if="darkMode"
       />
-      <h1 class="mx-2 text-lg text-gray-200 hidden lg:block">
+      <img
+        src="/xerox-lexmark-logo-black.svg"
+        alt="Logo"
+        class="mb-1 h-[26px] md:ml-[5rem] mr-5"
+        v-else
+      />
+
+      <h1 class="mx-2 text-lg hidden lg:block">
         <NuxtLink to="/">{{ APP_NAME }}</NuxtLink>
-        <DevOnly><span class="text-red-600 px-2 m-2 bg-base-200">DEV</span></DevOnly>
+        <DevOnly><span class="text-primary px-2 m-2 bg-base-200">DEV</span></DevOnly>
       </h1>
     </div>
     <div class="navbar-center"></div>
@@ -25,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-const logo = "~";
+const darkMode = useIsDarkMode();
 </script>
 
 <style></style>

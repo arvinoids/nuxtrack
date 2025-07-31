@@ -7,9 +7,9 @@
       <!-- this hidden checkbox controls the state -->
       <input type="checkbox" v-model="isDarkMode" @change="toggleTheme" />
       <!-- sun icon (shows in dark mode) -->
-      <Icon name="ph:sun-duotone" class="swap-on text-gray-200" size="1.6rem" />
+      <Icon name="ph:sun-duotone" class="swap-on" size="1.6rem" />
       <!-- moon icon (shows in light mode) -->
-      <Icon name="ph:moon-stars-duotone" class="swap-off text-gray-200" size="1.6rem" />
+      <Icon name="ph:moon-stars-duotone" class="swap-off" size="1.6rem" />
     </label>
   </div>
 </template>
@@ -23,21 +23,24 @@ onMounted(() => {
   // Check localStorage first
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme) {
-    isDarkMode.value = savedTheme === "lex-dark";
+    isDarkMode.value = savedTheme === "xrx-dark";
     applyTheme(savedTheme);
+    useIsDarkMode().value = isDarkMode.value;
   } else {
     // Check system preference
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     isDarkMode.value = prefersDark;
-    applyTheme(prefersDark ? "lex-dark" : "xrx");
+    applyTheme(prefersDark ? "xrx-dark" : "xrx");
+    useIsDarkMode().value = isDarkMode.value;
   }
 });
 
 // Toggle between themes
 function toggleTheme() {
-  const newTheme = isDarkMode.value ? "lex-dark" : "xrx";
+  const newTheme = isDarkMode.value ? "xrx-dark" : "xrx";
   applyTheme(newTheme);
   localStorage.setItem("theme", newTheme);
+  useIsDarkMode().value = isDarkMode.value;
 }
 
 // Apply theme to document
