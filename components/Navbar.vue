@@ -1,19 +1,7 @@
 <template>
   <div class="navbar bg-base-100 border-b border-base-300 px-5">
     <div class="navbar-start">
-      <img
-        src="/xerox-lexmark-logo-white.svg"
-        alt="Logo"
-        class="mb-1 h-[26px] md:ml-[5rem] mr-5"
-        v-if="darkMode"
-      />
-      <img
-        src="/xerox-lexmark-logo-black.svg"
-        alt="Logo"
-        class="mb-1 h-[26px] md:ml-[5rem] mr-5"
-        v-else
-      />
-
+      <AdaptiveLogo />
       <h1 class="mx-2 text-2xl hidden lg:block">
         <NuxtLink to="/">{{ APP_NAME }}</NuxtLink>
         <DevOnly><span class="text-primary px-2 m-2 bg-base-200">DEV</span></DevOnly>
@@ -31,9 +19,5 @@
     <MiniToast />
   </div>
 </template>
-
-<script setup lang="ts">
-const darkMode = useIsDarkMode();
-</script>
 
 <style></style>

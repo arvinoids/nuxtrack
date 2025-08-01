@@ -7,7 +7,7 @@
       <div></div>
       <div class="flex items-center gap-4">
         <p class="">Your status is currently ON LEAVE</p>
-        <button class="btn btn-xs btn-accent" @click="setAvailable">
+        <button class="btn btn-xs btn-info" @click="setAvailable">
           Set to Available
         </button>
       </div>
