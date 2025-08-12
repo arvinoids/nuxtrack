@@ -6,7 +6,7 @@ export function useShowToast(message: string, status: string) {
       position: toast.POSITION.BOTTOM_RIGHT,
       hideProgressBar: true,
       toastStyle: {
-        fontFamily: "Inter",
+        fontFamily: "Urbanist",
         borderRadius: '0px',
       }
 
@@ -16,7 +16,7 @@ export function useShowToast(message: string, status: string) {
       position: toast.POSITION.BOTTOM_CENTER,
       autoClose: 5000,
       toastStyle: {
-        fontFamily: "Inter",
+        fontFamily: "Urbanist",
         borderRadius: '0px',
       }
     })
@@ -26,7 +26,7 @@ export function useShowToast(message: string, status: string) {
     autoClose: 5000,
     hideProgressBar: true,
     toastStyle: {
-      fontFamily: "Inter",
+      fontFamily: "Urbanist",
       borderRadius: '0px',
     }
   })
