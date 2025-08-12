@@ -2,11 +2,11 @@
   <transition>
     <div
       class="px-5 py-1 shadow-lg bg-warning bg-opacity-20 border-b backdrop-blur-sm border-warning flex justify-between items-center gap-3"
-      v-if="user!.status === 'On leave' && show===true"
+      v-if="user!.status === 'On leave'||user!.status === 'Rest day' && show===true"
     >
       <div></div>
       <div class="flex items-center gap-4">
-        <p class="">Your status is currently ON LEAVE</p>
+        <p class="">Your status is currently {{ user?.status.toUpperCase() }}</p>
         <button class="btn btn-xs btn-info" @click="setAvailable">
           Set to Available
         </button>
@@ -21,30 +21,44 @@
       </div>
     </div>
   </transition>
+  <GlobalLoading :show="changingToAvail">{{ loadingMessage }}</GlobalLoading>
 </template>
 
 <script setup lang="ts">
-import type { LogData } from "custom-types";
+import type { LogData, statuschoice } from "custom-types";
+import type { LeavesReasonOptions } from "~/pocketbase-types";
 
 const user = useCurrentUser();
+const oldStatus: statuschoice = user.value!.status;
 const show = ref(true);
+const changingToAvail = ref(false);
+const loadingMessage = ref("");
 
 async function setAvailable() {
-  if (user.value!.status === "On leave") {
+  loadingMessage.value = "Setting status to Available";
+  changingToAvail.value = true;
+  if (oldStatus === "On leave" || oldStatus === "Rest day") {
     try {
       await useChangeUserStatus(user.value!.id, "Available");
-      await useUserIsBackFromLeave(user.value!.id);
+      loadingMessage.value = `Computing dummy cases earned from ${oldStatus}`;
+      await useUserIsBackFromLeaveOrRestDay(
+        user.value!.id,
+        oldStatus as LeavesReasonOptions
+      );
       useShowToast("Your status is now Available", "success");
+      loadingMessage.value = "Logging to database";
       const data: LogData = {
         user: user.value!.username,
         type: "changed status",
-        details: "from On leave to Available",
+        details: `from ${oldStatus} to Available`,
       };
+
       logActivity(data);
     } catch (e: any) {
       miniToast("failed", e.message);
     }
   }
+  changingToAvail.value = false;
 }
 </script>
 

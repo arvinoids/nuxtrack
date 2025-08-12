@@ -762,8 +762,10 @@ async function addToTotalCases(quantity: number, groupId: string) {
   pb.autoCancellation(false);
   const leaveRecords = await pb.collection('leaves').getList<LeavesRecord & BaseSystemFields>(1, 1000, { filter: `group="${groupId}" && active=true` })
   for (const record of leaveRecords.items) {
+    const oldRecord = await pb.collection('leaves').getOne<LeavesRecord>(record.id)
+    const reason = oldRecord.reason || "On leave"
     const total_cases = record.total_cases + quantity
-    const data = { total_cases }
+    const data = { total_cases, reason }
     await pb.collection('leaves').update(record.id, data)
   }
 }

@@ -36,4 +36,3 @@ export const useNotifications = ()=> useState<notification[]>(()=>([]))
 export const useCurrentUser = ()=> useState<AuthModel>(()=>[])
 export const usePercentComplete = (sessionId: string = 'default')=> useState(`percentComplete-${sessionId}`, ()=>(0))
 export const useIsDarkMode = (()=>useState(()=>false))
- 

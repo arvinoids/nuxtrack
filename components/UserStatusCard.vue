@@ -79,16 +79,21 @@
       <span class="bg-error badge-error border-error"></span>
       <span class="bg-neutral badge-neutral border-neutral"></span>
     </div>
+    <GlobalLoading :show="changingStatus">{{ loadingMessage }}</GlobalLoading>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { statuschoice, LogData } from "custom-types";
+import { useUserOnLeaveOrRestDay } from "~/composables/userfunctions";
+import type { LeavesReasonOptions } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb;
+const changingStatus = ref(false);
 
 const user = ref(pb.authStore.model!);
 const show = ref(false);
 const avatarUrl = await useGetAvatarUrl(user.value);
+const loadingMessage = ref("");
 
 const status = ref<{ status: string; message: string }>({
   status: pb.authStore.model!.status,
@@ -99,6 +104,8 @@ let choices = STATUS_CHOICES;
 if (user.value.role === "user") choices = STATUS_CHOICES_USER;
 
 async function changeStatus(newStatus: statuschoice) {
+  loadingMessage.value = `Changing status to ${newStatus}...`;
+  changingStatus.value = true;
   try {
     const oldStatus = pb.authStore.model!.status;
     useUserWhoChangedStatus().value = user.value.username;
@@ -108,24 +115,28 @@ async function changeStatus(newStatus: statuschoice) {
       (oldStatus === "On leave" || oldStatus === "Rest day") &&
       oldStatus !== newStatus
     ) {
-      await useUserIsBackFromLeave(user.value.id);
+      loadingMessage.value = `Computing dummy cases earned from ${oldStatus}`;
+      await useUserIsBackFromLeaveOrRestDay(user.value.id, oldStatus);
     }
     if (
       (newStatus === "On leave" || newStatus === "Rest day") &&
       oldStatus !== newStatus
     ) {
-      await useUserOnLeave(user.value.id);
+      loadingMessage.value = `Setting record for your ${newStatus}`;
+      await useUserOnLeaveOrRestDay(user.value.id, newStatus as LeavesReasonOptions);
     }
     const logData: LogData = {
       user: user.value.username,
       type: "changed status",
       details: newStatus + " - " + status.value.message,
     };
-    let log = await logActivity(logData);
+    loadingMessage.value = "Logging to database";
+    await logActivity(logData);
     useUserWhoChangedStatus().value = user.value.username;
   } catch (e) {
     console.log(e);
   }
+  changingStatus.value = false;
 }
 
 const badgeColor = computed(() => {
@@ -172,7 +183,6 @@ pb.collection("users").subscribe(user.value.id, async () => {
 pb.collection("users").subscribe(pb.authStore.model!.id, (e) => {
   if (e.action === "update") {
     pb.authStore.save(pb.authStore.token, e.record);
-    console.log("AuthStore updated with realtime data:", pb.authStore.model);
   }
 });
 

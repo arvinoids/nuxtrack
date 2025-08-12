@@ -181,12 +181,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ListResult } from "pocketbase";
-import type { user, group } from "pocketbase-types";
 import type { LogData } from "custom-types";
 
 const casesChanged = useCaseCountChanged();
-const users: ListResult<user> = await useGetAllUsers();
+const users = await useGetAllUsers();
 const tickets = ref(1);
 const validUsers = getValidUsers();
 const currentuser = useCurrentUser();
@@ -211,14 +209,8 @@ async function getCalculations() {
 }
 
 console.log("allGroups", allGroups);
-type userExpandedMemberOf = user & {
-  expand: {
-    memberOf: group[];
-  };
-};
-const selectedUser: Ref<userExpandedMemberOf> = ref(
-  validUsers[0] as userExpandedMemberOf
-);
+
+const selectedUser = ref(validUsers[0]);
 const availableGroups = computed(() => {
   return selectedUser.value.expand.memberOf;
 });

@@ -59,31 +59,43 @@
         </div>
       </HeadlessListbox>
     </div>
+    <GlobalLoading :show="changingStatus">{{ loadingMessage }}</GlobalLoading>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { statuschoice, LogData } from "custom-types";
 import type { user } from "pocketbase-types";
+import type { LeavesReasonOptions } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb;
 
 const props = defineProps<{
   user: user;
 }>();
+
+const changingStatus = ref(false);
+const loadingMessage = ref("");
 const choices = STATUS_CHOICES;
 const selected = ref(props.user.status);
 
 watch(selected, async (newStatus, oldStatus) => {
   await useChangeUserStatus(props.user.id, newStatus as statuschoice, "");
   if (newStatus === "On leave" || newStatus === "Rest day") {
-    await useUserOnLeave(props.user.id);
+    loadingMessage.value = `Updating ${props.user.username} status from ${oldStatus} to ${newStatus}`;
+    changingStatus.value = true;
+    await useUserOnLeaveOrRestDay(props.user.id, newStatus as LeavesReasonOptions);
   }
   if (oldStatus === "On leave" || oldStatus === "Rest day") {
-    console.log("running back on leave script for", props.user.username);
-    await useUserIsBackFromLeave(props.user.id);
+    loadingMessage.value = `Updating ${props.user.username} status from ${oldStatus} to ${newStatus}`;
+    changingStatus.value = true;
+    await useUserIsBackFromLeaveOrRestDay(
+      props.user.id,
+      oldStatus as LeavesReasonOptions
+    );
   }
   const message = `${props.user.username} status was changed to ${selected.value}`;
   useShowToast(message, "success");
+  loadingMessage.value = "Logging to database";
   const logData: LogData = {
     user: pb.authStore.model!.username,
     type: "changed status",
@@ -91,5 +103,6 @@ watch(selected, async (newStatus, oldStatus) => {
   };
 
   await logActivity(logData);
+  changingStatus.value = false;
 });
 </script>

@@ -36,8 +36,6 @@ html {
 </style>
 
 <script setup lang="ts">
-import UserLeaveNotification from "~/components/UserLeaveNotification.vue";
-
 const currentUser = useCurrentUser();
 
 const pb = useNuxtApp().$pb;

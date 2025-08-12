@@ -1,7 +1,7 @@
 import type { AuthModel, ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice, notification, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
-import type { GroupsRecord, UsersResponse } from "~/pocketbase-types";
+import type { GroupsRecord, LeavesReasonOptions, LeavesRecord, UsersResponse } from "~/pocketbase-types";
 import { useCreateCounter } from "./casefunctions";
 
 
@@ -145,34 +145,35 @@ export async function useGetSortedUsers(group: string) {
  * @param groupId 
  * @returns cases added to user in this group
  */
-async function userIsBackFromLeave(userId: string, groupId: string) {
+async function userIsBackFromLeave(userId: string, groupId: string, oldStatus: LeavesReasonOptions) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`);
     let casesToAdd: number = await getCasesToAdd(userId, groupId)
-    await pb.collection('leaves').update(userLeaveRecord.id, { active: false })
-    await useAddDummyCases(casesToAdd, userId, groupId, "Leave")
+    await pb.collection('leaves').update(userLeaveRecord.id, { active: false, reason:oldStatus })
+    const prefix = oldStatus==="On leave" ? "Leave" : "Restday"
+    await useAddDummyCases(casesToAdd, userId, groupId, prefix)
     await useRefreshGroupCounter(groupId);
     return casesToAdd
 }
 
-export async function useUserIsBackFromLeave(userId: string): Promise<{ status: 'success' | 'failed' | 'warning', message: string }> {
+export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:LeavesReasonOptions): Promise<{ status: 'success' | 'failed' | 'warning', message: string }> {
     const groups = await useGetUserGroups(userId);
     console.log('user groups: ', groups)
     try {
         groups.forEach(async (group: string) => {
             console.log('user is back from leave on group', group)
-            const casesToAdd = await userIsBackFromLeave(userId, group);
+            const casesToAdd = await userIsBackFromLeave(userId, group,oldStatus);
             const groupName = await useGetGroupName(group)
             const userName = await useGetUsernameFromId(userId)
             const logData: LogData = {
                 user: 'system',
                 type: 'assigned case',
-                details: `${casesToAdd} cases skipped in ${groupName} for ${userName} from leave`
+                details: `${casesToAdd} cases skipped in ${groupName} for ${userName} from ${oldStatus}`
             }
             await logActivity(logData)
         });
-        return { status: 'success', message: 'updated user case count after leave' }
+        return { status: 'success', message: `updated user case count after ${oldStatus}` }
     } catch (e: any) {
         await logActivity({ user:'system',type:'changed status',details:`Error in updating cases - ${e.message}`})
         return {
@@ -182,11 +183,11 @@ export async function useUserIsBackFromLeave(userId: string): Promise<{ status: 
     }
 }
 
-export async function useUserOnLeave(id: string) {
+export async function useUserOnLeaveOrRestDay(id: string, newStatus: LeavesReasonOptions) {
     const groups = await useGetUserGroups(id);
     console.log('user groups: ')
     for (let group of groups) {
-        await userGoesOnLeave(id, group);
+        await userGoesOnLeaveOrRestDay(id, group, newStatus);
     }
 }
 
@@ -220,24 +221,25 @@ async function cleanUpCounter(group: string) {
 }
 
 /** Save the current case count for the group and store in leave record */
-async function useSaveLeaveRecord(userId: string, groupId: string, position: number) {
+async function useSaveLeaveRecord(userId: string, groupId: string, position: number,newStatus:LeavesReasonOptions) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     let total_cases = await useGetGroupCaseCount(groupId)
-    await pb.collection("leaves").create({
+    await pb.collection("leaves").create<LeavesRecord>({
         user: userId,
         group: groupId,
         position,
         total_cases,
         active: true,
+        reason: newStatus
     });
 }
 
-export async function userGoesOnLeave(userId: string, groupId: string) {
+export async function userGoesOnLeaveOrRestDay(userId: string, groupId: string, newStatus:LeavesReasonOptions) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const position = await getUserPositionInGroup(userId, groupId)
-    await useSaveLeaveRecord(userId, groupId, position);
+    await useSaveLeaveRecord(userId, groupId, position,newStatus);
 }
 
 async function getUserPositionInGroup(userId: string, groupId: string) {
