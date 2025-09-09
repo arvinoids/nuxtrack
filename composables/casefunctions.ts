@@ -1000,6 +1000,12 @@ export async function useGetCaseReport(userId: string, groupId: string, from: Da
   return res
 }
 
+export async function useGetCaseRecordById(caseId: string) {
+  const pb = useNuxtApp().$pb
+  const res = await pb.collection('cases').getFirstListItem<CasesRecord>(`case="${caseId}"`)
+  return res
+}
+
 export async function useCreateCounter(userId: string, groupId: string) {
   const res: notification = { message: '', status: 'failed' }
   const pb = useNuxtApp().$pb

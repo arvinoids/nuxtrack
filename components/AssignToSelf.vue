@@ -39,7 +39,7 @@
           >
           <label
             for="assignToSelf"
-            class="btn btn-warning btn-primary"
+            class="btn btn-primary"
             :class="{ hidden: !caseExists || disableEscalate }"
             @click="escalateCase(caseId, user.id, selectedGroupId)"
             >Escalate</label

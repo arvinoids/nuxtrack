@@ -38,6 +38,32 @@ export async function useSendEmail(email: emailContent) {
   return res;
 }
 
+export async function useSendAssignNotification(caseRecord:CasesRecord){
+  const currentUser = useCurrentUser()
+  const groupName = useGetGroupName(caseRecord.group!)
+  const currentTime = useFormatDate(new Date(Date.now()));
+  const pb = useNuxtApp().$pb
+  const user = await pb.collection("users").getOne(caseRecord.user);
+  const email = {
+    to: user.email,
+    subject: "New case assigned to you",
+    body: `Hi ${user.fullname}, \n\n${caseRecord.case} in ${groupName} has been assigned to you by ${currentUser.value!.username} on ${currentTime}.\n\nRotation Tracker`,
+  };
+  const emailres = await useSendEmail(email);
+  miniToast(emailres.status, emailres.message);
+}
+
+export async function useSendUnassignNotification(caseRecord:CasesRecord){
+    const owner  = await useGetUserById(caseRecord.user)
+    const email: emailContent = {
+    to: owner.email,
+    subject: "Case has been unassigned",
+    body: `Hello ${owner.fullname}, \n\nThe case ${caseRecord.case} has been removed from your assignment.\n\nThanks,\nRotation Tracker`,
+  };
+  const emailres = await useSendEmail(email);
+  miniToast(emailres.status, emailres.message);
+}
+
 export async function logActivity(data: LogData) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);

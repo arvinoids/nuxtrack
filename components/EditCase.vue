@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import type { LogData } from "custom-types";
+import { useSendUnassignNotification } from "~/composables/generics";
 const loggedInUser = useCurrentUser();
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -94,6 +95,8 @@ const message = ref("");
 const updated = useDataUpdated();
 
 async function doUpdate() {
+  const oldRecord = await useGetCaseRecordById(props.caseId);
+  const oldUser = props.owner;
   const res = await useUpdateCase(
     props.id,
     newUser.value,
@@ -101,6 +104,11 @@ async function doUpdate() {
     newCase,
     pb.authStore.model!.username
   );
+  if (oldUser !== newUser.value) {
+    const newRecord = await useGetCaseRecordById(props.caseId);
+    await useSendUnassignNotification(oldRecord);
+    await useSendAssignNotification(newRecord);
+  }
   updated.value++;
   useShowToast(res.message, res.status);
   const logData: LogData = {

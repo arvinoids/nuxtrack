@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGetL1Groups } from "~/composables/generics";
+import { useGetL1Groups, useSendAssignNotification } from "~/composables/generics";
 
 const groups = await useGetAllGroups();
 // const L1name = "NA Solutions L1"; // cannot escalate to this group
@@ -105,11 +105,13 @@ async function doEscalate() {
       selectedUser.value,
       selectedGroup.value
     );
+    const caseRecord = await useGetCaseRecordById(props.caseId);
     await logActivity({
       user: user.value!.username || "unknown",
       type: "assigned case",
       details: `Escalated case ${props.caseId}`,
     });
+    await useSendAssignNotification(caseRecord);
     miniToast(res.status, res.message);
   } catch (error) {
     miniToast("failed", "Failed to escalate case");
