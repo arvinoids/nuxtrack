@@ -1,7 +1,7 @@
-import type { notification } from "custom-types";
+import type { notification, result } from "custom-types";
 import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
-import type { GroupsResponse, ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord, CounterResponse, CasesResponse, UsersResponse } from "~/pocketbase-types";
+import type { GroupsResponse, ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord, CounterResponse, CasesResponse, UsersResponse, CounterRecord } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -1023,4 +1023,42 @@ export async function useCreateCounter(userId: string, groupId: string) {
 function isValidCaseId(caseId:string) {
   const regex = /^CAS-\d{7}-[A-Z0-9]{6}$/;
   return regex.test(caseId);
+}
+
+export async function updateArchivedCasesCount(userId: string, groupId: string, casesToArchive: number) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false)
+  const result:result = { message: '', status: 'failed' }
+  try {
+    const record = await pb.collection("counter").getFirstListItem<CounterRecord>(`user="${userId}" && group="${groupId}"`);
+    const currentArchivedCases = record.archived || 0
+    const count = record.count ?? 0 - casesToArchive
+    await pb.collection("counter").update(record.id, { archived: casesToArchive + currentArchivedCases, count: count < 0 ? 0 : count });
+    result.message = `Counter updated to ${count}`;
+    result.status = 'success'
+    return result
+  } catch (e: any) {
+    result.message = e.message;
+    return result
+  }
+}
+
+async function TrimOldCases(userId: string, groupId: string, numberOfCasesToKeep: number) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false)
+  const result:result = { message: '', status: 'failed' }
+  const cases = await pb.collection('cases').getList<CasesRecord>(1, 10000, { filter: `user="${userId}"&&group="${groupId}"`, sort: '+created', fields: '' })
+  if(cases.totalItems>numberOfCasesToKeep) try {
+    for (const caseItem of cases.items.slice(0, cases.totalItems - numberOfCasesToKeep)) {
+      await pb.collection('cases').delete(caseItem.id)
+    }
+    result.message = `Archived old cases and kept only ${numberOfCasesToKeep}.`;
+    result.status = 'success'
+  } catch(e:any) { 
+    result.message = e.message;
+  }
+  return result
+}
+
+async function saveCasesToArchiveFile(cases: CasesRecord[]) {
 }
