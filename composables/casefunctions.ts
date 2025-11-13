@@ -562,7 +562,7 @@ export async function useMakeCounter(group: string, users: ListResult<user>) {
 }
 
 /** Revised make counter function. */
-export async function useNewMakeCounter(group: string, users: user[]) {
+export async function useNewMakeCounter(group: string, users: UsersResponse[]) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   users.forEach(async (user) => {
@@ -679,9 +679,9 @@ export async function useFindCase(id: string) {
 
 export async function useFindCases(caseId: string) {
   type Texpand = {
-  user:UsersResponse,
-  group:GroupsResponse
-};
+    user: UsersResponse,
+    group: GroupsResponse
+  };
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   const res = await pb.collection('cases').getList<CasesResponse<Texpand>>(1, 100, { filter: `case~"${caseId}"`, expand: 'user,group', sort: '-created' })
@@ -737,15 +737,15 @@ export async function useAddDummyCases(quantity: number, userId: string, groupId
     };
     try {
       await pb.collection("cases").create(data)
-      .then(() => { 
-        createdCasesCount.value++; 
-        percent.value = Math.floor((createdCasesCount.value / quantity) * 100) 
-      });
+        .then(() => {
+          createdCasesCount.value++;
+          percent.value = Math.floor((createdCasesCount.value / quantity) * 100)
+        });
     } catch (e) {
       console.log(e);
     }
   }
-  
+
   await addToTotalCases(quantity, groupId) // this adds to the total case count on all active leaves to account for dummy case computation after leave
   console.log('created =', createdCasesCount.value, 'quantity=', quantity)
   if (createdCasesCount.value === quantity) return { status: 'success', message: `${quantity} Cases created` }
@@ -774,7 +774,7 @@ async function addToTotalCases(quantity: number, groupId: string) {
 export async function useGetAllGroups() {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const res = await pb.collection<GroupsResponse>('groups').getList(1,100,{sort:'+order'})
+  const res = await pb.collection<GroupsResponse>('groups').getList(1, 100, { sort: '+order' })
   return res
 }
 
@@ -1020,21 +1020,39 @@ export async function useCreateCounter(userId: string, groupId: string) {
   return res
 }
 
-function isValidCaseId(caseId:string) {
-  const regex = /^CAS-\d{7}-[A-Z0-9]{6}$/;
-  return regex.test(caseId);
-}
-
-export async function updateArchivedCasesCount(userId: string, groupId: string, casesToArchive: number) {
+export async function useArchiveOldCases(userId: string, groupId: string, numberOfCasesToKeep: number) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false)
-  const result:result = { message: '', status: 'failed' }
+  const result: result = { message: '', status: 'failed' }
+  try {
+    const trimResult = await TrimOldCases(userId, groupId, numberOfCasesToKeep)
+    if (trimResult.status === 'success') {
+      const casesToArchive = trimResult.message.match(/\d+/)
+      if (casesToArchive) {
+        const updateResult = await updateArchivedCasesCount(userId, groupId, parseInt(casesToArchive[0]))
+        return updateResult
+      } else {
+        result.message = 'No cases were archived.'
+        return result
+      }
+    }
+  } catch (e: any) {
+    result.message = e.message;
+    return result
+  }
+}
+
+async function updateArchivedCasesCount(userId: string, groupId: string, casesToArchive: number) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false)
+  const result: result = { message: '', status: 'failed' }
   try {
     const record = await pb.collection("counter").getFirstListItem<CounterRecord>(`user="${userId}" && group="${groupId}"`);
     const currentArchivedCases = record.archived || 0
-    const count = record.count ?? 0 - casesToArchive
-    await pb.collection("counter").update(record.id, { archived: casesToArchive + currentArchivedCases, count: count < 0 ? 0 : count });
-    result.message = `Counter updated to ${count}`;
+    const newCount = (record.count ?? 0) - casesToArchive
+    const newArchivedCount = currentArchivedCases + casesToArchive
+    await pb.collection("counter").update(record.id, { archived: newArchivedCount, count: newCount < 0 ? 0 : newCount });
+    result.message = `Counter updated to ${newCount}`;
     result.status = 'success'
     return result
   } catch (e: any) {
@@ -1046,19 +1064,77 @@ export async function updateArchivedCasesCount(userId: string, groupId: string, 
 async function TrimOldCases(userId: string, groupId: string, numberOfCasesToKeep: number) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false)
-  const result:result = { message: '', status: 'failed' }
-  const cases = await pb.collection('cases').getList<CasesRecord>(1, 10000, { filter: `user="${userId}"&&group="${groupId}"`, sort: '+created', fields: '' })
-  if(cases.totalItems>numberOfCasesToKeep) try {
-    for (const caseItem of cases.items.slice(0, cases.totalItems - numberOfCasesToKeep)) {
+  const result: result = { message: '', status: 'failed' }
+  const user = await useGetUserById(userId)
+  const cases = await pb.collection('cases').getFullList<CasesRecord>({ filter: `user="${userId}"&&group="${groupId}"`, sort: '+created' })
+  const totalCases = cases.length
+  if (totalCases > numberOfCasesToKeep) try {
+    const numberOfCasesToArchive = totalCases - numberOfCasesToKeep
+    const casesToArchive = cases.slice(0, numberOfCasesToArchive)
+    await saveCasesToArchiveFile(casesToArchive, user.username)
+    for (const caseItem of casesToArchive) {
       await pb.collection('cases').delete(caseItem.id)
     }
-    result.message = `Archived old cases and kept only ${numberOfCasesToKeep}.`;
+    result.message = `Archived ${numberOfCasesToArchive} old cases and kept only ${numberOfCasesToKeep}.`;
     result.status = 'success'
-  } catch(e:any) { 
+  } catch (e: any) {
     result.message = e.message;
   }
   return result
 }
 
-async function saveCasesToArchiveFile(cases: CasesRecord[]) {
+async function compressToGzip(data: string): Promise<Blob> {
+  const pako = await import('pako')
+  const compressed = pako.gzip(data)
+  return new Blob([compressed], { type: 'application/gzip' })
+}
+
+async function convertCasesToCSV(cases: CasesRecord[]): Promise<string> {
+  if (!Array.isArray(cases) || cases.length === 0) {
+    return '';
+  } else {
+    const csvHeader = Object.keys(cases[0]).join(',');
+    const csvRows = cases.map(row => {
+      return Object.values(row).map(value =>
+        `"${value.toString().replace(/"/g, '""')}"`
+      ).join(',');
+    });
+    return [csvHeader, ...csvRows].join('\n');
+  }
+}
+
+/** save cases to the archive collection as .csv.gz */
+async function saveCasesToArchiveFile(cases: CasesRecord[], userName: string) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+  const csvData = await convertCasesToCSV(cases)
+  const compressed = await compressToGzip(csvData)
+  const formData = new FormData()
+  const filename = 'archived_cases_' + userName + '_' + getCurrentTimestamp() + '.csv.gz'
+  const now = new Date()
+  const dateStr = `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()}`
+  formData.append('file', compressed, filename)
+  formData.append('name', filename)
+  formData.append('description', `${userName} archived cases ${dateStr}`)
+  try {
+    const upload: ArchiveRecord = await pb.collection('archive').create(formData)
+    return {
+      status: 'success', message: 'File archived',
+      filename: filename,
+      data: { url: pb.files.getUrl(upload, filename) }
+    } as notification & { filename: string; data: { url: string } }
+  } catch (e: any) {
+    console.log('Error uploading file')
+    return { status: 'failed', message: e.message } as notification
+  }
+}
+
+export async function useGetAllCounters() {
+  type Texpand = {
+  user: UsersResponse,
+  group: GroupsResponse
+  };
+  const pb = useNuxtApp().$pb
+  const allCounters = await pb.collection('counter').getList<CounterResponse<Texpand>>(1, 1000, { expand: 'user, group', sort: '-count' })
+  return allCounters
 }

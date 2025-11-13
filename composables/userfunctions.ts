@@ -1,7 +1,7 @@
 import type { AuthModel, ListResult } from "pocketbase";
-import type { userEntry, userStatus, statuschoice, notification, LogData, result } from "custom-types";
+import type { userEntry, userStatus, statuschoice, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
-import type { GroupsRecord, LeavesReasonOptions, LeavesRecord, UsersResponse } from "~/pocketbase-types";
+import type { CounterResponse, GroupsRecord, GroupsResponse, LeavesReasonOptions, LeavesRecord, UsersResponse } from "~/pocketbase-types";
 import { useCreateCounter } from "./casefunctions";
 
 
@@ -136,8 +136,8 @@ export async function useGetSortedUsers(group: string) {
     await cleanUpCounter(group);
     const users = await pb
         .collection("counter")
-        .getList(1, 50, { filter: `group="${group}"`, sort: "+count", expand: "user" });
-    return (users as unknown) as expandedUsers;
+        .getList<CounterResponse<{user:UsersResponse,group:GroupsResponse}>>(1, 50, { filter: `group="${group}"`, sort: "+total_count", expand: "user, group" });
+    return users;
 }
 
 /** Runs the back from leave function and returns cases added to user in group

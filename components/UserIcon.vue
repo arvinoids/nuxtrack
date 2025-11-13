@@ -22,10 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import type { user } from "pocketbase-types";
+import type { UsersResponse } from "~/pocketbase-types";
 
 const props = defineProps<{
-  user: user;
+  user: UsersResponse;
 }>();
 const avatar = await useGetAvatarUrl(props.user);
 </script>

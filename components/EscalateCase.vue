@@ -90,10 +90,10 @@ const displayUsers = computed(() => {
   return allCounters.value.filter((counter) => counter.group === selectedGroup.value);
 });
 
-const selectedUser = ref(displayUsers.value[0]?.expand.user.id || "");
+const selectedUser = ref(displayUsers.value[0].expand.user.id || "");
 
 watch(selectedGroup, () => {
-  selectedUser.value = displayUsers.value[0]?.expand.user.id || "";
+  selectedUser.value = displayUsers.value[0].expand.user.id || "";
 });
 
 const user = useCurrentUser();

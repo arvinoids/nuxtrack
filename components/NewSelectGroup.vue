@@ -29,15 +29,15 @@
 </template>
 
 <script setup lang="ts">
-import type { expandedCounter, user } from "pocketbase-types";
 import type { LogData, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
+import type { CounterResponse, GroupsResponse, UsersResponse } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb
 pb.autoCancellation(false)
 
 const props = defineProps<{
   group: string;
-  users: expandedCounter[];
+  users: CounterResponse<{ user: UsersResponse, group: GroupsResponse}>[];
 }>();
 
 const emit = defineEmits(["skip", "reset"]);
@@ -68,7 +68,7 @@ function moveCursor() {
   } else cursor.value++;
 }
 
-async function skipCatch(user: user) {
+async function skipCatch(user: UsersResponse) {
   const message = `${user.username.toLowerCase()} was skipped.`;
   // useShowToast(message, "success");
   emit("skip");
@@ -151,7 +151,7 @@ watch(caseId, async (caseId) => {
 });
 
 pb.collection('users').subscribe('*', async () => {
-  userlist.value = await useGetSortedUsers(props.group) as unknown as expandedCounter[]
+  userlist.value = (await useGetSortedUsers(props.group)).items
 })
 
 function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {

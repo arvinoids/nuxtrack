@@ -49,7 +49,7 @@
               ' is ' +
               user.expand.user.status +
               ' - ' +
-              user.count +
+              user.total_count +
               ' case(s)'
             "
           >
@@ -101,14 +101,14 @@
 import { useNewMakeCounter } from "~/composables/casefunctions";
 import type { LogData } from "custom-types";
 import { useCounters } from "~/composables/states";
-import type { expandedCounter, group, user } from "pocketbase-types";
 import { miniToast } from "../composables/viewhelpers";
 import type { notification } from "custom-types";
+import type { CounterResponse, GroupsResponse, UsersResponse } from "~/pocketbase-types";
 
 const props = defineProps<{
-  users: user[];
-  group: group;
-  counters: expandedCounter[] | undefined;
+  users: UsersResponse[];
+  group: GroupsResponse;
+  counters: CounterResponse<{ user: UsersResponse; group: GroupsResponse }>[];
 }>();
 
 const loading = ref(false);
@@ -120,19 +120,21 @@ const anchor: string = "#" + props.group.id + "select";
 const allCounters = useCounters();
 const currentUser = useCurrentUser();
 
-let users: expandedCounter[] = allCounters.value.filter(
-  (user) => user.group === props.group.id
-);
+let users = allCounters.value.filter((user) => user.group === props.group.id);
 
 const displayUsers = ref(users);
 const pb = useNuxtApp().$pb;
 pb.collection("counter").subscribe("*", async () => {
-  const res = await pb.collection("counter").getList(1, 30, {
+  type Texpand = {
+    user: UsersResponse;
+    group: GroupsResponse;
+  };
+  const res = await pb.collection("counter").getList<CounterResponse<Texpand>>(1, 30, {
     filter: `group="${props.group.id}"`,
     expand: "user,group",
-    sort: "+count",
+    sort: "+total_countcount",
   });
-  displayUsers.value = (res.items as unknown) as expandedCounter[];
+  displayUsers.value = res.items;
 });
 //console.log(props.counters.length);
 if (props.counters?.length === 0) {

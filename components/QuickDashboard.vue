@@ -18,7 +18,7 @@
             <ProductCard
               :group="group"
               :users="getGroupUsers(group.id)"
-              :counters="getGroupCounters(group.id)"
+              :counters="getGroupCounters(group.id) ?? []"
               class="flex-grow"
             />
           </transition>
@@ -34,24 +34,33 @@
 
 <script setup lang="ts">
 import { useCounters } from "~/composables/states";
-import type { group, user } from "pocketbase-types";
+import type { CounterResponse, GroupsResponse, UsersResponse } from "~/pocketbase-types";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
 const currentUser = useCurrentUser();
 const loading = ref(true);
 const allCounters = useCounters();
-let groups: group[];
-let users: user[];
+let groups: GroupsResponse[];
+let users: UsersResponse[];
 
 onMounted(async () => {
   groups = await pb.collection("groups").getFullList({ sort: "+order" });
   users = await pb.collection("users").getFullList();
+  type Texpand = {
+    user: UsersResponse;
+    group: GroupsResponse;
+  };
   allCounters.value = await pb
     .collection("counter")
-    .getFullList({ sort: "+count", expand: "user" });
+    .getFullList<CounterResponse<Texpand>>({ sort: "+total_count", expand: "user" });
   loading.value = false;
 });
+
+type Texpand = {
+  user: UsersResponse;
+  group: GroupsResponse;
+};
 
 function getGroupUsers(groupId: string) {
   return users.filter((user) => user.memberOf.includes(groupId));
@@ -67,18 +76,23 @@ function getGroupCounters(groupId: string) {
 pb.collection("users").subscribe("*", async () => {
   loading.value = true;
   users = await pb.collection("users").getFullList();
+  type Texpand = {
+    user: UsersResponse;
+    group: GroupsResponse;
+  };
   allCounters.value = await pb
     .collection("counter")
-    .getFullList({ sort: "+count", expand: "user" });
+    .getFullList<CounterResponse<Texpand>>({ sort: "+total_count", expand: "user" });
   loading.value = false;
   pb.collection("users").authRefresh();
 });
 
 pb.collection("counter").subscribe("*", async () => {
   loading.value = true;
+
   allCounters.value = await pb
     .collection("counter")
-    .getFullList({ sort: "+count", expand: "user" });
+    .getFullList<CounterResponse<Texpand>>({ sort: "+total_count", expand: "user" });
   loading.value = false;
 });
 </script>
