@@ -4,10 +4,7 @@
     <p class="text-sm text-center w-auto font-condensed">
       Archive cases that exceed a certain number of cases to keep for a user.
     </p>
-    <table
-      class="table border font-condensed border-neutral-200 table-sm flex"
-      v-if="allCounters"
-    >
+    <table class="table font-condensed border-neutral-200 border flex" v-if="allCounters">
       <thead class="bg-base-200">
         <tr>
           <th>User</th>
@@ -18,14 +15,21 @@
         </tr>
       </thead>
       <tbody v-for="counter in allCounters.items" class="w-full">
-        <tr :class="[{ 'bg-error/15': counter.count > casesToKeep }]">
+        <tr
+          :class="[{ 'bg-error/15': counter.count > casesToKeep }]"
+          class="hover:bg-base-200/50"
+        >
           <td>{{ counter.expand.user.fullname }}</td>
           <td>{{ counter.expand.group.description }}</td>
           <td>
             {{ counter.count }}
-            <div class="btn btn-xs btn-ghost btn-primary" title="Archive cases" v-if="counter.count > casesToKeep" 
-            @click="archiveCaseForUserInGroup(counter.user,counter.group)">
-              <Icon name="mdi:zip-box-outline" size="16px" />
+            <div
+              class="btn btn-xs btn-ghost btn-primary btn-square mx-1"
+              title="Archive cases"
+              v-if="counter.count > casesToKeep"
+              @click="archiveCaseForUserInGroup(counter.user, counter.group)"
+            >
+              <Icon name="mdi:zip-box-outline" size="20px" />
             </div>
           </td>
           <td>{{ counter.archived }}</td>
@@ -84,8 +88,8 @@ async function archiveOldCases() {
   }
 }
 
-async function archiveCaseForUserInGroup(userId:string,groupId:string){
-
+async function archiveCaseForUserInGroup(userId: string, groupId: string) {
+  useArchiveOldCases(userId, groupId, casesToKeep.value)
 }
 </script>
 
