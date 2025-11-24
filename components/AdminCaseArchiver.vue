@@ -89,7 +89,7 @@ async function archiveOldCases() {
 }
 
 async function archiveCaseForUserInGroup(userId: string, groupId: string) {
-  useArchiveOldCases(userId, groupId, casesToKeep.value)
+  useArchiveOldCases(userId, groupId, casesToKeep.value);
 }
 </script>
 
