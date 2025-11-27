@@ -7,9 +7,9 @@
         <h2
           class="ml-3 my-2 text-secondary max-w-[200px] overflow-hidden whitespace-nowrap"
         >
-          <NuxtLink :to="`/${group.name}`" class="text-white font-[Roboto_Condensed]">{{
-            group.description
-          }}</NuxtLink>
+          <NuxtLink :to="`/${group.name}`" class="text-white font-[Roboto_Condensed]">
+            {{ group.description }}
+          </NuxtLink>
         </h2>
         <div class="items-center group-hover:flex hidden">
           <button
