@@ -25,12 +25,23 @@
             {{ counter.count }}
             <div
               class="btn btn-xs btn-ghost btn-primary btn-square mx-1"
-              title="Archive cases"
+              :title="
+                'Archive ' +
+                (counter.count - casesToKeep) +
+                ' cases for ' +
+                counter.expand.user.fullname
+              "
               v-if="counter.count > casesToKeep"
-              @click="archiveCaseForUserInGroup(counter.user, counter.group)"
+              @click="
+                archiveAndDeleteCaseForUserInGroup(counter.expand.user, counter.group)
+              "
             >
               <Icon name="mdi:zip-box-outline" size="20px" />
             </div>
+            <FullScreenProcessing v-if="archiveSingleUser"
+              >Archiving {{ counter.count - casesToKeep }} cases for
+              {{ counter.expand.user.fullname }}</FullScreenProcessing
+            >
           </td>
           <td>{{ counter.archived }}</td>
           <td>{{ counter.total_count }}</td>
@@ -38,7 +49,13 @@
       </tbody>
     </table>
     <div v-else><LoadingBlockPage /></div>
-
+    <ProgressDialog
+      id="progressDialog"
+      :actionable="false"
+      title="Archive Cases"
+      :open="archiveSingleUser"
+      >Archiving cases for {{ currentUserName }}</ProgressDialog
+    >
     <div class="flex gap-2 items-center">
       <div>Latest cases to keep:</div>
       <input
@@ -72,11 +89,17 @@
 </template>
 
 <script setup lang="ts">
+import type { UsersResponse } from "~/pocketbase-types";
+
 const casesToKeep = ref(100);
 const allCounters = await useGetAllCounters();
 const progressCounter = ref(allCounters.totalItems);
 const progress = computed(() => (100 * progressCounter.value) / allCounters.totalItems);
 const currentUserName = ref();
+const archiveSingleUser = ref(false);
+const progressSingle = ref(0);
+
+const archiveCases = ref();
 async function archiveOldCases() {
   progressCounter.value = 0;
   for (const counter of allCounters.items) {
@@ -88,8 +111,18 @@ async function archiveOldCases() {
   }
 }
 
-async function archiveCaseForUserInGroup(userId: string, groupId: string) {
-  useArchiveOldCases(userId, groupId, casesToKeep.value);
+async function archiveAndDeleteCaseForUserInGroup(user: UsersResponse, groupId: string) {
+  archiveSingleUser.value = true;
+  currentUserName.value = user.fullname;
+  progressSingle.value = 0;
+  const res = await useArchiveAndDeleteCasesForUserInGroup(
+    user.id,
+    groupId,
+    casesToKeep.value
+  );
+  progressSingle.value = 100;
+  archiveSingleUser.value = false;
+  useShowToast(res.message, res.status);
 }
 </script>
 

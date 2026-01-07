@@ -132,7 +132,7 @@ pb.collection("counter").subscribe("*", async () => {
   const res = await pb.collection("counter").getList<CounterResponse<Texpand>>(1, 30, {
     filter: `group="${props.group.id}"`,
     expand: "user,group",
-    sort: "+total_countcount",
+    sort: "+total_count",
   });
   displayUsers.value = res.items;
 });
