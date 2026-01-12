@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-md bg-base-100 text-xs shadow-sm mx-2 w-[160px]">
+  <div class="rounded-md bg-base-100 text-xs shadow-sm mx-2 w-[160px]" v-if="currentUser">
     <div class="flex flex-col items-center p-3 gap-1">
       <div class="indicator">
         <span class="indicator-item status" :class="`status-${badgeColor}`"></span>
@@ -17,8 +17,8 @@
           class="h-10 w-10 flex-none rounded-full bg-gray-200"
         />
       </div>
-      <nuxt-link :to="`/user/${user.username}`" class="text-sm text-center">{{
-        user.fullname
+      <nuxt-link :to="`/user/${currentUser.username}`" class="text-sm text-center">{{
+        currentUser.fullname
       }}</nuxt-link>
       <div
         class="badge badge-sm min-w-max cursor-pointer rounded-full"
@@ -90,9 +90,9 @@ import type { LeavesReasonOptions } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb;
 const changingStatus = ref(false);
 
-const user = ref(pb.authStore.model!);
+const currentUser = useCurrentUser() ?? pb.authStore.model;
 const show = ref(false);
-const avatarUrl = await useGetAvatarUrl(user.value);
+const avatarUrl = await useGetAvatarUrl(currentUser.value);
 const loadingMessage = ref("");
 
 const status = ref<{ status: string; message: string }>({
@@ -101,38 +101,41 @@ const status = ref<{ status: string; message: string }>({
 });
 const auth = useAuth();
 let choices = STATUS_CHOICES;
-if (user.value.role === "user") choices = STATUS_CHOICES_USER;
+if (currentUser.value?.role === "user") choices = STATUS_CHOICES_USER;
 
 async function changeStatus(newStatus: statuschoice) {
   loadingMessage.value = `Changing status to ${newStatus}...`;
   changingStatus.value = true;
   try {
     const oldStatus = pb.authStore.model!.status;
-    useUserWhoChangedStatus().value = user.value.username;
-    await useChangeUserStatus(user.value.id, newStatus, status.value.message);
+    useUserWhoChangedStatus().value = currentUser.value?.username;
+    await useChangeUserStatus(currentUser.value?.id, newStatus, status.value.message);
     status.value.status = newStatus;
     if (
       (oldStatus === "On leave" || oldStatus === "Rest day") &&
       oldStatus !== newStatus
     ) {
       loadingMessage.value = `Computing dummy cases earned from ${oldStatus}`;
-      await useUserIsBackFromLeaveOrRestDay(user.value.id, oldStatus);
+      await useUserIsBackFromLeaveOrRestDay(currentUser.value?.id, oldStatus);
     }
     if (
       (newStatus === "On leave" || newStatus === "Rest day") &&
       oldStatus !== newStatus
     ) {
       loadingMessage.value = `Setting record for your ${newStatus}`;
-      await useUserOnLeaveOrRestDay(user.value.id, newStatus as LeavesReasonOptions);
+      await useUserOnLeaveOrRestDay(
+        currentUser.value?.id,
+        newStatus as LeavesReasonOptions
+      );
     }
     const logData: LogData = {
-      user: user.value.username,
+      user: currentUser.value?.username,
       type: "changed status",
       details: newStatus + " - " + status.value.message,
     };
     loadingMessage.value = "Logging to database";
     await logActivity(logData);
-    useUserWhoChangedStatus().value = user.value.username;
+    useUserWhoChangedStatus().value = currentUser.value?.username;
   } catch (e) {
     console.log(e);
   }
@@ -154,14 +157,15 @@ const badgeColor = computed(() => {
 });
 
 async function logout() {
-  let outStatus = user.value.role === "user" ? "Outside shift" : "Not available";
-  user.value.status === "On leave" || user.value.status === "Rest day"
-    ? (outStatus = user.value.status)
+  let outStatus = currentUser.value?.role === "user" ? "Outside shift" : "Not available";
+  console.log("user status is ", currentUser.value?.status);
+  currentUser.value?.status === "On leave" || currentUser.value?.status === "Rest day"
+    ? (outStatus = currentUser.value.status)
     : null;
-  useChangeUserStatus(user.value.id, outStatus as statuschoice, null);
+  useChangeUserStatus(currentUser.value?.id, outStatus as statuschoice, null);
 
   logActivity({
-    user: user.value.username,
+    user: currentUser.value?.username,
     type: "logged out",
     details: outStatus,
   });
@@ -176,13 +180,14 @@ onClickOutside(menu as MaybeRef, (event) => {
   show.value = false;
 });
 
-pb.collection("users").subscribe(user.value.id, async () => {
-  status.value = await useGetUserStatus(user.value.id);
+pb.collection("users").subscribe(currentUser.value?.id, async () => {
+  status.value = await useGetUserStatus(currentUser.value?.id);
 });
 
 pb.collection("users").subscribe(pb.authStore.model!.id, (e) => {
   if (e.action === "update") {
     pb.authStore.save(pb.authStore.token, e.record);
+    currentUser.value = pb.authStore.model;
   }
 });
 

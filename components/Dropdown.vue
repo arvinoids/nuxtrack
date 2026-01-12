@@ -33,7 +33,7 @@
         class="absolute right-0 mt-3 py-2 bg-base-100/70 backdrop-blur-lg shadow-xl min-w-[400px] z-40 flex flex-row"
         ref="menu"
       >
-        <UserStatusCard />
+        <UserStatusCard v-if="currentUser" />
         <div class="flex flex-col">
           <NuxtLink
             to="/Admin"
