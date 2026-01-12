@@ -166,6 +166,7 @@ export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:
             const casesToAdd = await userIsBackFromLeave(userId, group,oldStatus);
             const groupName = await useGetGroupName(group)
             const userName = await useGetUsernameFromId(userId)
+            await checkAndDisableUserStaleLeaveRecordForGroup(userId, group);
             const logData: LogData = {
                 user: 'system',
                 type: 'assigned case',
@@ -318,4 +319,12 @@ export async function useUpdateAvatar(userId:string, formData: FormData) {
         result.message = e.message
     }
     return result
+}
+
+async function checkAndDisableUserStaleLeaveRecordForGroup(userId:string, groupId:string) {
+    const pb = useNuxtApp().$pb
+    const activeLeaveRecords = await pb.collection('leaves').getList<LeavesRecord>(1,1000,{filter:`user="${userId}"&&active=true&&group="${groupId}"`})
+    for (let record of activeLeaveRecords.items) { 
+        await pb.collection('leaves').update(record.id,{active:false})
+    }
 }
