@@ -101,7 +101,7 @@ async function login() {
     currentUser.value = pb.authStore.model;
 
     logActivity({
-      user: currentUser.value!.username,
+      user: currentUser.value?.username,
       type: "logged in",
     });
     navigateTo("/");

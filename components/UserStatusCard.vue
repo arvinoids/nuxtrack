@@ -85,7 +85,10 @@
 
 <script setup lang="ts">
 import type { statuschoice, LogData } from "custom-types";
-import { useUserOnLeaveOrRestDay } from "~/composables/userfunctions";
+import {
+  useCheckAndDisableUserStaleLeaveRecordForGroup,
+  useUserOnLeaveOrRestDay,
+} from "~/composables/userfunctions";
 import type { LeavesReasonOptions } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb;
 const changingStatus = ref(false);
@@ -99,9 +102,19 @@ const status = ref<{ status: string; message: string }>({
   status: pb.authStore.model!.status,
   message: pb.authStore.model!.message,
 });
+
+const currentUserGroups = await useGetUserGroups(currentUser.value?.id);
 const auth = useAuth();
 let choices = STATUS_CHOICES;
 if (currentUser.value?.role === "user") choices = STATUS_CHOICES_USER;
+if (
+  currentUser.value &&
+  (currentUser.value.status !== "On leave" || currentUser.value.status !== "Rest day")
+) {
+  for (const group of currentUserGroups) {
+    await useCheckAndDisableUserStaleLeaveRecordForGroup(currentUser.value.id, group);
+  }
+}
 
 async function changeStatus(newStatus: statuschoice) {
   loadingMessage.value = `Changing status to ${newStatus}...`;
@@ -182,9 +195,10 @@ onClickOutside(menu as MaybeRef, (event) => {
 
 pb.collection("users").subscribe(currentUser.value?.id, async () => {
   status.value = await useGetUserStatus(currentUser.value?.id);
+  currentUser.value = pb.authStore.model;
 });
 
-pb.collection("users").subscribe(pb.authStore.model!.id, (e) => {
+pb.collection("users").subscribe(currentUser.value?.id, (e) => {
   if (e.action === "update") {
     pb.authStore.save(pb.authStore.token, e.record);
     currentUser.value = pb.authStore.model;
