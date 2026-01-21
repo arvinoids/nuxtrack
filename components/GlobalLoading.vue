@@ -15,8 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { useGlobalStatusMessage } from "~/composables/settings";
-
 defineProps<{
   show: boolean;
 }>();

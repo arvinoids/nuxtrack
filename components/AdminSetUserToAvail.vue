@@ -34,8 +34,9 @@ const changingStatus = ref(false);
 const loadingMessage = ref("");
 const oldStatus = props.user.status as "On leave" | "Rest day";
 async function setToAvail(userId: string) {
-  loadingMessage.value = `Changing ${props.user.username} status from ${oldStatus} to Available`;
   changingStatus.value = true;
+  loadingMessage.value = `Changing ${props.user.username} status from ${oldStatus} to Available`;
+
   try {
     loadingMessage.value = `Computing dummy cases earned from ${oldStatus}`;
     await useChangeUserStatus(userId, "Available");

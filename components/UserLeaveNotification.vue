@@ -7,7 +7,7 @@
       <div></div>
       <div class="flex items-center gap-4">
         <p class="">Your status is currently {{ user?.status.toUpperCase() }}</p>
-        <button class="btn btn-xs btn-info" @click="setAvailable">
+        <button class="btn btn-xs btn-info" @click="setAvailableNotify">
           Set to Available
         </button>
       </div>
@@ -33,33 +33,42 @@ const oldStatus: statuschoice = user.value!.status;
 const show = ref(true);
 const changingToAvail = ref(false);
 const loadingMessage = ref("");
+const showDropdown = useShowDropdown();
 
-async function setAvailable() {
-  loadingMessage.value = "Setting status to Available";
-  changingToAvail.value = true;
-  if (oldStatus === "On leave" || oldStatus === "Rest day") {
-    try {
-      await useChangeUserStatus(user.value!.id, "Available");
-      loadingMessage.value = `Computing dummy cases earned from ${oldStatus}`;
-      await useUserIsBackFromLeaveOrRestDay(
-        user.value!.id,
-        oldStatus as LeavesReasonOptions
-      );
-      useShowToast("Your status is now Available", "success");
-      loadingMessage.value = "Logging to database";
-      const data: LogData = {
-        user: user.value!.username,
-        type: "changed status",
-        details: `from ${oldStatus} to Available`,
-      };
-
-      logActivity(data);
-    } catch (e: any) {
-      miniToast("failed", e.message);
-    }
-  }
-  changingToAvail.value = false;
+async function setAvailableNotify() {
+  showDropdown.value = true;
+  miniToast(
+    "warning",
+    "Please click on the status pill below your avatar to change status"
+  );
 }
+
+// async function setAvailable() {
+//   loadingMessage.value = "Setting status to Available";
+//   changingToAvail.value = true;
+//   if (oldStatus === "On leave" || oldStatus === "Rest day") {
+//     try {
+//       await useChangeUserStatus(user.value!.id, "Available");
+//       loadingMessage.value = `Computing dummy cases earned from ${oldStatus}`;
+//       await useUserIsBackFromLeaveOrRestDay(
+//         user.value!.id,
+//         oldStatus as LeavesReasonOptions
+//       );
+//       useShowToast("Your status is now Available", "success");
+//       loadingMessage.value = "Logging to database";
+//       const data: LogData = {
+//         user: user.value!.username,
+//         type: "changed status",
+//         details: `from ${oldStatus} to Available`,
+//       };
+
+//       logActivity(data);
+//     } catch (e: any) {
+//       miniToast("failed", e.message);
+//     }
+//   }
+//   changingToAvail.value = false;
+// }
 </script>
 
 <style scoped>

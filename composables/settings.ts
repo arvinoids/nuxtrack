@@ -1,8 +1,7 @@
 import type { SettingsResponse } from "~/pocketbase-types";
 
-const pb = useNuxtApp().$pb
-
 async function useGetAllSettings() {
+    const pb = useNuxtApp().$pb
     const settings = await pb.collection("settings").getFullList<SettingsResponse>();
     return settings;
 }

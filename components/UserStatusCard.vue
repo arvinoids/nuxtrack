@@ -63,7 +63,7 @@
             <span
               class="badge badge-sm badge-outline cursor-pointer my-[1px]"
               :class="{ [`badge-${choice.color}`]: true }"
-              @click="changeStatus(choice.status as statuschoice); show = false"
+              @click="changeStatus(choice.status as statuschoice); show = false;"
             >
               {{ choice.status }}</span
             >
@@ -97,6 +97,7 @@ const currentUser = useCurrentUser() ?? pb.authStore.model;
 const show = ref(false);
 const avatarUrl = await useGetAvatarUrl(currentUser.value);
 const loadingMessage = ref("");
+const showDropdown = useShowDropdown();
 
 const status = ref<{ status: string; message: string }>({
   status: pb.authStore.model!.status,
@@ -149,6 +150,7 @@ async function changeStatus(newStatus: statuschoice) {
     loadingMessage.value = "Logging to database";
     await logActivity(logData);
     useUserWhoChangedStatus().value = currentUser.value?.username;
+    showDropdown.value = false;
   } catch (e) {
     console.log(e);
   }

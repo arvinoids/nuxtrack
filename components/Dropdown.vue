@@ -75,7 +75,7 @@
 const pb = useNuxtApp().$pb;
 const auth = useAuth();
 const currentUser = useCurrentUser();
-const show = ref(false);
+const show = useShowDropdown();
 
 function userIsAdmin() {
   return currentUser.value!.role === "admin" || currentUser.value!.role === "lead";
