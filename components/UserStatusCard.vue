@@ -110,7 +110,8 @@ let choices = STATUS_CHOICES;
 if (currentUser.value?.role === "user") choices = STATUS_CHOICES_USER;
 if (
   currentUser.value &&
-  (currentUser.value.status !== "On leave" || currentUser.value.status !== "Rest day")
+  currentUser.value.status !== "On leave" &&
+  currentUser.value.status !== "Rest day"
 ) {
   for (const group of currentUserGroups) {
     await useCheckAndDisableUserStaleLeaveRecordForGroup(currentUser.value.id, group);
