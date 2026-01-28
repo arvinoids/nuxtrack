@@ -914,7 +914,7 @@ export async function useGroupCasesOlderThan(groupId: string, days: number) {
 
 export async function useGetAllCases() {
   const pb = useNuxtApp().$pb
-  const res = await pb.collection('cases').getFullList({ fields: 'created,group' })
+  const res = await pb.collection('cases').getFullList<CasesRecord>({ fields: 'created,group' })
   return res
 }
 

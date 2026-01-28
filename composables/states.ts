@@ -1,6 +1,7 @@
 import type { notification } from "custom-types"
 import type { AuthModel } from "pocketbase"
 import type { expandedCounter } from "pocketbase-types"
+import type { LeavesResponse } from "~/pocketbase-types"
 
 export const useAuth = ()=> 
 useState(() => ({ 
@@ -37,3 +38,4 @@ export const useCurrentUser = ()=> useState<AuthModel>(()=>[])
 export const usePercentComplete = (sessionId: string = 'default')=> useState(`percentComplete-${sessionId}`, ()=>(0))
 export const useIsDarkMode = (()=>useState(()=>false))
 export const useShowDropdown = ()=> useState(()=>(false))
+export const useActiveLeaves = ()=> useState<LeavesResponse[]>(()=>[])

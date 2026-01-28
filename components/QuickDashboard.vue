@@ -35,12 +35,14 @@
 <script setup lang="ts">
 import { useCounters } from "~/composables/states";
 import type { group, user } from "pocketbase-types";
+import type { LeavesResponse } from "~/pocketbase-types";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
 const currentUser = useCurrentUser();
 const loading = ref(true);
 const allCounters = useCounters();
+const leaveRecords = useActiveLeaves();
 let groups: group[];
 let users: user[];
 
@@ -51,6 +53,10 @@ onMounted(async () => {
     .collection("counter")
     .getFullList({ sort: "+count", expand: "user" });
   loading.value = false;
+  leaveRecords.value = await pb
+    .collection("leaves")
+    .getList<LeavesResponse>(1, 500, { filter: "active=true" })
+    .then((res) => res.items);
 });
 
 function getGroupUsers(groupId: string) {
@@ -80,5 +86,12 @@ pb.collection("counter").subscribe("*", async () => {
     .collection("counter")
     .getFullList({ sort: "+count", expand: "user" });
   loading.value = false;
+});
+
+pb.collection("leaves").subscribe("*", async () => {
+  leaveRecords.value = await pb
+    .collection("leaves")
+    .getList<LeavesResponse>(1, 500, { filter: "active=true" })
+    .then((res) => res.items);
 });
 </script>

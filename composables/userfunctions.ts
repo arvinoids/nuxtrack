@@ -159,9 +159,8 @@ async function userIsBackFromLeave(userId: string, groupId: string, oldStatus: L
 
 export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:LeavesReasonOptions): Promise<{ status: 'success' | 'failed' | 'warning', message: string }> {
     const groups = await useGetUserGroups(userId);
-    console.log('user groups: ', groups)
     try {
-        groups.forEach(async (group: string) => {
+        for(const group of groups){
             console.log('user is back from leave on group', group)
             const casesToAdd = await userIsBackFromLeave(userId, group,oldStatus);
             const groupName = await useGetGroupName(group)
@@ -173,7 +172,7 @@ export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:
                 details: `${casesToAdd} cases skipped in ${groupName} for ${userName} from ${oldStatus}`
             }
             await logActivity(logData)
-        });
+        };
         return { status: 'success', message: `updated user case count after ${oldStatus}` }
     } catch (e: any) {
         await logActivity({ user:'system',type:'changed status',details:`Error in updating cases - ${e.message}`})
@@ -186,7 +185,6 @@ export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:
 
 export async function useUserOnLeaveOrRestDay(id: string, newStatus: LeavesReasonOptions) {
     const groups = await useGetUserGroups(id);
-    console.log('user groups: ')
     for (let group of groups) {
         await userGoesOnLeaveOrRestDay(id, group, newStatus);
     }
@@ -247,9 +245,7 @@ async function getUserPositionInGroup(userId: string, groupId: string) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     const sortedUsers = await useGetSortedUsers(groupId);
-    console.log('sorted users: ', sortedUsers)
     const userPosition = sortedUsers.items.findIndex((item) => userId === item.user);
-    console.log('user position in group', groupId, userPosition)
     return userPosition
 }
 

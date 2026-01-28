@@ -46,18 +46,18 @@
         >
           <div class="flex min-w-max items-center justify-between mb-1">
             <p class="text-xs font-semibold">Edit Status...</p>
-            <p
-              class="text-xs font-semibold self-end border px-1 hover:bg-error hover:text-white"
+            <div
+              class="text-xs cursor-default font-semibold self-end border px-1 hover:bg-error hover:text-white"
               @click="show = false"
             >
               ✕
-            </p>
+            </div>
           </div>
           <input
             type="text"
-            class="input-xs input-border bg-base-200 rounded mb-1"
+            class="input-sm h-5 px-2 text-xs input-border bg-base-200 rounded mb-1"
             v-model="status.message"
-            placeholder="Enter status message here..."
+            placeholder="Your status message..."
           />
           <p v-for="choice in choices">
             <span
