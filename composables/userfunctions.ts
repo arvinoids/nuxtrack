@@ -1,9 +1,10 @@
 import type { AuthModel, ListResult } from "pocketbase";
-import type { userEntry, userStatus, statuschoice, notification, LogData, result } from "custom-types";
+import type { userEntry, userStatus, statuschoice, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
 import type { GroupsRecord, LeavesReasonOptions, LeavesRecord, UsersResponse } from "~/pocketbase-types";
 import { useCreateCounter } from "./casefunctions";
 
+const setStatus = useStatus().set;
 
 export async function useDeleteUser(userId: string) {
     const pb = useNuxtApp().$pb
@@ -173,6 +174,12 @@ export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:
             }
             await logActivity(logData)
         };
+        setStatus({
+        message: `Updated user case count after ${oldStatus}`,
+        type: "info",
+        loading: true,
+        timeout: 3000,
+      })
         return { status: 'success', message: `updated user case count after ${oldStatus}` }
     } catch (e: any) {
         await logActivity({ user:'system',type:'changed status',details:`Error in updating cases - ${e.message}`})
@@ -237,8 +244,20 @@ async function useSaveLeaveRecord(userId: string, groupId: string, position: num
 export async function userGoesOnLeaveOrRestDay(userId: string, groupId: string, newStatus:LeavesReasonOptions) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
+    setStatus({
+        message: "Creating leave or restday record...",
+        type: "info",
+        loading: true,
+        timeout: 0,
+    })
     const position = await getUserPositionInGroup(userId, groupId)
     await useSaveLeaveRecord(userId, groupId, position,newStatus);
+        setStatus({
+        message: "Leave or restday record created",
+        type: "success",
+        loading: false,
+        timeout: 3000,
+    })
 }
 
 async function getUserPositionInGroup(userId: string, groupId: string) {

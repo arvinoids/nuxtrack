@@ -118,8 +118,15 @@ if (
   }
 }
 
+const { set } = useStatus();
+
 async function changeStatus(newStatus: statuschoice) {
-  loadingMessage.value = `Changing status to ${newStatus}...`;
+  set({
+    message: `Changing status to ${newStatus}...`,
+    type: "info",
+    loading: true,
+    timeout: 0,
+  });
   changingStatus.value = true;
   try {
     const oldStatus = pb.authStore.model!.status;
@@ -130,7 +137,12 @@ async function changeStatus(newStatus: statuschoice) {
       (oldStatus === "On leave" || oldStatus === "Rest day") &&
       oldStatus !== newStatus
     ) {
-      loadingMessage.value = `Computing dummy cases earned from ${oldStatus}`;
+      set({
+        message: `Computing dummy cases earned from ${oldStatus}`,
+        type: "info",
+        loading: true,
+        timeout: 0,
+      });
       await useUserIsBackFromLeaveOrRestDay(currentUser.value?.id, oldStatus);
     }
     if (
@@ -152,6 +164,12 @@ async function changeStatus(newStatus: statuschoice) {
     await logActivity(logData);
     useUserWhoChangedStatus().value = currentUser.value?.username;
     showDropdown.value = false;
+    set({
+      message: `Status changed to ${newStatus}`,
+      type: "success",
+      loading: false,
+      timeout: 3000,
+    });
   } catch (e) {
     console.log(e);
   }

@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import { useCounters } from "~/composables/states";
 import type { group, user } from "pocketbase-types";
 import type { LeavesResponse } from "~/pocketbase-types";
 

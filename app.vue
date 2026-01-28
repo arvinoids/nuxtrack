@@ -4,6 +4,7 @@
   </div>
   <NuxtLayout>
     <NuxtPage />
+    <StatusMessage compact />
   </NuxtLayout>
 </template>
 
