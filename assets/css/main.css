@@ -29,7 +29,7 @@ body {
   --color-secondary-content: oklch(100% 0 0);
   --color-accent: #9B2583;
   --color-accent-content: oklch(100% 0 0);
-  --color-neutral: oklch(0.5704 0.227 24.34);
+  --color-neutral: #737373;
   --color-neutral-content: oklch(100% 0 0);
   --color-info: #2895D5;
   --color-info-content: oklch(100% 0 0);
