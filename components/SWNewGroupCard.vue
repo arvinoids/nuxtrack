@@ -72,9 +72,9 @@
       <div v-else class="text-xs mt-3">
         <p>No users are currently active.</p>
       </div>
-      <div v-if="usersOnLeave.length > 0" :key="listUpdated">
-        <div class="font-bold mt-3">Users on Leave</div>
-        <div v-for="user in usersOnLeave" :key="user.id" class="my-[0.1rem]">
+      <div v-if="unavailableUsers.length > 0" :key="listUpdated">
+        <div class="font-bold mt-3">Unavailabe Users</div>
+        <div v-for="user in unavailableUsers" :key="user.id" class="my-[0.1rem]">
           <nuxt-link
             :to="`/${group.name}/${user.username}`"
             class="tooltip tooltip-right"
@@ -148,10 +148,10 @@ const userBoxHeight: Ref<number | null> = ref(null);
 // reactive variables
 const loading = ref(true);
 const activeUsers: Ref<user[]> = ref(
-  props.users.filter((user) => user.status !== "On leave")
+  props.users.filter((user) => user.status === "Available")
 );
-const usersOnLeave: Ref<user[]> = ref(
-  props.users.filter((user) => user.status === "On leave")
+const unavailableUsers: Ref<user[]> = ref(
+  props.users.filter((user) => user.status !== "Available")
 );
 const advancedCases = useAdvancedCasesStore();
 const loggedInUser = useLoggedInUsername();
@@ -177,8 +177,8 @@ async function updateUserCount() {
 
 async function refreshCard() {
   const users = await useGetUsersOfGroup(props.group.id);
-  activeUsers.value = users.items.filter((user) => user.status !== "On leave");
-  usersOnLeave.value = users.items.filter((user) => user.status === "On leave");
+  activeUsers.value = users.items.filter((user) => user.status === "Available");
+  unavailableUsers.value = users.items.filter((user) => user.status !== "Available");
 }
 // watchers
 
