@@ -1,4 +1,16 @@
 <template>
+  <!-- Skip Reason Modal -->
+  <dialog id="skip_reason_modal" class="modal">
+    <form method="dialog" class="modal-box">
+      <h3 class="font-bold text-lg">Skip Reason</h3>
+      <p class="py-4">Please provide a reason for skipping {{ taggedUser.fullname }}.</p>
+      <textarea class="textarea textarea-bordered w-full" placeholder="Reason..." v-model="skipReason"></textarea>
+      <div class="modal-action">
+        <button class="btn">Cancel</button>
+        <button class="btn btn-primary" @click.prevent="confirmSkip" :disabled="!skipReason">Submit</button>
+      </div>
+    </form>
+  </dialog>
   <div class="modal" :id="`${group}select`">
     <div class="modal-box
     ">
@@ -15,7 +27,7 @@
       <div class="text-xs text-error pt-2">{{ message }}</div>
       </p>
       <div class="modal-action justify-center">
-        <a class="btn btn-secondary" @click="skipCatch(taggedUser)">Skip</a>
+        <a class="btn btn-secondary" @click="skipCatch()">Skip</a>
         <a href="#" class="btn btn-primary"
           :class="{ hidden: (caseExists || caseId === ''||!validateCASNumber(caseId)) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="submitCase(caseId, taggedUser.id, group)">Assign</a>
@@ -41,6 +53,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["skip", "reset"]);
+const groupName = await useGetGroupName(props.group)
 const loggedInUser = useCurrentUser()
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
@@ -51,7 +64,7 @@ const disableEscalate = ref(false);
 const caseIsBlank = ref(false)
 const forced = ref(false)
 const currentUser = pb.authStore.model!.fullname
-const groupName:string = await useGetGroupName(props.group)
+const skipReason = ref('')
 
 // let userlist = ref(await useGetSortedUsers(props.group))
 let userlist = ref(props.users)
@@ -68,17 +81,39 @@ function moveCursor() {
   } else cursor.value++;
 }
 
-async function skipCatch(user: user) {
-  const message = `${user.username.toLowerCase()} was skipped.`;
-  // useShowToast(message, "success");
+function skipCatch() {
+  const modal = document.getElementById('skip_reason_modal') as HTMLDialogElement;
+  if (modal) {
+    modal.showModal();
+  }
+}
+
+async function confirmSkip() {
+  const user = taggedUser.value;
+  if (!skipReason.value) {
+    miniToast('failed', 'A reason is required to skip.');
+    return;
+  }
+  
+  const message = `${user.username.toLowerCase()} was skipped. Reason: ${skipReason.value}`;
+  
   emit("skip");
   moveCursor();
+  
   const logData: LogData = {
     user: loggedInUser.value?.username,
     type: "skipped user",
     details: message,
   };
   logActivity(logData);
+
+  const modal = document.getElementById('skip_reason_modal') as HTMLDialogElement;
+  if (modal) {
+    modal.close();
+  }
+  
+  skipReason.value = "";
+  miniToast('success', `${user.fullname} was skipped.`)
 }
 
 async function submitCase(caseId: string, userId: string, group: string) {

@@ -5,7 +5,7 @@
         Hello, <span class="font-semibold">{{ currentUser!.fullname }}</span
         >. To assign or escalate a case, please hover over group below and assign.
 
-        <span v-if="currentUser ? currentUser.memberOf.length !== 0 : false"
+        <span v-if="showAssignToSelf()"
           >You may also
           <AssignToSelf class="mx-1">Assign case to yourself</AssignToSelf>.</span
         >
@@ -44,6 +44,10 @@ const allCounters = useCounters();
 const leaveRecords = useActiveLeaves();
 let groups: group[];
 let users: user[];
+
+function showAssignToSelf() {
+  return currentUser.value!.memberOf.length !== 0 && currentUser.value!.role !== "user";
+}
 
 onMounted(async () => {
   groups = await pb.collection("groups").getFullList({ sort: "+order" });
