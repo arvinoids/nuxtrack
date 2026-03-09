@@ -25,7 +25,11 @@ const group = await pb
   .getFirstListItem<GroupsResponse>(`name="${route.params.groupname}"`);
 
 function showAssignToSelf() {
-  return currentUser.value!.memberOf.length !== 0 && currentUser.value!.role !== "user" && !user.memberOf;
+  return (
+    currentUser.value!.role === "admin" ||
+    currentUser.value!.role === "lead" ||
+    group.is_l3
+  );
 }
 </script>
 

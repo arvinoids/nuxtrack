@@ -200,6 +200,7 @@ export type GroupsRecord = {
 	description?: string
 	id: string
 	name: string
+	is_l3: boolean
 	order?: number
 	updated?: IsoDateString
 }
