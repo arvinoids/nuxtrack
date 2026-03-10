@@ -1,7 +1,7 @@
 import type { notification } from "custom-types";
 import type { ListResult, RecordModel } from "pocketbase";
 import type { user } from "pocketbase-types";
-import type { GroupsResponse, ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord, CounterResponse, CasesResponse, UsersResponse } from "~/pocketbase-types";
+import type { GroupsResponse, ArchiveRecord, BaseSystemFields, CasesRecord, LeavesRecord, CounterResponse, CasesResponse, UsersResponse, LogsResponse } from "~/pocketbase-types";
 
 // When the dashboard loads, the system looks for users under each group from the currentlist collection.
 //If there are no users, the system creates the currentlist by running a query from the counter sorted by count.
@@ -199,11 +199,11 @@ export async function useGetFilteredLogs(
   try {
     if (type === undefined || type === "")
       return await pb
-        .collection("logs")
+        .collection<LogsResponse>("logs")
         .getList(pageNumber, perPage, { sort: sorting });
     else
       return await pb
-        .collection("logs")
+        .collection<LogsResponse>("logs")
         .getList(pageNumber, perPage, {
           filter: `type="${type}"`,
           sort: sorting,
@@ -526,8 +526,6 @@ export async function useRemoveUserFromGroups(id: string) {
   }
   return res;
 }
-
-
 
 export async function useMakeCounter(group: string, users: ListResult<user>) {
   const pb = useNuxtApp().$pb

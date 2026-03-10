@@ -1,5 +1,5 @@
 <template>
-  <PaginatedLogs />
+  <PaginatedLogsWithFilter />
 </template>
 <script setup lang="ts">
 definePageMeta({

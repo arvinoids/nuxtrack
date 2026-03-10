@@ -1,6 +1,6 @@
 <template>
   <!-- Skip Reason Modal -->
-  <dialog id="skip_reason_modal" class="modal">
+  <dialog :id="`skip_reason_modal_${group}`" class="modal">
     <form method="dialog" class="modal-box">
       <h3 class="font-bold text-lg">Skip Reason</h3>
       <p class="py-4">Please provide a reason for skipping {{ taggedUser.fullname }}.</p>
@@ -82,7 +82,7 @@ function moveCursor() {
 }
 
 function skipCatch() {
-  const modal = document.getElementById('skip_reason_modal') as HTMLDialogElement;
+  const modal = document.getElementById(`skip_reason_modal_${props.group}`) as HTMLDialogElement;
   if (modal) {
     modal.showModal();
   }
@@ -107,7 +107,7 @@ async function confirmSkip() {
   };
   logActivity(logData);
 
-  const modal = document.getElementById('skip_reason_modal') as HTMLDialogElement;
+  const modal = document.getElementById(`skip_reason_modal_${props.group}`) as HTMLDialogElement;
   if (modal) {
     modal.close();
   }
