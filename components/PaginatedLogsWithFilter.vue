@@ -8,10 +8,10 @@
         <table class="table table-compact" v-if="!loading">
           <thead class="sticky top-0 z-20">
             <tr class="bg-base-200">
-              <th class="rounded-none">User</th>
-              <th>Transaction</th>
-              <th>Details</th>
-              <th class="rounded-none">Time</th>
+              <th class="rounded-none w-20">User</th>
+              <th class="w-32">Transaction</th>
+              <th class="w-auto">Details</th>
+              <th class="rounded-none w-48">Time</th>
             </tr>
           </thead>
           <tbody>
@@ -25,46 +25,56 @@
         </table>
         <div class="text-center mx-auto my-auto" v-else><Spinner /></div>
       </div>
-      <div class="flex flex-row gap-10">
-        <select class="select select-bordered w-full max-w-xs" v-model="itemsPerPage">
-          <option disabled>Items per page</option>
-          <option>15</option>
-          <option>30</option>
-          <option>100</option>
-        </select>
-
-        <div class="btn-group">
-          <button
-            class="btn"
-            :class="{ 'btn-disabled': currentPage === 1 }"
-            @click="currentPage = 1"
-          >
-            ‹
-          </button>
-          <button
-            class="btn"
-            :class="{ 'btn-disabled': currentPage === 1 }"
-            @click="currentPage--"
-          >
-            «
-          </button>
-          <button class="btn">Page {{ currentPage }} of {{ logs?.totalPages }}</button>
-          <button
-            class="btn"
-            :class="{ 'btn-disabled': currentPage === logs?.totalPages }"
-            @click="currentPage++"
-          >
-            »
-          </button>
-          <button
-            class="btn"
-            :class="{ 'btn-disabled': currentPage === 1 }"
-            @click="currentPage = logs!.totalPages"
-          >
-            ›
-          </button>
+      <div
+        v-else
+        class="overflow-x-auto bg-base-200 shadow-md flex flex-col items-center justify-center w-[1080px] h-[650px] font-condensed"
+      >
+        <p>No logs found. Please check your filters.</p>
+      </div>
+      <div class="flex">
+        <div class="flex gap-5 w-full" v-if="logs!.totalItems">
+          <select class="select select-bordered w-full max-w-xs" v-model="itemsPerPage">
+            <option disabled>Items per page</option>
+            <option>15</option>
+            <option>30</option>
+            <option>100</option>
+          </select>
+          <div class="btn-group">
+            <button
+              class="btn"
+              :class="{ 'btn-disabled': currentPage === 1 }"
+              @click="currentPage = 1"
+            >
+              ‹
+            </button>
+            <button
+              class="btn"
+              :class="{ 'btn-disabled': currentPage === 1 }"
+              @click="currentPage--"
+            >
+              «
+            </button>
+            <button class="btn">Page {{ currentPage }} of {{ logs?.totalPages }}</button>
+            <button
+              class="btn"
+              :class="{ 'btn-disabled': currentPage === logs?.totalPages }"
+              @click="currentPage++"
+            >
+              »
+            </button>
+            <button
+              class="btn"
+              :class="{ 'btn-disabled': currentPage === 1 }"
+              @click="currentPage = logs!.totalPages"
+            >
+              ›
+            </button>
+          </div>
         </div>
-        <button class="btn" @click="showFilters">Filters</button>
+        <div v-else class="w-full"></div>
+        <button class="btn btn-info" @click="showFilters">
+          <Icon name="ic:round-filter-alt" size="1.2rem" />Filters
+        </button>
       </div>
       <p class="text-center my-3 text-sm">
         Total <span class="text-accent">{{ logs!.totalItems }}</span> logs
@@ -111,7 +121,7 @@
             Clear Values
           </button>
           <button class="btn">Cancel</button>
-          <button class="btn btn-primary" @click.prevent="getFilteredLogs">Apply</button>
+          <button class="btn btn-primary" @click.prevent="applyFilters">Apply</button>
         </div>
       </form>
     </dialog>
@@ -178,32 +188,21 @@ async function getLogs(page: number | null | undefined) {
   return logs;
 }
 
-let page = props.pageNum === undefined ? 1 : props.pageNum;
-
-let logs = await getLogs(page);
-
-async function getPage(page: number | null) {
-  if (page === null || page === 0) {
-    page = 1;
-  }
-  currentPage.value = page;
-  localStorage.setItem("tracker-currentpagelogs", currentPage.value!.toString());
-  updateTable.value++;
-}
+let logs = await getLogs(1);
 
 watch(itemsPerPage, async () => {
-  getPage(1);
-  currentPage.value = 1;
-  loading.value = true;
-  await getFilteredLogs();
-  loading.value = false;
-  updateTable.value++;
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+  } else {
+    // if page is already 1, watcher won't fire, so fetch manually
+    await getFilteredLogs();
+  }
 });
 
-watch(currentPage, async (p = currentPage.value) => {
-  getPage(p);
+watch(currentPage, async (p) => {
+  if (!p) return;
+  localStorage.setItem("tracker-currentpagelogs", p.toString());
   await getFilteredLogs();
-  updateTable.value++;
 });
 
 function showFilters() {
@@ -213,12 +212,19 @@ function showFilters() {
   }
 }
 
-async function getFilteredLogs() {
+async function applyFilters() {
   const modal = document.getElementById("filterDialog") as HTMLDialogElement;
   if (modal) {
     modal.close();
   }
+  if (currentPage.value !== 1) {
+    currentPage.value = 1;
+  } else {
+    await getFilteredLogs();
+  }
+}
 
+async function getFilteredLogs() {
   const intervalFilters =
     interval.value.timeStart || interval.value.timeEnd
       ? {
@@ -229,13 +235,12 @@ async function getFilteredLogs() {
 
   loading.value = true;
   logs = await useGetLogsData(
-    page,
+    currentPage.value,
     itemsPerPage.value ?? 100,
     intervalFilters,
     filters.value.user,
-    LogsTypeOptions[filters.value.type!]
+    filters.value.type ? LogsTypeOptions[filters.value.type] : undefined
   );
-  currentPage.value = 1;
   loading.value = false;
   updateTable.value++;
 }
