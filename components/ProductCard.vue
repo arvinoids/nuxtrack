@@ -86,7 +86,7 @@
       </div>
       <div v-if="users.length" :key="updateCard">
         <NewSelectGroup
-          :group="group.id"
+          :group="group"
           :users="displayUsers"
           @skip="nextUser"
           @reset="resetSelection"
@@ -104,10 +104,11 @@ import { useCounters } from "~/composables/states";
 import type { expandedCounter, group, user } from "pocketbase-types";
 import { miniToast } from "../composables/viewhelpers";
 import type { notification } from "custom-types";
+import type { GroupsResponse } from "~/pocketbase-types";
 
 const props = defineProps<{
   users: user[];
-  group: group;
+  group: GroupsResponse;
   counters: expandedCounter[] | undefined;
 }>();
 

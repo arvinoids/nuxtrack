@@ -1,6 +1,6 @@
 <template>
   <!-- Skip Reason Modal -->
-  <dialog :id="`skip_reason_modal_${group}`" class="modal">
+  <dialog :id="`skip_reason_modal_${group.id}`" class="modal">
     <form method="dialog" class="modal-box">
       <h3 class="font-bold text-lg">Skip Reason</h3>
       <p class="py-4">Please provide a reason for skipping {{ taggedUser.fullname }}.</p>
@@ -11,7 +11,7 @@
       </div>
     </form>
   </dialog>
-  <div class="modal" :id="`${group}select`">
+  <div class="modal" :id="`${group.id}select`">
     <div class="modal-box
     ">
       <h3 class="text-lg font">
@@ -31,7 +31,7 @@
         <a href="#" class="btn btn-primary"
           :class="{ hidden: (caseExists || caseId === ''||!validateCASNumber(caseId)) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="submitCase(caseId, taggedUser.id, group)">Assign</a>
-        <a href="#" class="btn btn-warning" v-if="groupName!=='l1_na'"
+        <a href="#" class="btn btn-warning" v-if="!group.is_l3"
           :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
         <a href="#" class="btn btn-outline btn-error hover:text-primary-content" @click=" resetSelection(); showCanceledToast();">Cancel</a>
@@ -44,16 +44,16 @@
 import type { expandedCounter, user } from "pocketbase-types";
 import type { LogData, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
+import type { GroupsResponse } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb
 pb.autoCancellation(false)
 
 const props = defineProps<{
-  group: string;
+  group: GroupsResponse;
   users: expandedCounter[];
 }>();
 
 const emit = defineEmits(["skip", "reset"]);
-const groupName = await useGetGroupName(props.group)
 const loggedInUser = useCurrentUser()
 let caseId = ref(useCaseId().value);
 let cursor = ref(0);
@@ -82,7 +82,7 @@ function moveCursor() {
 }
 
 function skipCatch() {
-  const modal = document.getElementById(`skip_reason_modal_${props.group}`) as HTMLDialogElement;
+  const modal = document.getElementById(`skip_reason_modal_${props.group.id}`) as HTMLDialogElement;
   if (modal) {
     modal.showModal();
   }
@@ -107,7 +107,7 @@ async function confirmSkip() {
   };
   logActivity(logData);
 
-  const modal = document.getElementById(`skip_reason_modal_${props.group}`) as HTMLDialogElement;
+  const modal = document.getElementById(`skip_reason_modal_${props.group.id}`) as HTMLDialogElement;
   if (modal) {
     modal.close();
   }
@@ -116,8 +116,8 @@ async function confirmSkip() {
   miniToast('success', `${user.fullname} was skipped.`)
 }
 
-async function submitCase(caseId: string, userId: string, group: string) {
-  const res:notification = await useSubmitCase(caseId, userId, group);
+async function submitCase(caseId: string, userId: string, group: GroupsResponse){
+  const res:notification = await useSubmitCase(caseId, userId, group.id);
   miniToast(res.status, res.message);
   resetSelection();
   if (res.status === 'success') {
@@ -126,7 +126,7 @@ async function submitCase(caseId: string, userId: string, group: string) {
     const email = {
       to: user.email,
       subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
+      body: `Hi ${user.fullname}, \n\n${caseId} in ${group.name} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
     }
     const emailres: result = (await useSendEmail(email)) as result
     miniToast(emailres.status, emailres.message)
@@ -138,14 +138,14 @@ async function submitCase(caseId: string, userId: string, group: string) {
     details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   // first get the id of the counter for this group and user
-  const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group}"`)
+  const counter = await pb.collection('counter').getFirstListItem(`user="${userId}"&&group="${group.id}"`)
   // then increment counter
   // await pb.collection('counter').update(counter.id,{count:counter.count+1})
   logActivity(logData);
 }
 
-async function escalateCase(caseId: string, userId: string, group: string) {
-  const res = await useEscalateCase(caseId, userId, group);
+async function escalateCase(caseId: string, userId: string, group: GroupsResponse) {
+  const res = await useEscalateCase(caseId, userId, group.id);
   miniToast(res.status, res.message);
   const currentTime = useFormatDate(new Date(Date.now()));
   resetSelection();
@@ -155,7 +155,7 @@ async function escalateCase(caseId: string, userId: string, group: string) {
     const email = {
       to: user.email,
       subject: "New case assigned to you",
-      body: `Hi ${user.fullname}, \n\n${caseId} in ${groupName} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
+      body: `Hi ${user.fullname}, \n\n${caseId} in ${group.description} has been assigned to you by ${currentUser} on ${currentTime}.\n\nRotation Tracker`
     }
     const emailres: notification = (await useSendEmail(email)) as notification
     miniToast(emailres.status, emailres.message)
@@ -186,7 +186,7 @@ watch(caseId, async (caseId) => {
 });
 
 pb.collection('users').subscribe('*', async () => {
-  userlist.value = await useGetSortedUsers(props.group) as unknown as expandedCounter[]
+  userlist.value = await useGetSortedUsers(props.group.id) as unknown as expandedCounter[]
 })
 
 function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {
@@ -195,7 +195,7 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
     return "Already escalated. Please check case number.";
   }
   if (caseExists && !caseIsEscalated) {
-    if (groupName === 'l1_na') { return "This case is in the database. Please select an L3 group to escalate." }
+    if (!props.group.is_l3) { return "This case is in the database. Please select an L3 group to escalate." }
     else return "This case is in the database. Escalate to proceed."
   };
   if (!caseExists) return "Assign case to proceed.";

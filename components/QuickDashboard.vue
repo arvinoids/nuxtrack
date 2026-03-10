@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import type { group, user } from "pocketbase-types";
-import type { LeavesResponse } from "~/pocketbase-types";
+import type { GroupsResponse, LeavesResponse } from "~/pocketbase-types";
 
 const pb = useNuxtApp().$pb;
 pb.autoCancellation(false);
@@ -42,7 +42,7 @@ const currentUser = useCurrentUser();
 const loading = ref(true);
 const allCounters = useCounters();
 const leaveRecords = useActiveLeaves();
-let groups: group[];
+let groups: GroupsResponse[];
 let users: user[];
 
 function showAssignToSelf() {
@@ -50,7 +50,7 @@ function showAssignToSelf() {
 }
 
 onMounted(async () => {
-  groups = await pb.collection("groups").getFullList({ sort: "+order" });
+  groups = await pb.collection("groups").getFullList<GroupsResponse>({ sort: "+order" });
   users = await pb.collection("users").getFullList();
   allCounters.value = await pb
     .collection("counter")
