@@ -2,7 +2,7 @@
   <transition>
     <div
       class="px-5 py-1 shadow-lg bg-warning bg-opacity-20 border-b backdrop-blur-sm border-warning flex justify-between items-center gap-3"
-      v-if="user!.status === 'On leave'||user!.status === 'Rest day' && show===true"
+      v-if="(user!.status === 'On leave'||user!.status === 'Rest day') && show "
     >
       <div></div>
       <div class="flex items-center gap-4">
@@ -25,12 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import type { LogData, statuschoice } from "custom-types";
-import type { LeavesReasonOptions } from "~/pocketbase-types";
-
 const user = useCurrentUser();
-const oldStatus: statuschoice = user.value!.status;
-const show = ref(true);
+const show = useUserLeaveNotificationShown();
 const changingToAvail = ref(false);
 const loadingMessage = ref("");
 const showDropdown = useShowDropdown();

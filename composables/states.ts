@@ -39,3 +39,4 @@ export const usePercentComplete = (sessionId: string = 'default')=> useState(`pe
 export const useIsDarkMode = (()=>useState(()=>false))
 export const useShowDropdown = ()=> useState(()=>(false))
 export const useActiveLeaves = ()=> useState<LeavesResponse[]>(()=>[])
+export const useUserLeaveNotificationShown = ()=> useState(()=>(true))

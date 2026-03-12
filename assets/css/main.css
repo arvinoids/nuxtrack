@@ -52,8 +52,8 @@ body {
   name: "xrx-dark";
   default: false;
   color-scheme: "dark";
-  --color-base-100: oklch(0% 0 0);
-  --color-base-200: oklch(25% 0 0);
+  --color-base-100: oklch(25% 0 0);
+  --color-base-200: oklch(35% 0 0);
   --color-base-300: oklch(40% 0 0);
   --color-base-content: oklch(97% 0 0);
   --color-primary: oklch(0.5704 0.2137 24.19);

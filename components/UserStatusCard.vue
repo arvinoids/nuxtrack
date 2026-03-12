@@ -164,6 +164,7 @@ async function changeStatus(newStatus: statuschoice) {
     await logActivity(logData);
     useUserWhoChangedStatus().value = currentUser.value?.username;
     showDropdown.value = false;
+    useUserLeaveNotificationShown().value = true;
     set({
       message: `Status changed to ${newStatus}`,
       type: "success",
