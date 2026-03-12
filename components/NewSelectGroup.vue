@@ -31,8 +31,8 @@
         <a href="#" class="btn btn-primary"
           :class="{ hidden: (caseExists || caseId === ''||!validateCASNumber(caseId)) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="submitCase(caseId, taggedUser.id, group)">Assign</a>
-        <a href="#" class="btn btn-warning" v-if="!group.is_l3"
-          :class="{ hidden: (!caseExists || disableEscalate) || ((taggedUser.status !== 'Available') && !forced) }"
+        <a href="#" class="btn btn-warning"
+          :class="{ hidden: (!caseExists || disableEscalate || !group.is_l3) || ((taggedUser.status !== 'Available') && !forced) }"
           @click="escalateCase(caseId, taggedUser.id, group)">Escalate</a>
         <a href="#" class="btn btn-outline btn-error hover:text-primary-content" @click=" resetSelection(); showCanceledToast();">Cancel</a>
       </div>
@@ -197,6 +197,7 @@ function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: str
   if (caseExists && !caseIsEscalated) {
     if (!props.group.is_l3) { return "This case is in the database. Please select an L3 group to escalate." }
     else return "This case is in the database. Escalate to proceed."
+    disableEscalate.value = false;
   };
   if (!caseExists) return "Assign case to proceed.";
   else return "";
