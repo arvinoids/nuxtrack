@@ -89,7 +89,7 @@ import {
   useCheckAndDisableUserStaleLeaveRecordForGroup,
   useUserOnLeaveOrRestDay,
 } from "~/composables/userfunctions";
-import type { LeavesReasonOptions } from "~/pocketbase-types";
+import { LogsTypeOptions, type LeavesReasonOptions } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb;
 const changingStatus = ref(false);
 
@@ -144,6 +144,7 @@ async function changeStatus(newStatus: statuschoice) {
         timeout: 0,
       });
       await useUserIsBackFromLeaveOrRestDay(currentUser.value?.id, oldStatus);
+      logActivity({user:currentUser.value?.username,type:LogsTypeOptions["debug"],details:"Initiated User back from leave",debug:true})
     }
     if (
       (newStatus === "On leave" || newStatus === "Rest day") &&
@@ -155,13 +156,12 @@ async function changeStatus(newStatus: statuschoice) {
         newStatus as LeavesReasonOptions
       );
     }
-    const logData: LogData = {
-      user: currentUser.value?.username,
-      type: "changed status",
-      details: newStatus + " - " + status.value.message,
-    };
     loadingMessage.value = "Logging to database";
-    await logActivity(logData);
+    await logActivity({
+      user: currentUser.value?.username,
+      type: LogsTypeOptions["changed status"],
+      details: newStatus + " - " + status.value.message,
+    });
     useUserWhoChangedStatus().value = currentUser.value?.username;
     showDropdown.value = false;
     useUserLeaveNotificationShown().value = true;
@@ -201,7 +201,7 @@ async function logout() {
 
   logActivity({
     user: currentUser.value?.username,
-    type: "logged out",
+    type: LogsTypeOptions["logged out"],
     details: outStatus,
   });
 

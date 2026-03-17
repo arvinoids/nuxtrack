@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import type { LogData } from "custom-types";
-import type { LeavesReasonOptions, UsersRecord } from "~/pocketbase-types";
+import { LogsTypeOptions, type LeavesReasonOptions, type LogsRecord, type UsersRecord } from "~/pocketbase-types";
 const currentUser = useCurrentUser();
 
 const props = defineProps<{
@@ -47,9 +47,9 @@ async function setToAvail(userId: string) {
   const message = `${props.user.username} status was changed from ${oldStatus} to Available`;
   useShowToast(message, "success");
   loadingMessage.value = "Logging to database";
-  const logData: LogData = {
+  const logData = {
     user: currentUser.value!.username,
-    type: "changed status",
+    type: LogsTypeOptions["changed status"],
     details: message,
   };
   await logActivity(logData);

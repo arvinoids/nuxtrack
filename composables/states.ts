@@ -1,12 +1,12 @@
 import type { notification } from "custom-types"
 import type { AuthModel } from "pocketbase"
 import type { expandedCounter } from "pocketbase-types"
-import type { LeavesResponse } from "~/pocketbase-types"
+import type { UsersResponse, LeavesResponse, GroupsResponse } from "~/pocketbase-types"
 
 export const useAuth = ()=> 
 useState(() => ({ 
     isAuthenticated: false,
-    role: null
+    role: 'user'
  }))
 
 export const useRefresher = ()=>
@@ -33,6 +33,8 @@ export const useCaseCountChanged = ()=> useState(()=>(0))
 export const useUserWhoChangedStatus =()=> useState(()=>(''))
 
 export const useCounters = ()=> useState<expandedCounter[]>(()=>([]))
+export const useAllUsers = ()=> useState<UsersResponse[]>(()=>[])
+export const useAllGroups = ()=> useState<GroupsResponse[]>(()=>[])
 export const useNotifications = ()=> useState<notification[]>(()=>([]))
 export const useCurrentUser = ()=> useState<AuthModel>(()=>[])
 export const usePercentComplete = (sessionId: string = 'default')=> useState(`percentComplete-${sessionId}`, ()=>(0))

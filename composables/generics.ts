@@ -1,4 +1,4 @@
-import type { emailContent, LogData } from "custom-types";
+import type { emailContent, LogData, notification } from "custom-types";
 import type { ListResult } from "pocketbase";
 import type { CasesRecord, LogsRecord, LogsResponse, SettingsResponse } from "~/pocketbase-types";
 
@@ -11,7 +11,7 @@ export function useGetBooleanFromLocalStorage(value: string | null) {
   return result
 }
 
-export async function useSendEmail(email: emailContent) {
+export async function useSendEmail(email: emailContent):Promise<notification>{
   const pb = useNuxtApp().$pb
   const enabled = await pb
     .collection("settings")
@@ -35,7 +35,7 @@ export async function useSendEmail(email: emailContent) {
       Authorization: token,
     },
   });
-  return res;
+  return res as notification;
 }
 
 export async function useSendAssignNotification(caseRecord:CasesRecord){
@@ -62,16 +62,6 @@ export async function useSendUnassignNotification(caseRecord:CasesRecord){
   };
   const emailres = await useSendEmail(email);
   miniToast(emailres.status, emailres.message);
-}
-
-export async function logActivity(data: LogData) {
-  const pb = useNuxtApp().$pb
-  pb.autoCancellation(false);
-  try {
-    pb.collection("logs").create(data);
-  } catch (e: any) {
-    console.log(e.message);
-  }
 }
 
 function jsonCasesToCsv(cases: CasesRecord[]) {

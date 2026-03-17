@@ -1,4 +1,5 @@
-import type { LogsResponse, LogsTypeOptions } from "~/pocketbase-types";
+import type { LogData, LogsCreate } from "custom-types";
+import type { LogsRecord, LogsResponse, LogsTypeOptions } from "~/pocketbase-types";
 
 
 type interval = {
@@ -42,4 +43,14 @@ export async function useGetLogsData(
         sort: "-created"
     })
     return data;
+}
+
+export async function logActivity(data: LogsCreate) {
+  const pb = useNuxtApp().$pb
+  pb.autoCancellation(false);
+    try {
+    await pb.collection("logs").create(data);
+  } catch (e: any) {
+    console.log(e.message);
+  }
 }

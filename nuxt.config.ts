@@ -16,6 +16,7 @@ export default defineNuxtConfig({
       pocketBaseURL: process.env.VITE_POCKETBASE_URL,
       emailAPI: process.env.EMAIL_API_URL,
       pbStorage: process.env.PB_LOCALSTORAGE,
+      debug:process.env.DEBUG
     },
   },
 

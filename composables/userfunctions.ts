@@ -1,7 +1,7 @@
 import type { AuthModel, ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
-import type { GroupsRecord, LeavesReasonOptions, LeavesRecord, UsersResponse } from "~/pocketbase-types";
+import { LogsTypeOptions, type GroupsRecord, type LeavesReasonOptions, type LeavesRecord, type LogsRecord, type UsersResponse } from "~/pocketbase-types";
 import { useCreateCounter } from "./casefunctions";
 
 const setStatus = useStatus().set;
@@ -149,7 +149,8 @@ export async function useGetSortedUsers(group: string) {
 async function userIsBackFromLeave(userId: string, groupId: string, oldStatus: LeavesReasonOptions) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    const userLeaveRecord = await pb.collection("leaves").getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`);
+    const activeLeaves = useActiveLeaves()
+    const userLeaveRecord = activeLeaves.value.find(leave=>leave.user===userId&&leave.group===groupId)!
     let casesToAdd: number = await getCasesToAdd(userId, groupId)
     await pb.collection('leaves').update(userLeaveRecord.id, { active: false, reason:oldStatus })
     const prefix = oldStatus==="On leave" ? "Leave" : "Restday"
@@ -159,17 +160,19 @@ async function userIsBackFromLeave(userId: string, groupId: string, oldStatus: L
 }
 
 export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:LeavesReasonOptions): Promise<{ status: 'success' | 'failed' | 'warning', message: string }> {
-    const groups = await useGetUserGroups(userId);
+    const allUsers = useAllUsers()
+    const allGroups = useAllGroups()
+    const groups = allUsers.value.find(u=>u.id===userId)!.memberOf
     try {
         for(const group of groups){
             console.log('user is back from leave on group', group)
             const casesToAdd = await userIsBackFromLeave(userId, group,oldStatus);
-            const groupName = await useGetGroupName(group)
-            const userName = await useGetUsernameFromId(userId)
+            const groupName = allGroups.value.find(g=>g.id===group)?.description
+            const userName = allUsers.value.find(u=>u.id===userId)?.username
             await useCheckAndDisableUserStaleLeaveRecordForGroup(userId, group);
-            const logData: LogData = {
+            const logData:Omit<LogsRecord, 'id'|'created'|'updated'> = {
                 user: 'system',
-                type: 'assigned case',
+                type: LogsTypeOptions['assigned case'],
                 details: `${casesToAdd} cases skipped in ${groupName} for ${userName} from ${oldStatus}`
             }
             await logActivity(logData)
@@ -182,7 +185,7 @@ export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:
       })
         return { status: 'success', message: `updated user case count after ${oldStatus}` }
     } catch (e: any) {
-        await logActivity({ user:'system',type:'changed status',details:`Error in updating cases - ${e.message}`})
+        await logActivity({ user:'system',type:LogsTypeOptions['changed status'],details:`Error in updating cases - ${e.message}`})
         return {
             status: 'failed',
             message: e.message

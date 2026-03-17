@@ -16,15 +16,4 @@ body {
   @apply m-0 p-0 min-h-screen w-full;
   font-family: "Roboto", "Roboto Condensed", Arial, sans-serif;
 }
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: url("@/assets/img/gb6.jpg") center / cover no-repeat;
-  transform: translate(var(--shift-x), var(--shift-y)) scale(1.08);
-  transform-origin: center;
-  will-change: transform;
-  z-index: -1;
-}
 </style>

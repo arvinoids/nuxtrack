@@ -99,15 +99,15 @@
 
 <script setup lang="ts">
 import { useNewMakeCounter } from "~/composables/casefunctions";
-import type { LogData } from "custom-types";
+import type { LogData, LogsCreate } from "custom-types";
 import { useCounters } from "~/composables/states";
 import type { expandedCounter, group, user } from "pocketbase-types";
 import { miniToast } from "../composables/viewhelpers";
 import type { notification } from "custom-types";
-import type { GroupsResponse } from "~/pocketbase-types";
+import { LogsTypeOptions, type GroupsResponse, type UsersResponse } from "~/pocketbase-types";
 
 const props = defineProps<{
-  users: user[];
+  users: UsersResponse[];
   group: GroupsResponse;
   counters: expandedCounter[] | undefined;
 }>();
@@ -155,9 +155,9 @@ function resetSelection() {
 async function updatedTimestamp(group: string) {
   lastUpdated.value = "Updating...";
   let result = { status: "failed", message: "" };
-  const logData: LogData = {
+  const logData: LogsCreate = {
     user: currentUser.value!.username,
-    type: "checked for new cases",
+    type: LogsTypeOptions["checked for new cases"],
     details: `in ${await useGetGroupName(group)}`,
   };
   try {

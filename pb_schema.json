@@ -2140,7 +2140,8 @@
                     "changed status",
                     "checked for new cases",
                     "logged in",
-                    "logged out"
+                    "logged out",
+                    "debug"
                 ]
             },
             {
@@ -2156,6 +2157,15 @@
                 "required": false,
                 "system": false,
                 "type": "text"
+            },
+            {
+                "hidden": false,
+                "id": "bool1822771111",
+                "name": "debug",
+                "presentable": false,
+                "required": false,
+                "system": false,
+                "type": "bool"
             },
             {
                 "hidden": false,

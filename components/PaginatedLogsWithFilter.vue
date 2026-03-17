@@ -15,7 +15,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="log in logs!.items" :key="log.id" class="hover:bg-base-200">
+            <tr
+              v-for="log in logs!.items.filter(log=>!log.debug)"
+              :key="log.id"
+              class="hover:bg-base-200"
+            >
               <td class="rounded-none">{{ log.user }}</td>
               <td>{{ log.type }}</td>
               <td>{{ log.details }}</td>

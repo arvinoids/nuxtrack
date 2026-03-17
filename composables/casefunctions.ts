@@ -340,7 +340,8 @@ export async function useGetGroupName(group: string) {
 export async function useRefreshGroupCounter(group: string) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
-  const users = await pb.collection('users').getList(1, 100, { filter: `memberOf~"${group}"` }).then(res => res.items)
+  const allUsers = useAllUsers()
+  const users = allUsers.value.filter(user=>user.memberOf.includes(group))
   users.forEach((user) => {
     updateCounter(group, user.id);
   });
@@ -430,7 +431,7 @@ async function getCase(id: string) {
   return rec;
 }
 
-async function renameOldCase(rec: RecordModel) {
+async function renameOldCase(rec: CasesResponse) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   let newCaseId = rec.case + "-escalated";
@@ -560,7 +561,7 @@ export async function useMakeCounter(group: string, users: ListResult<user>) {
 }
 
 /** Revised make counter function. */
-export async function useNewMakeCounter(group: string, users: user[]) {
+export async function useNewMakeCounter(group: string, users: UsersResponse[]) {
   const pb = useNuxtApp().$pb
   pb.autoCancellation(false);
   users.forEach(async (user) => {
@@ -1009,7 +1010,7 @@ export async function useCreateCounter(userId: string, groupId: string) {
   const pb = useNuxtApp().$pb
   const oldRecordList = await pb.collection('counter').getList(1, 10, { filter: `user="${userId}"&&group="${groupId}"` })
   if (oldRecordList.totalItems === 0) {
-    const res = await pb.collection('counter').create({ user: userId, group: groupId, count: 0 });
+    await pb.collection('counter').create({ user: userId, group: groupId, count: 0 });
     res.message = 'Counter created'
     res.status = 'success'
   } else {

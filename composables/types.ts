@@ -92,14 +92,16 @@ declare module 'pocketbase-types' {
 }
 
 declare module 'custom-types' {
+    import type { LogsRecord } from "~/pocketbase-types"
 
+    type LogsCreate = Omit<LogsRecord,'id'|'created'|'updated'>
     interface result {
         message:string,
         status:"success"|"failed"
     }
     type LogData = {
         user: string,
-        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out",
+        type: "assigned case" | "updated case" | "deleted case" | "dismissed notification" | "skipped user" | "deleted user" | "updated user"|"changed status"|"canceled assign"|"checked for new cases"|"logged in"|"logged out"|"debug",
         details?: string
     }
 

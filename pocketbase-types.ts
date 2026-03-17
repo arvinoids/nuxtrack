@@ -252,12 +252,14 @@ export enum LogsTypeOptions {
 	"checked for new cases" = "checked for new cases",
 	"logged in" = "logged in",
 	"logged out" = "logged out",
+	"debug" = "debug"
 }
 export type LogsRecord = {
 	created?: IsoDateString
 	details?: string
 	id: string
 	type: LogsTypeOptions
+	debug?:boolean
 	updated?: IsoDateString
 	user: string
 }

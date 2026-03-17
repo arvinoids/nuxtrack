@@ -42,9 +42,9 @@
 
 <script setup lang="ts">
 import type { expandedCounter, user } from "pocketbase-types";
-import type { LogData, notification, result } from "custom-types";
+import type { LogData, LogsCreate, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
-import type { GroupsResponse } from "~/pocketbase-types";
+import { LogsTypeOptions, type GroupsResponse } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb
 pb.autoCancellation(false)
 
@@ -100,9 +100,9 @@ async function confirmSkip() {
   emit("skip");
   moveCursor();
   
-  const logData: LogData = {
+  const logData: LogsCreate = {
     user: loggedInUser.value?.username,
-    type: "skipped user",
+    type: LogsTypeOptions["skipped user"],
     details: message,
   };
   logActivity(logData);
@@ -132,9 +132,9 @@ async function submitCase(caseId: string, userId: string, group: GroupsResponse)
     miniToast(emailres.status, emailres.message)
     useDataUpdated().value++;
   }
-  const logData: LogData = {
+  const logData: LogsCreate = {
     user: loggedInUser.value?.username,
-    type: "assigned case",
+    type: LogsTypeOptions["assigned case"],
     details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   // first get the id of the counter for this group and user
@@ -161,9 +161,9 @@ async function escalateCase(caseId: string, userId: string, group: GroupsRespons
     miniToast(emailres.status, emailres.message)
     useDataUpdated().value++;
   }
-  const logData: LogData = {
+  const logData: LogsCreate = {
     user: loggedInUser.value?.username,
-    type: "assigned case",
+    type: LogsTypeOptions["assigned case"],
     details: `${caseId} to ` + (await useGetUsernameFromId(userId)) + ' via rotation',
   };
   logActivity(logData);
