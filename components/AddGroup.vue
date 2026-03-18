@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 border-neutral-200 my-4 bg-neutral-200 shadow-md bg-opacity-50">
+  <div class="p-4 border-neutral-200 my-4 bg-base-200 shadow-md bg-opacity-50">
     <p class="font-semibold">Add a Group</p>
     <div class="flex flex-col gap-2 py-2">
       <div class="flex flex-col">

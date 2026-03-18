@@ -53,23 +53,19 @@
 </template>
 
 <script setup lang="ts">
+import type { SettingsResponse } from "~/pocketbase-types";
+
 const loading = ref(true);
 const pb = useNuxtApp().$pb;
+const allSettings = await pb.collection<SettingsResponse>("settings").getFullList();
 
-const enabled = ref("");
-const token = ref("");
-const api = ref("");
+const enabled = ref(
+  allSettings.find((setting) => setting.field === "emailnotification")!.value
+);
+const token = ref(allSettings.find((setting) => setting.field === "emailtoken")!.value);
+const api = ref(allSettings.find((setting) => setting.field === "emailservice")!.value);
 
 onMounted(async () => {
-  enabled.value = (
-    await pb.collection("settings").getFirstListItem('field="emailnotification"')
-  ).value;
-  token.value = (
-    await pb.collection("settings").getFirstListItem('field="emailtoken"')
-  ).value;
-  api.value = (
-    await pb.collection("settings").getFirstListItem('field="emailservice"')
-  ).value;
   loading.value = false;
 });
 
