@@ -160,7 +160,7 @@ async function changeStatus(newStatus: statuschoice) {
     await logActivity({
       user: currentUser.value?.username,
       type: LogsTypeOptions["changed status"],
-      details: newStatus + " - " + status.value.message,
+      details: "from " + oldStatus + " to " + newStatus + (status.value.message ? " - " + status.value.message : "")
     });
     useUserWhoChangedStatus().value = currentUser.value?.username;
     showDropdown.value = false;

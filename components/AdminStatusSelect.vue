@@ -64,9 +64,9 @@
 </template>
 
 <script setup lang="ts">
-import type { statuschoice, LogData } from "custom-types";
+import type { statuschoice, LogData, LogsCreate } from "custom-types";
 import type { user } from "pocketbase-types";
-import type { LeavesReasonOptions } from "~/pocketbase-types";
+import { LogsTypeOptions, type LeavesReasonOptions } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb;
 
 const props = defineProps<{
@@ -96,9 +96,9 @@ watch(selected, async (newStatus, oldStatus) => {
   const message = `${props.user.username} status was changed to ${selected.value}`;
   useShowToast(message, "success");
   loadingMessage.value = "Logging to database";
-  const logData: LogData = {
+  const logData: LogsCreate = {
     user: pb.authStore.model!.username,
-    type: "changed status",
+    type: LogsTypeOptions["changed status"],
     details: message,
   };
 
