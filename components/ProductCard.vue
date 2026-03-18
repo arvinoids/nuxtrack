@@ -126,6 +126,9 @@ let users: expandedCounter[] = allCounters.value.filter(
 );
 
 const displayUsers = ref(users);
+watch(() => props.counters, (newVal) => {
+  if (newVal) displayUsers.value = newVal;
+});
 const pb = useNuxtApp().$pb;
 pb.collection("counter").subscribe("*", async () => {
   const res = await pb.collection("counter").getList(1, 30, {

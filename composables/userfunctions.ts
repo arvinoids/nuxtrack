@@ -4,7 +4,7 @@ import type { user, expandedUsers } from "pocketbase-types";
 import { LogsTypeOptions, type GroupsRecord, type LeavesReasonOptions, type LeavesRecord, type LogsRecord, type UsersResponse } from "~/pocketbase-types";
 import { useCreateCounter } from "./casefunctions";
 
-const setStatus = useStatus().set;
+const {set } = useStatus();
 
 export async function useDeleteUser(userId: string) {
     const pb = useNuxtApp().$pb
@@ -113,7 +113,7 @@ export async function useChangeUserStatus(id: string, newStatus: statuschoice, n
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
     try {
-        const record = await pb.collection('users').update(id, { 'status': newStatus, 'statusmessage': newMessage })
+        await pb.collection('users').update(id, { 'status': newStatus, 'statusmessage': newMessage })
     } catch (e) {
         console.log(e)
     }
@@ -177,7 +177,7 @@ export async function useUserIsBackFromLeaveOrRestDay(userId: string, oldStatus:
             }
             await logActivity(logData)
         };
-        setStatus({
+        set({
         message: `Updated user case count after ${oldStatus}`,
         type: "info",
         loading: true,
@@ -243,20 +243,20 @@ async function useSaveLeaveRecord(userId: string, groupId: string, position: num
         reason: newStatus
     });
 }
-
+//TODO: optimize this to use cached data
 export async function userGoesOnLeaveOrRestDay(userId: string, groupId: string, newStatus:LeavesReasonOptions) {
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    setStatus({
-        message: "Creating leave or restday record...",
+    set({
+        message: `Creating ${newStatus} record...`,
         type: "info",
         loading: true,
         timeout: 0,
     })
-    const position = await getUserPositionInGroup(userId, groupId)
-    await useSaveLeaveRecord(userId, groupId, position,newStatus);
-        setStatus({
-        message: "Leave or restday record created",
+    // const position = await getUserPositionInGroup(userId, groupId)
+    await useSaveLeaveRecord(userId, groupId, 0, newStatus);
+        set({
+        message: `${newStatus} record created`,
         type: "success",
         loading: false,
         timeout: 3000,
@@ -283,14 +283,14 @@ async function getCasesToAdd(userId: string, groupId: string) {
     const leaveRecord = await pb.collection('leaves').getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`)
     const groupMemberCount = await useGetGroupMemberCount(groupId)
     const oldCount = leaveRecord.total_cases
-    const userPosition = leaveRecord.position
+    // const userPosition = leaveRecord.position
     let casesToAdd: number
     const countDiff = (newCount - oldCount)
     console.log('computing cases to add...', "oldCount: ", oldCount, 'newCount: ', newCount, 'diff: ', countDiff)
     casesToAdd = Math.floor(countDiff / groupMemberCount)
     console.log('cases to add before remainder: ', casesToAdd)
     let remainder = countDiff % groupMemberCount
-    if (remainder > userPosition) casesToAdd++
+    // if (remainder > userPosition) casesToAdd++
     console.log('cases to add after remainder: ', casesToAdd)
     return casesToAdd
 }

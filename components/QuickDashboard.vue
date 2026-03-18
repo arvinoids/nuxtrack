@@ -66,7 +66,7 @@ onMounted(async () => {
 });
 
 function getGroupUsers(groupId: string) {
-  return users.filter((user) => user.memberOf.includes(groupId));
+  return allUsers.value.filter((user) => user.memberOf.includes(groupId));
 }
 
 function getGroupCounters(groupId: string) {
@@ -82,15 +82,12 @@ pb.collection("users").subscribe("*", async () => {
   allCounters.value = await pb
     .collection("counter")
     .getFullList({ sort: "+count", expand: "user" });
-  pb.collection("users").authRefresh();
 });
 
 pb.collection("counter").subscribe("*", async () => {
-  loading.value = true;
   allCounters.value = await pb
     .collection("counter")
     .getFullList({ sort: "+count", expand: "user" });
-  loading.value = false;
 });
 
 pb.collection("leaves").subscribe("*", async () => {

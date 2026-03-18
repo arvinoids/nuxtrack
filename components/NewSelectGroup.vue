@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import type { expandedCounter, user } from "pocketbase-types";
-import type { LogData, LogsCreate, notification, result } from "custom-types";
+import type { LogsCreate, notification, result } from "custom-types";
 import { miniToast } from "../composables/viewhelpers";
 import { LogsTypeOptions, type GroupsResponse } from "~/pocketbase-types";
 const pb = useNuxtApp().$pb
@@ -69,10 +69,16 @@ const skipReason = ref('')
 // let userlist = ref(await useGetSortedUsers(props.group))
 let userlist = ref(props.users)
 
-//const taggedUser = ref(userlist.value.items[cursor.value].expand.user as user);
+watch(() => props.users, (newVal) => {
+  userlist.value = newVal;
+});
 
 const taggedUser = computed(() => {
-  return userlist.value[cursor.value].expand.user
+  if (userlist.value && userlist.value.length > 0) {
+    const item = userlist.value[cursor.value];
+    if (item && item.expand && item.expand.user) return item.expand.user;
+  }
+  return { fullname: "Loading...", status: "Unknown", id: "" } as user;
 })
 
 function moveCursor() {
@@ -186,7 +192,8 @@ watch(caseId, async (caseId) => {
 });
 
 pb.collection('users').subscribe('*', async () => {
-  userlist.value = await useGetSortedUsers(props.group.id) as unknown as expandedCounter[]
+  const res = await useGetSortedUsers(props.group.id);
+  userlist.value = res.items;
 })
 
 function errorMessage(caseExists: boolean, caseIsEscalated: boolean, caseId: string) {

@@ -130,7 +130,6 @@ async function changeStatus(newStatus: statuschoice) {
   changingStatus.value = true;
   try {
     const oldStatus = pb.authStore.model!.status;
-    useUserWhoChangedStatus().value = currentUser.value?.username;
     await useChangeUserStatus(currentUser.value?.id, newStatus, status.value.message);
     status.value.status = newStatus;
     if (
@@ -162,7 +161,6 @@ async function changeStatus(newStatus: statuschoice) {
       type: LogsTypeOptions["changed status"],
       details: "from " + oldStatus + " to " + newStatus + (status.value.message ? " - " + status.value.message : "")
     });
-    useUserWhoChangedStatus().value = currentUser.value?.username;
     showDropdown.value = false;
     useUserLeaveNotificationShown().value = true;
     set({

@@ -68,7 +68,8 @@
 </template>
 
 <script setup lang="ts">
-import type { LogData } from "custom-types";
+import type { LogData, LogsCreate } from "custom-types";
+import { LogsTypeOptions } from "~/pocketbase-types";
 
 const selectedGroup = ref("");
 const selectedGroupDescription: Ref<string | undefined> = ref("");
@@ -80,9 +81,9 @@ const currentUser = useCurrentUser();
 async function deleteGroupCases(group: string) {
   const res = await useDeleteGroupCases(group);
   useShowToast(res.message, res.status);
-  const logData: LogData = {
+  const logData: LogsCreate = {
     user: currentUser.value?.username,
-    type: "deleted case",
+    type: LogsTypeOptions["deleted case"],
     details: `Deleted all cases in group ${group}`,
   };
   logActivity(logData);

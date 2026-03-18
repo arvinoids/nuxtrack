@@ -68,6 +68,7 @@
 
 <script setup lang="ts">
 import { useGetL1Groups, useSendAssignNotification } from "~/composables/generics";
+import { LogsTypeOptions } from "~/pocketbase-types";
 
 const groups = await useGetAllGroups();
 // const L1name = "NA Solutions L1"; // cannot escalate to this group
@@ -108,7 +109,7 @@ async function doEscalate() {
     const caseRecord = await useGetCaseRecordById(props.caseId);
     await logActivity({
       user: user.value!.username || "unknown",
-      type: "assigned case",
+      type: LogsTypeOptions["assigned case"],
       details: `Escalated case ${props.caseId}`,
     });
     await useSendAssignNotification(caseRecord);
