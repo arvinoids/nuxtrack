@@ -47,7 +47,7 @@
             </div>
             <div
               class="flex items-center bg-warning/20 alert h-[40px]"
-              v-if="calculatedCases"
+              v-if="calculatedCases > -1"
             >
               <label for="team" class="label"
                 >Created while on leave: {{ rawData.casesCreatedDuringLeave }}, Dummy:
@@ -170,7 +170,7 @@
         />
         <div
           class="btn btn-secondary text-white btn-sm w-[15ch] h-[38px]"
-          :class="creating ? 'btn-disabled cursor-wait' : 'cursor-default'"
+          :class="creating || tickets < 1 ? 'btn-disabled cursor-wait' : 'cursor-default'"
           @click.prevent="AddDummyCases()"
         >
           {{ creating ? "Creating..." : "Create" }}
@@ -181,7 +181,8 @@
 </template>
 
 <script setup lang="ts">
-import type { LogData } from "custom-types";
+import type { LogData, LogsCreate } from "custom-types";
+import { LogsTypeOptions } from "~/pocketbase-types";
 
 const casesChanged = useCaseCountChanged();
 const users = await useGetAllUsers();
@@ -191,7 +192,7 @@ const currentuser = useCurrentUser();
 const creating = ref(false);
 const allGroups = await useGetAllGroups();
 const teamCalc = ref();
-const calculatedCases = ref(0);
+const calculatedCases = ref(-1);
 const leaveFrom = ref();
 const leaveTo = ref();
 const rawData = ref();
@@ -204,7 +205,7 @@ async function getCalculations() {
     leaveTo.value
   );
   calculatedCases.value = rawData.value.casesToAdd;
-  tickets.value = rawData.value.casesToAdd;
+  if (rawData.value.casesToAdd) tickets.value = rawData.value.casesToAdd;
   console.log("rawData", rawData.value);
 }
 
@@ -246,9 +247,9 @@ async function AddDummyCases() {
     result.message = e.message;
   }
   useShowToast(result.message, result.status);
-  const data: LogData = {
+  const data: LogsCreate = {
     user: currentuser.value?.username,
-    type: "assigned case",
+    type: LogsTypeOptions["assigned case"],
     details: `${tickets.value} cases assigned to ${selectedUser.value.username} in ${selectedGroup.value.description}`,
   };
   await logActivity(data);
