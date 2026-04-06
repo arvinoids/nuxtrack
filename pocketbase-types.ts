@@ -252,7 +252,7 @@ export enum LogsTypeOptions {
 	"checked for new cases" = "checked for new cases",
 	"logged in" = "logged in",
 	"logged out" = "logged out",
-	"debug" = "debug"
+	"other" = "other"
 }
 export type LogsRecord = {
 	created?: IsoDateString

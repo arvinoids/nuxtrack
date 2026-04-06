@@ -1,7 +1,7 @@
 import type { AuthModel, ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
-import { LogsTypeOptions, type GroupsRecord, type LeavesReasonOptions, type LeavesRecord, type LogsRecord, type UsersResponse } from "~/pocketbase-types";
+import { LogsTypeOptions, type GroupsRecord, type LeavesReasonOptions, type LeavesRecord, type LeavesResponse, type LogsRecord, type UsersResponse } from "~/pocketbase-types";
 import { useCreateCounter } from "./casefunctions";
 
 const {set } = useStatus();
@@ -151,7 +151,7 @@ async function userIsBackFromLeave(userId: string, groupId: string, oldStatus: L
     pb.autoCancellation(false);
     const activeLeaves = useActiveLeaves()
     const userLeaveRecord = activeLeaves.value.find(leave=>leave.user===userId&&leave.group===groupId)!
-    let casesToAdd: number = await getCasesToAdd(userId, groupId)
+    let casesToAdd: number = await computeCasesToAdd(userId, groupId)
     await pb.collection('leaves').update(userLeaveRecord.id, { active: false, reason:oldStatus })
     const prefix = oldStatus==="On leave" ? "Leave" : "Restday"
     await useAddDummyCases(casesToAdd, userId, groupId, prefix)
@@ -293,6 +293,20 @@ async function getCasesToAdd(userId: string, groupId: string) {
     // if (remainder > userPosition) casesToAdd++
     console.log('cases to add after remainder: ', casesToAdd)
     return casesToAdd
+}
+
+async function computeCasesToAdd(userId:string, groupId:string) {
+    const pb = useNuxtApp().$pb
+    pb.autoCancellation(false);
+    const activeLeaves = useActiveLeaves()
+    const leaveRecord = activeLeaves.value.find(record=>record.user===userId&&record.group===groupId)!
+    
+    // PocketBase filters require ISO-like date strings. By passing the raw 'created' string 
+    // and an ISO string for 'now', the template literal in useComputeDummyCases will 
+    // correctly format the filter. We cast to 'any' to satisfy the Date type signature.
+    const res = await useComputeDummyCases(groupId, leaveRecord.created as any, new Date().toISOString() as any)
+    
+    return res.casesToAdd
 }
 
 export async function useComputeDummyCases(groupId:string,startOfLeaveDateTime:Date,endOfLeaveDateTime:Date,){

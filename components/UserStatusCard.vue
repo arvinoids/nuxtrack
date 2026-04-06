@@ -143,7 +143,7 @@ async function changeStatus(newStatus: statuschoice) {
         timeout: 0,
       });
       await useUserIsBackFromLeaveOrRestDay(currentUser.value?.id, oldStatus);
-      logActivity({user:currentUser.value?.username,type:LogsTypeOptions["debug"],details:"Initiated User back from leave",debug:true})
+      logActivity({user:currentUser.value?.username,type:LogsTypeOptions["other"],details:"Initiated User back from leave",debug:true})
     }
     if (
       (newStatus === "On leave" || newStatus === "Rest day") &&
