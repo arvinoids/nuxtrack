@@ -375,6 +375,25 @@
             },
             {
                 "hidden": false,
+                "id": "select2397329842",
+                "maxSelect": 1,
+                "name": "previous_status",
+                "presentable": false,
+                "required": false,
+                "system": false,
+                "type": "select",
+                "values": [
+                    "Available",
+                    "Busy",
+                    "Rest day",
+                    "Outside shift",
+                    "On leave",
+                    "Not Available",
+                    "Unknown"
+                ]
+            },
+            {
+                "hidden": false,
                 "id": "autodate2990389176",
                 "name": "created",
                 "onCreate": true,
@@ -416,7 +435,7 @@
                 "username": "username",
                 "avatarURL": ""
             },
-            "enabled": false
+            "enabled": true
         },
         "passwordAuth": {
             "enabled": true,
@@ -954,6 +973,78 @@
         "system": false
     },
     {
+        "id": "pbc_1110081758",
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "@request.auth.role=\"admin\"||@request.auth.role=\"lead\"",
+        "updateRule": "@request.auth.role=\"admin\"||@request.auth.role=\"lead\"",
+        "deleteRule": "@request.auth.role=\"admin\"||@request.auth.role=\"lead\"",
+        "name": "blobs",
+        "type": "base",
+        "fields": [
+            {
+                "autogeneratePattern": "[a-z0-9]{15}",
+                "hidden": false,
+                "id": "text3208210256",
+                "max": 15,
+                "min": 15,
+                "name": "id",
+                "pattern": "^[a-z0-9]+$",
+                "presentable": false,
+                "primaryKey": true,
+                "required": true,
+                "system": true,
+                "type": "text"
+            },
+            {
+                "autogeneratePattern": "",
+                "hidden": false,
+                "id": "text1579384326",
+                "max": 0,
+                "min": 0,
+                "name": "name",
+                "pattern": "",
+                "presentable": false,
+                "primaryKey": false,
+                "required": true,
+                "system": false,
+                "type": "text"
+            },
+            {
+                "hidden": false,
+                "id": "json2918445923",
+                "maxSize": 0,
+                "name": "data",
+                "presentable": false,
+                "required": false,
+                "system": false,
+                "type": "json"
+            },
+            {
+                "hidden": false,
+                "id": "autodate2990389176",
+                "name": "created",
+                "onCreate": true,
+                "onUpdate": false,
+                "presentable": false,
+                "system": false,
+                "type": "autodate"
+            },
+            {
+                "hidden": false,
+                "id": "autodate3332085495",
+                "name": "updated",
+                "onCreate": true,
+                "onUpdate": true,
+                "presentable": false,
+                "system": false,
+                "type": "autodate"
+            }
+        ],
+        "indexes": [],
+        "system": false
+    },
+    {
         "id": "ngvg9wxzr10vm6k",
         "listRule": "",
         "viewRule": "",
@@ -1318,7 +1409,7 @@
             },
             {
                 "hidden": false,
-                "id": "cpubf67o",
+                "id": "9d3aoltv",
                 "max": null,
                 "min": null,
                 "name": "archived",
@@ -1330,7 +1421,7 @@
             },
             {
                 "hidden": false,
-                "id": "mihqecm5",
+                "id": "ktyloxpc",
                 "max": null,
                 "min": null,
                 "name": "total_count",
@@ -1361,7 +1452,9 @@
                 "type": "autodate"
             }
         ],
-        "indexes": [],
+        "indexes": [
+            "CREATE INDEX `idx_Rz2zKjZKtE` ON `counter` (\n  `user`,\n  `group`\n)"
+        ],
         "system": false
     },
     {
@@ -1765,6 +1858,15 @@
             },
             {
                 "hidden": false,
+                "id": "bool988987747",
+                "name": "is_l3",
+                "presentable": false,
+                "required": false,
+                "system": false,
+                "type": "bool"
+            },
+            {
+                "hidden": false,
                 "id": "autodate2990389176",
                 "name": "created",
                 "onCreate": true,
@@ -2141,6 +2243,9 @@
                     "checked for new cases",
                     "logged in",
                     "logged out",
+                    "created group",
+                    "updated group",
+                    "deleted group",
                     "other"
                 ]
             },
@@ -2738,6 +2843,33 @@
                 ]
             },
             {
+                "cascadeDelete": false,
+                "collectionId": "_pb_users_auth_",
+                "hidden": false,
+                "id": "relation3479234172",
+                "maxSelect": 1,
+                "minSelect": 0,
+                "name": "owner",
+                "presentable": false,
+                "required": false,
+                "system": false,
+                "type": "relation"
+            },
+            {
+                "autogeneratePattern": "",
+                "hidden": false,
+                "id": "text4194641934",
+                "max": 0,
+                "min": 0,
+                "name": "credentials",
+                "pattern": "",
+                "presentable": false,
+                "primaryKey": false,
+                "required": false,
+                "system": false,
+                "type": "text"
+            },
+            {
                 "hidden": false,
                 "id": "autodate2990389176",
                 "name": "created",
@@ -2803,7 +2935,7 @@
                 "autogeneratePattern": "",
                 "hidden": false,
                 "id": "03dhi1bo",
-                "max": 0,
+                "max": 20000,
                 "min": 0,
                 "name": "value",
                 "pattern": "",

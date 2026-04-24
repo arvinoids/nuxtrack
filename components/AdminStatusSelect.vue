@@ -6,16 +6,18 @@
           <HeadlessListboxButton
             class="relative w-full cursor-default bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm"
           >
-            <span class="block truncate" :class="`text-${getColor(selected)}`">{{
-              selected
-            }}</span>
+            <span
+              class="block truncate"
+              :class="`text-${getColor(selected)} font-semibold`"
+              >{{ selected }}</span
+            >
             <span
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
             >
               <Icon
                 name="carbon:chevron-sort"
                 size="1.2rem"
-                class="h-5 w-5 text-gray-400"
+                class="h-5 w-5 text-gray-500"
                 aria-hidden="true"
               />
             </span>

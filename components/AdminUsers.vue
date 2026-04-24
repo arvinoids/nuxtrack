@@ -23,7 +23,8 @@
             <th>Username</th>
             <th>Group</th>
             <th>Status</th>
-            <th class="rounded-none">Actions</th>
+            <th>Previous Status</th>
+            <th class="rounded-none w-34">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -40,6 +41,9 @@
 
             <td>
               <AdminStatusSelect :user="user" />
+            </td>
+            <td>
+              {{ user.previous_status }}
             </td>
 
             <td>
@@ -83,10 +87,18 @@ async function getUsers() {
   const res = await pb.collection("users").getFullList(1000, {
     sort: "+fullname",
     expand: "memberOf",
-    fields: "id,fullname,username,expand.memberOf,status",
+    fields: "id,fullname,username,expand.memberOf,status,previous_status",
   });
   return res;
 }
+
+const unsubscribe = await pb.collection("users").subscribe("*", async (e) => {
+  users.value = await getUsers();
+});
+
+onUnmounted(() => {
+  unsubscribe?.();
+});
 
 // const groups = await pb.collection("groups").getFullList(100);
 
