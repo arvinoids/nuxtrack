@@ -2,7 +2,7 @@ import type { AuthModel, ListResult } from "pocketbase";
 import type { userEntry, userStatus, statuschoice, LogData, result } from "custom-types";
 import type { user, expandedUsers } from "pocketbase-types";
 import { LogsTypeOptions, type GroupsRecord, type LeavesReasonOptions, type LeavesRecord, type LeavesResponse, type LogsRecord, type UsersResponse } from "~/pocketbase-types";
-import { useCreateCounter } from "./casefunctions";
+import { useCachedGroupMemberCount, useCreateCounter } from "./casefunctions";
 
 const {set } = useStatus();
 
@@ -263,37 +263,37 @@ export async function userGoesOnLeaveOrRestDay(userId: string, groupId: string, 
     })
 }
 
-async function getUserPositionInGroup(userId: string, groupId: string) {
-    const pb = useNuxtApp().$pb
-    pb.autoCancellation(false);
-    const sortedUsers = await useGetSortedUsers(groupId);
-    const userPosition = sortedUsers.items.findIndex((item) => userId === item.user);
-    return userPosition
-}
+// async function getUserPositionInGroup(userId: string, groupId: string) {
+//     const pb = useNuxtApp().$pb
+//     pb.autoCancellation(false);
+//     const sortedUsers = await useGetSortedUsers(groupId);
+//     const userPosition = sortedUsers.items.findIndex((item) => userId === item.user);
+//     return userPosition
+// }
 
 /** Computes the number of cases to add when a user comes bock from leave
  * @param userId the user id
  * @param groupId the group id
  * @returns the number of cases to add
  */
-async function getCasesToAdd(userId: string, groupId: string) {
-    const pb = useNuxtApp().$pb
-    pb.autoCancellation(false);
-    const newCount = await useGetGroupCaseCount(groupId)
-    const leaveRecord = await pb.collection('leaves').getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`)
-    const groupMemberCount = await useGetGroupMemberCount(groupId)
-    const oldCount = leaveRecord.total_cases
-    // const userPosition = leaveRecord.position
-    let casesToAdd: number
-    const countDiff = (newCount - oldCount)
-    console.log('computing cases to add...', "oldCount: ", oldCount, 'newCount: ', newCount, 'diff: ', countDiff)
-    casesToAdd = Math.floor(countDiff / groupMemberCount)
-    console.log('cases to add before remainder: ', casesToAdd)
-    let remainder = countDiff % groupMemberCount
-    // if (remainder > userPosition) casesToAdd++
-    console.log('cases to add after remainder: ', casesToAdd)
-    return casesToAdd
-}
+// async function getCasesToAdd(userId: string, groupId: string) {
+//     const pb = useNuxtApp().$pb
+//     pb.autoCancellation(false);
+//     const newCount = await useGetGroupCaseCount(groupId)
+//     const leaveRecord = await pb.collection('leaves').getFirstListItem(`user="${userId}"&&group="${groupId}"&&active=true`)
+//     const groupMemberCount = await useCachedGroupMemberCount(groupId)
+//     const oldCount = leaveRecord.total_cases
+//     // const userPosition = leaveRecord.position
+//     let casesToAdd: number
+//     const countDiff = (newCount - oldCount)
+//     console.log('computing cases to add...', "oldCount: ", oldCount, 'newCount: ', newCount, 'diff: ', countDiff)
+//     casesToAdd = Math.floor(countDiff / groupMemberCount)
+//     console.log('cases to add before remainder: ', casesToAdd)
+//     let remainder = countDiff % groupMemberCount
+//     // if (remainder > userPosition) casesToAdd++
+//     console.log('cases to add after remainder: ', casesToAdd)
+//     return casesToAdd
+// }
 
 async function computeCasesToAdd(userId:string, groupId:string) {
     const pb = useNuxtApp().$pb
@@ -312,9 +312,9 @@ async function computeCasesToAdd(userId:string, groupId:string) {
 export async function useComputeDummyCases(groupId:string,startOfLeaveDateTime:Date,endOfLeaveDateTime:Date,){
     const pb = useNuxtApp().$pb
     pb.autoCancellation(false);
-    // compute the number of cases that were created since the user went on leave until end of leave, excluding dummy case
-    const casesCreatedDuringLeave = await pb.collection('cases').getList(1, 10000, { filter: `group="${groupId}"&&created >= "${startOfLeaveDateTime}"&&created<="${endOfLeaveDateTime}"&&case!~"Leave"&&case!~"Dummy"`, fields: 'id' }).then((res) => res.totalItems)
-    const groupMemberCount = await useGetGroupMemberCount(groupId)
+    // compute the number of cases that were created since the user went on leave until end of leave, excluding nonspecific dummy cases, but including leave or restday dummy
+    const casesCreatedDuringLeave = await pb.collection('cases').getList(1, 10000, { filter: `group="${groupId}"&&created >= "${startOfLeaveDateTime}"&&created<="${endOfLeaveDateTime}"&&case!~"Dummy"`, fields: 'id' }).then((res) => res.totalItems)
+    const groupMemberCount = useCachedGroupMemberCount(groupId) // create offline version
     let casesToAdd = Math.floor(casesCreatedDuringLeave / groupMemberCount) 
     return {casesCreatedDuringLeave, groupMemberCount, casesToAdd}
 }

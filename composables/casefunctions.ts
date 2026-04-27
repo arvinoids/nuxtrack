@@ -986,11 +986,16 @@ export async function useGetGroupCaseCount(groupId: string) {
   return res.totalItems
 }
 
-export async function useGetGroupMemberCount(groupId: string) {
-  const pb = useNuxtApp().$pb
-  const res = await pb.collection('users').getList(1, 10000, { filter: `memberOf~"${groupId}"`, fields: '' })
-  const totalMembers = res.totalItems
-  return totalMembers
+// export async function useGetGroupMemberCount(groupId: string) {
+//   const pb = useNuxtApp().$pb
+//   const res = await pb.collection('users').getList(1, 10000, { filter: `memberOf~"${groupId}"`, fields: '' })
+//   const totalMembers = res.totalItems
+//   return totalMembers
+// }
+
+export function useCachedGroupMemberCount(groupId:string){
+  const members = useAllUsers().value.filter(user=>user.memberOf.includes(groupId))
+  return members.length
 }
 
 export async function useGetCaseReport(userId: string, groupId: string, from: Date, to: Date) {
